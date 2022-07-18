@@ -1,22 +1,20 @@
 package com.mesofi.collection.charactercatalog.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.repository.CharacterRepository;
+import com.mesofi.collection.charactercatalog.model.Restock;
+import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
 import lombok.AllArgsConstructor;
 
@@ -24,44 +22,26 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CharacterFigureController {
 
-	private final CharacterRepository characterRepository;
-	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	@PostMapping("/add")
-	public String saveCharacter(@RequestBody CharacterFigure characterFigure) {
-		characterRepository.save(characterFigure);
-		return "Added with id: " + characterFigure.getId();
-	}
+    private final CharacterFigureService service;
 
-	@GetMapping("/add")
-	public List<CharacterFigure> findCharacter() {
-		System.out.println("=========");
-		//return characterRepository.findAllByOrderByReleaseDate();
-		List<CharacterFigure>  l = characterRepository.findAll();
-		System.out.println(l);
-		return l;
-	}
+    @PostMapping("/characters")
+    public ResponseEntity<CharacterFigure> createNewCharacter(@RequestBody CharacterFigure characterFigure) {
+        return new ResponseEntity<>(service.createNewCharacter(characterFigure), HttpStatus.OK);
+    }
 
-	@PatchMapping("/add/{id}")
-	public String updateCharacter(@PathVariable String id, @RequestBody JsonPatch patch) {
-/*
-		Optional<CharacterFigure> found = characterRepository.findById(id);
-		CharacterFigure customerPatched = null;
-		try {
-			customerPatched = applyPatchToCustomer(patch, found.get());
-		} catch (JsonProcessingException | IllegalArgumentException | JsonPatchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		characterRepository.save(customerPatched);
-		return "ds";
-		*/
-		return null;
-	}
+    @GetMapping("/characters")
+    public List<CharacterFigure> retrieveAllCharacters(@RequestParam(required = false) String name) {
+        return service.retrieveAllCharacters(name);
+    }
 
-	private CharacterFigure applyPatchToCustomer(JsonPatch patch, CharacterFigure characterFigure) throws JsonProcessingException, IllegalArgumentException, JsonPatchException {
-		JsonNode patched = patch.apply(objectMapper.convertValue(characterFigure, JsonNode.class));
-	    return objectMapper.treeToValue(patched, CharacterFigure.class);
-		
-	}
+    @GetMapping("/characters/{id}")
+    public ResponseEntity<CharacterFigure> retrieveCharacterById(@PathVariable String id) {
+        return new ResponseEntity<>(service.retrieveCharacterById(id), HttpStatus.OK);
+    }
+
+    @PatchMapping("/characters/{id}/restocks")
+    public ResponseEntity<CharacterFigure> updateCharacterRestock(@PathVariable String id,
+            @RequestBody List<Restock> restock) {
+        return new ResponseEntity<>(service.updateCharacterRestock(id, restock), HttpStatus.OK);
+    }
 }

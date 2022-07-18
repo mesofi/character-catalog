@@ -1,7 +1,16 @@
+character:
+  keyword-exclude:
+  - Bandai
+  - Myth
+  - Cloth
+  - Saint
+
+logging:
+  level:
+    org.springframework: INFO
+    com.mesofi: DEBUG
+
 spring:
   data:
     mongodb:
-      database: SaintSeiya
-  mvc:
-    format:
-      date-time: iso
+      database: saintseiyauniverse

@@ -9,10 +9,10 @@ import lombok.Data;
 
 @Data
 public class Restock {
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy")
-	private Date releaseDate;
-	private BigDecimal basePrice;
-	private Distribution distribution;
-	private String url;
-	private String remarks;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy")
+    private Date releaseDate;
+    private BigDecimal basePrice;
+    private Distribution distribution;
+    private String url;
+    private String remarks;
 }

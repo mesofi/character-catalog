@@ -29,8 +29,7 @@ public class CharacterFigure {
     private BigDecimal basePrice;
     private LineUp lineUp;
     private Distribution distribution;
-    private boolean revival;
-    private boolean accesory;
     private String url;
     private List<Restock> restocks;
+    private List<Tag> tags;
 }

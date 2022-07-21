@@ -1,0 +1,17 @@
+character:
+  keyword-exclude:
+  - Bandai
+  - Myth
+  - Cloth
+  - Saint
+  - Spirits
+  - Masami
+  - Kurumada
+  - Tamashi
+  - Nation
+  - '2021'
+
+logging:
+  level:
+    org.springframework: INFO
+    com.mesofi: DEBUG

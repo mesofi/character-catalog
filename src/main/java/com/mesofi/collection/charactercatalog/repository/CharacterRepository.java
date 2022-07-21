@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.LineUp;
 
 public interface CharacterRepository extends MongoRepository<CharacterFigure, String> {
 
@@ -14,4 +15,6 @@ public interface CharacterRepository extends MongoRepository<CharacterFigure, St
     Optional<CharacterFigure> findByName(String name);
 
     List<CharacterFigure> findAllByOrderByReleaseDate();
+
+    List<CharacterFigure> findAllBylineUp(LineUp lineUp);
 }

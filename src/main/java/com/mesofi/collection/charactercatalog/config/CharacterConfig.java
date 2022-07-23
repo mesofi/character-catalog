@@ -9,5 +9,6 @@ import lombok.Data;
 @Data
 @ConfigurationProperties(prefix = "character")
 public class CharacterConfig {
+    private String symbolExclude;
     private List<String> keywordExclude;
 }

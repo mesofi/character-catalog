@@ -42,7 +42,7 @@ public class CharacterFigureService {
         } else {
             String filteredName = name.toLowerCase().trim();
             if (name.length() > 2) {
-                filteredName = filterName(config.getKeywordExclude(), filteredName);
+                filteredName = filterName(config.getKeywordExclude(), null, filteredName);
             }
             retrieveCharacterByName(name);
             findCharacterFigureByName(filteredName);
@@ -51,12 +51,12 @@ public class CharacterFigureService {
     }
 
     public Optional<CharacterFigure> retrieveCharacterByName(final String name) {
-        log.debug("Finding a character using this name: '{}'", name);
+        log.debug("Finding a character with name: '{}'", name);
         if (!StringUtils.hasLength(name) || name.trim().length() < 2) {
             // throw exception
         } else {
-            String filteredName = filterName(config.getKeywordExclude(), name);
-            log.debug("           After applying filtering: '{}'", filteredName);
+            String filteredName = filterName(config.getKeywordExclude(), config.getSymbolExclude(), name);
+            log.debug("After applying filtering: '{}'", filteredName);
 
             LineUp lineUp = findLineUp(filteredName);
             log.debug("LineUp found: {}", lineUp);
@@ -70,15 +70,23 @@ public class CharacterFigureService {
             for (CharacterFigure characterFigure : allCharactersByLineUp) {
                 // calculate the distance ...
                 minDistance = distance.apply(characterFigure.getName().toLowerCase(), filteredName.toLowerCase());
+                if (matches.containsKey(minDistance)) {
+                    log.warn("[{}] and [{}] have the same distance: {}", characterFigure.getName().toLowerCase(),
+                            matches.get(minDistance).toLowerCase(), minDistance);
+                }
+
                 matches.put(minDistance, characterFigure.getName());
             }
 
             if (!matches.isEmpty()) {
+                final int MAX_DISTANCE = 10;
                 Entry<Integer, String> firstEntry = matches.firstEntry();
-                if (firstEntry.getKey() < 10) {
+                if (firstEntry.getKey() < MAX_DISTANCE) {
                     String matchName = firstEntry.getValue();
                     return allCharactersByLineUp.stream().filter($ -> $.getName().equalsIgnoreCase(matchName))
-                            .findFirst();
+                            .peek($ -> log.debug("Figure found: '{}'", $.getName())).findFirst();
+                } else {
+                    log.warn("Distance too far from: {}, actual: {}", MAX_DISTANCE, firstEntry.getKey());
                 }
             }
             return Optional.empty();
@@ -118,10 +126,14 @@ public class CharacterFigureService {
     }
 
     private String filterName(LineUp[] lineUps, String name) {
-        return filterName(Stream.of(lineUps).map($ -> $.getFriendlyName()).collect(Collectors.toList()), name);
+        return filterName(Stream.of(lineUps).map($ -> $.getFriendlyName()).collect(Collectors.toList()), null, name);
     }
 
-    private String filterName(List<String> exclusionList, String name) {
+    private String filterName(List<String> exclusionList, String symbolExclusion, String name) {
+        if (StringUtils.hasLength(symbolExclusion)) {
+            name = name.replaceAll(symbolExclusion, "");
+        }
+
         StringBuilder sb = new StringBuilder();
         String[] splited = name.split("\\s+");
 

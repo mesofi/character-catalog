@@ -1,5 +1,7 @@
 package com.mesofi.collection.charactercatalog.service;
 
+import static com.mesofi.collection.charactercatalog.MockData.SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.createBasicEXFigures;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,14 +9,14 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +41,6 @@ public class CharacterFigureServiceTest {
 
     private CharacterFigureService characterFigureService;
 
-    private CharacterConfig config;
     @Mock
     private CharacterRepository characterRepository;
     @Mock
@@ -61,56 +62,39 @@ public class CharacterFigureServiceTest {
         Map<String, Object> map = (Map<String, Object>) yaml.loadAs(inputStream, Map.class);
 
         Map<String, Object> characterMap = (Map<String, Object>) map.get("character");
+        String symbols = (String) characterMap.get("symbol-exclude");
         List<String> keywords = (ArrayList<String>) characterMap.get("keyword-exclude");
 
         CharacterConfig config = new CharacterConfig();
+        config.setSymbolExclude(symbols);
         config.setKeywordExclude(keywords);
 
         return config;
     }
 
-    @Test
-    public void should_ReturnStatuses_WhenDataFound() {
+    @ParameterizedTest
+    @CsvFileSource(resources = "/Gemini Saga GOLD24/data.csv", numLinesToSkip = 1)
+    public void isSagaGold24_ShouldReturnTrueForSagaGold24(String name) {
+        testCharacterFigure(SAGA_GOLD24, name);
+    }
+
+    // @ParameterizedTest
+    // @ValueSource(strings = {
+    // "Bandai Saint Seiya Myth Cloth EX Masami Kurumada --Saga Gemini Saga set --Gemini Saga (God Cloth) / God Cross
+    // Correction BOX",
+    // "Bandai Saint Seiya Myth Cloth EX Gemini Saga (God Cloth) / No Modification Box -Saga Saga Premium set No
+    // Modification" })
+    // public void isSagaSaga_ShouldReturnTrueForSaga(String name) {
+    // testCharacterFigure(SAGA_SAGA, name);
+    // }
+
+    private void testCharacterFigure(String expectedName, String actualName) {
+        when(characterRepository.findAllBylineUp(LineUp.MYTH_CLOTH_EX)).thenReturn(createBasicEXFigures());
+
         // method to be tested
-        Optional<CharacterFigure> result = characterFigureService.retrieveCharacterByName("");
-    }
-
-    @Test
-    public void should_ReturnStatuses_WhenDataFound2() {
-        String mandarake = "Bandai Spirits Saint Seiya Myth Cloth EX Masami Kurumada Gemini Saga GOLD24 Tamashi Nation 2021";
-        String okini = "Saint Cloth Myth EX Gemini Saga (GOLD24)";
-        String yoyakunow = "MYTH CLOTH EX GEMINI SAGA GOLD24 \"SAINT SEIYA\"";
-
-        List<CharacterFigure> list = populateExFigures();
-        when(characterRepository.findAllBylineUp(LineUp.MYTH_CLOTH_EX)).thenReturn(list);
-
-        // method to be tested
-        Optional<CharacterFigure> result1 = characterFigureService.retrieveCharacterByName(mandarake);
-        Optional<CharacterFigure> result2 = characterFigureService.retrieveCharacterByName(okini);
-        Optional<CharacterFigure> result3 = characterFigureService.retrieveCharacterByName(yoyakunow);
-
-        assertNotNull(result1);
-        assertNotNull(result2);
-        assertNotNull(result3);
-
-        assertFalse(result1.isEmpty());
-        assertFalse(result2.isEmpty());
-        assertFalse(result3.isEmpty());
-
-        assertEquals("Gemini Saga GOLD24", result1.get().getName());
-        assertEquals(result1.get().getName(), result2.get().getName());
-        assertEquals(result2.get().getName(), result3.get().getName());
-
-    }
-
-    private List<CharacterFigure> populateExFigures() {
-        List<CharacterFigure> list = new ArrayList<>();
-        list.add(createExFigure("Gemini Saga GOLD24"));
-        list.add(createExFigure("Libra Dohko (Sacred Cloth)"));
-        return list;
-    }
-
-    private CharacterFigure createExFigure(String name) {
-        return CharacterFigure.builder().name(name).lineUp(LineUp.MYTH_CLOTH_EX).releaseDate(new Date()).build();
+        Optional<CharacterFigure> result = characterFigureService.retrieveCharacterByName(actualName);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(expectedName, result.get().getName());
     }
 }

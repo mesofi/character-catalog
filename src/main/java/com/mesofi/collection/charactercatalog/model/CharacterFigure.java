@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,6 +28,9 @@ public class CharacterFigure {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy")
     private Date releaseDate;
     private BigDecimal basePrice;
+    @Transient
+    private BigDecimal price;
+    private BigDecimal tax;
     private LineUp lineUp;
     private Distribution distribution;
     private String url;

@@ -1,6 +1,7 @@
 package com.mesofi.collection.charactercatalog.service;
 
 import static com.mesofi.collection.charactercatalog.MockData.SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA;
 import static com.mesofi.collection.charactercatalog.MockData.createBasicEXFigures;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,20 +74,16 @@ public class CharacterFigureServiceTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/Gemini Saga GOLD24/data.csv", numLinesToSkip = 1)
+    @CsvFileSource(resources = "/" + SAGA_GOLD24 + "/data.csv", numLinesToSkip = 1)
     public void isSagaGold24_ShouldReturnTrueForSagaGold24(String name) {
         testCharacterFigure(SAGA_GOLD24, name);
     }
 
-    // @ParameterizedTest
-    // @ValueSource(strings = {
-    // "Bandai Saint Seiya Myth Cloth EX Masami Kurumada --Saga Gemini Saga set --Gemini Saga (God Cloth) / God Cross
-    // Correction BOX",
-    // "Bandai Saint Seiya Myth Cloth EX Gemini Saga (God Cloth) / No Modification Box -Saga Saga Premium set No
-    // Modification" })
-    // public void isSagaSaga_ShouldReturnTrueForSaga(String name) {
-    // testCharacterFigure(SAGA_SAGA, name);
-    // }
+    @ParameterizedTest
+    @CsvFileSource(resources = "/" + SAGA_SAGA + "/data.csv", numLinesToSkip = 1)
+    public void isSagaSaga_ShouldReturnTrueForSaga(String name) {
+        testCharacterFigure(SAGA_SAGA, name);
+    }
 
     private void testCharacterFigure(String expectedName, String actualName) {
         when(characterRepository.findAllBylineUp(LineUp.MYTH_CLOTH_EX)).thenReturn(createBasicEXFigures());

@@ -18,6 +18,9 @@ character:
   - TAMASHII
   - LIMITED
   - Japan
+  - 'No'
+  - Modification
+  - version
 
 logging:
   level:

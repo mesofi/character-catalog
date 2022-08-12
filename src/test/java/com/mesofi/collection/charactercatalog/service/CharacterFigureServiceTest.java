@@ -7,10 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
-import org.yaml.snakeyaml.Yaml;
 
 import com.mesofi.collection.charactercatalog.MockData;
 import com.mesofi.collection.charactercatalog.config.CharacterConfig;
@@ -41,8 +37,10 @@ import com.mesofi.collection.charactercatalog.repository.CharacterUpdatableRepos
 @ExtendWith(MockitoExtension.class)
 public class CharacterFigureServiceTest {
 
+    private static final String CONFIG_PATH = "application-test.yml";
     private static final String DB_PATH = "src/test/resources/mongodb/character-figure.json";
-    private static List<CharacterFigure> allCharacters = new ArrayList<>();
+    private static CharacterConfig config;
+    private static List<CharacterFigure> allCharacters;
 
     private CharacterFigureService characterFigureService;
 
@@ -56,30 +54,13 @@ public class CharacterFigureServiceTest {
 
     @BeforeAll
     public static void beforeAll() throws Exception {
+        config = MockData.loadConfigFile(CONFIG_PATH);
         allCharacters = MockData.loadAllCharacters(DB_PATH);
     }
 
     @BeforeEach
     public void init() {
-        CharacterConfig config = loadConfigFile("application-test.yml");
         characterFigureService = new CharacterFigureService(config, characterRepository, characterUpdatableRepository);
-    }
-
-    @SuppressWarnings("unchecked")
-    private CharacterConfig loadConfigFile(String configLocation) {
-        Yaml yaml = new Yaml();
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(configLocation);
-        Map<String, Object> map = (Map<String, Object>) yaml.loadAs(inputStream, Map.class);
-
-        Map<String, Object> characterMap = (Map<String, Object>) map.get("character");
-        String symbols = (String) characterMap.get("symbol-exclude");
-        List<String> keywords = (ArrayList<String>) characterMap.get("keyword-exclude");
-
-        CharacterConfig config = new CharacterConfig();
-        config.setSymbolExclude(symbols);
-        config.setKeywordExclude(keywords);
-
-        return config;
     }
 
     @ParameterizedTest

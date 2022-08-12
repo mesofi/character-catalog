@@ -1,13 +1,19 @@
 package com.mesofi.collection.charactercatalog;
 
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.yaml.snakeyaml.Yaml;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mesofi.collection.charactercatalog.config.CharacterConfig;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -26,7 +32,7 @@ public class MockData {
     }
 
     @SuppressWarnings("unchecked")
-    private static CharacterFigure mapCharacterFigure(LinkedHashMap<String, Object> item) {
+    private static CharacterFigure mapCharacterFigure(final LinkedHashMap<String, Object> item) {
         CharacterFigure characterFigure = new CharacterFigure();
 
         LinkedHashMap<String, String> idMap = (LinkedHashMap<String, String>) item.get("_id");
@@ -43,5 +49,22 @@ public class MockData {
         characterFigure.setUrl((String) item.get("url"));
 
         return characterFigure;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static CharacterConfig loadConfigFile(final String configLocation) {
+        Yaml yaml = new Yaml();
+        InputStream inputStream = MockData.class.getClassLoader().getResourceAsStream(configLocation);
+        Map<String, Object> map = (Map<String, Object>) yaml.loadAs(inputStream, Map.class);
+
+        Map<String, Object> characterMap = (Map<String, Object>) map.get("character");
+        String symbols = (String) characterMap.get("symbol-exclude");
+        List<String> keywords = (ArrayList<String>) characterMap.get("keyword-exclude");
+
+        CharacterConfig config = new CharacterConfig();
+        config.setSymbolExclude(symbols);
+        config.setKeywordExclude(keywords);
+
+        return config;
     }
 }

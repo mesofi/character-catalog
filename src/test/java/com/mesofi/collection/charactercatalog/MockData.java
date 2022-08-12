@@ -19,10 +19,14 @@ import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 
 public class MockData {
-    public static final String SAGA = "Gemini Saga";
-    public static final String SAGA_SAGA = "Gemini Saga (God Cloth) Saga Saga premium set";
-    public static final String SAGA_GOLD24 = "Gemini Saga GOLD24";
-    public static final String LIBRA_SOG = "Libra Dohko (Sacred Cloth)";
+    public static final String EX_LINE_UP = "/lineup/mythclothex/";
+    public static final String DATA_CSV = "/data.csv";
+
+    public static final String GEMINI_SAGA_GOLD24 = "Gemini Saga GOLD24";
+    public static final String EX_GEMINI_SAGA_GOLD24 = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
+
+    public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
+    public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
 
     @SuppressWarnings("unchecked")
     public static List<CharacterFigure> loadAllCharacters(String dbPath) throws Exception {

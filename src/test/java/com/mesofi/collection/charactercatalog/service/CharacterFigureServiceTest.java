@@ -1,7 +1,10 @@
 package com.mesofi.collection.charactercatalog.service;
 
-import static com.mesofi.collection.charactercatalog.MockData.SAGA_GOLD24;
-import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA;
+//import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA;
+import static com.mesofi.collection.charactercatalog.MockData.EX_GEMINI_SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.EX_SAGA_SAGA_SET;
+import static com.mesofi.collection.charactercatalog.MockData.GEMINI_SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA_SET;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +21,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.mesofi.collection.charactercatalog.MockData;
@@ -49,9 +52,6 @@ public class CharacterFigureServiceTest {
     @Mock
     private CharacterUpdatableRepository characterUpdatableRepository;
 
-    @Value("${character.keyword-exclude}")
-    private List<String> ordersBatchSize;
-
     @BeforeAll
     public static void beforeAll() throws Exception {
         config = MockData.loadConfigFile(CONFIG_PATH);
@@ -64,19 +64,20 @@ public class CharacterFigureServiceTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/" + SAGA_GOLD24 + "/data.csv", numLinesToSkip = 1)
-    public void isSagaGold24_ShouldReturnTrueForSagaGold24(String name) {
-        testCharacterFigure(SAGA_GOLD24, name);
+    @CsvFileSource(resources = EX_GEMINI_SAGA_GOLD24, numLinesToSkip = 1)
+    public void isSagaGold24_ShouldReturnTrueForSagaGold24_EX(final String name) {
+        testCharacterFigure(GEMINI_SAGA_GOLD24, name, LineUp.MYTH_CLOTH_EX);
     }
 
-    // @ParameterizedTest
-    // @CsvFileSource(resources = "/" + SAGA_SAGA + "/data.csv", numLinesToSkip = 1)
-    public void isSagaSaga_ShouldReturnTrueForSaga(String name) {
-        testCharacterFigure(SAGA_SAGA, name);
+    @ParameterizedTest
+    @CsvFileSource(resources = EX_SAGA_SAGA_SET, numLinesToSkip = 1)
+    public void isSagaSaga_ShouldReturnTrueForSaga_EX(final String name) {
+        testCharacterFigure(SAGA_SAGA_SET, name, LineUp.MYTH_CLOTH_EX);
     }
 
-    private void testCharacterFigure(String expectedName, String actualName) {
-        when(characterRepository.findAllBylineUp(LineUp.MYTH_CLOTH_EX)).thenReturn(allCharacters);
+    private void testCharacterFigure(final String expectedName, final String actualName, final LineUp lineUp) {
+        when(characterRepository.findAllBylineUp(lineUp))
+                .thenReturn(allCharacters.stream().filter($ -> $.getLineUp() == lineUp).collect(Collectors.toList()));
 
         // method to be tested
         Optional<CharacterFigure> result = characterFigureService.retrieveCharacterByName(actualName);

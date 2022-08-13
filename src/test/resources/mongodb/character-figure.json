@@ -1570,6 +1570,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13915/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1602,6 +1605,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13555/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1646,6 +1652,9 @@
       "remarks": "Released first in Tamashii 2015"
     }
   ],
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1687,6 +1696,9 @@
       },
       "distribution": "GENERAL"
     }
+  ],
+  "tags": [
+    "ACCESORY"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -1788,6 +1800,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/10074/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1829,6 +1844,10 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13912/",
+  "tags": [
+    "METAL",
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1845,6 +1864,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13827/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1909,6 +1931,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13756/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1925,6 +1950,10 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13760/",
+  "tags": [
+    "METAL",
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1941,6 +1970,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/14082/",
+  "tags": [
+    "METAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1957,6 +1989,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13973/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2005,6 +2040,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13953/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2021,6 +2059,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13687/",
+  "tags": [
+    "METAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2110,6 +2151,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13591/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2126,6 +2170,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13528/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2158,6 +2205,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13470/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2174,6 +2224,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13451/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2190,6 +2243,10 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13404/",
+  "tags": [
+    "METAL",
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2206,6 +2263,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13394/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2222,6 +2282,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13372/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2254,6 +2317,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13331/",
+  "tags": [
+    "METAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2286,6 +2352,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13244/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2318,6 +2387,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/13212/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2334,6 +2406,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13199/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2350,6 +2425,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13182/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2446,6 +2524,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_NATIONS",
   "url": "https://tamashii.jp/item/13047/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2558,6 +2639,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12862/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2574,6 +2658,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/12547/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2590,6 +2677,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12559/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2686,6 +2776,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12826/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2702,6 +2795,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/12842/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2778,6 +2874,9 @@
       "remarks": "Released first in Tamashii 2018"
     }
   ],
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2794,6 +2893,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_NATIONS",
   "url": "https://tamashii.jp/item/12716/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2862,6 +2964,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/12145/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2878,6 +2983,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12177/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2894,6 +3002,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12197/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2910,6 +3021,9 @@
   "lineUp": "APPENDIX",
   "distribution": "OTHER_LIMITED_EDITION",
   "url": "https://tamashii.jp/item/12250/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2926,6 +3040,9 @@
   "lineUp": "APPENDIX",
   "distribution": "OTHER_LIMITED_EDITION",
   "url": "https://tamashii.jp/item/12251/",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -2958,6 +3075,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/12278/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3054,6 +3174,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/10702/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3198,6 +3321,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_NATIONS",
   "url": "https://tamashii.jp/item/10884/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3255,6 +3381,9 @@
       }
     }
   ],
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3296,6 +3425,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/11009/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3312,6 +3444,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11011/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3328,6 +3463,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11038/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3376,6 +3514,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11121/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3392,6 +3533,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/11143/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3408,6 +3552,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11226/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3424,6 +3571,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11312/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3440,6 +3590,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11368/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3456,6 +3609,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11447/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3472,6 +3628,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/11461/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3488,6 +3647,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/11462/",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3504,6 +3666,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11615/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3520,6 +3685,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11665/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3536,6 +3704,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11666/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3584,6 +3755,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11739/",
+  "tags": [
+    "SOG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3628,6 +3802,9 @@
       "remarks": "Lottery sale"
     }
   ],
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3644,6 +3821,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12395/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3724,6 +3904,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12498/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3756,6 +3939,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/12531/",
+  "tags": [
+    "REVIVAL"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4493,6 +4679,9 @@
       "remarks": "Released first in Tamashii 2013"
     }
   ],
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4748,6 +4937,9 @@
   "tax": "0.05",
   "lineUp": "APPENDIX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4763,6 +4955,9 @@
   "tax": "0.05",
   "lineUp": "APPENDIX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4778,6 +4973,9 @@
   "tax": "0.05",
   "lineUp": "APPENDIX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4793,6 +4991,9 @@
   "tax": "0.05",
   "lineUp": "APPENDIX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4808,6 +5009,9 @@
   "tax": "0.05",
   "lineUp": "APPENDIX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4898,6 +5102,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4913,6 +5120,10 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "ACCESORY",
+    "POG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4928,6 +5139,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "POG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4943,6 +5157,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "POG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4958,6 +5175,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "POG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4973,6 +5193,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "POG"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5063,6 +5286,9 @@
   "tax": "0.08",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5078,6 +5304,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5093,6 +5322,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5108,6 +5340,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5123,6 +5358,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5138,6 +5376,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5153,6 +5394,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_WEB_SHOP",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5168,6 +5412,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5183,6 +5430,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5198,6 +5448,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5213,6 +5466,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5228,6 +5484,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5243,6 +5502,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5258,6 +5520,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5273,6 +5538,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "CAMPAIGN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5288,6 +5556,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "CAMPAIGN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5303,6 +5574,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "CAMPAIGN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5318,6 +5592,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "CAMPAIGN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5333,6 +5610,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "CAMPAIGN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5408,6 +5688,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "ACCESORY"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5423,6 +5706,9 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "OTHER_LIMITED_EDITION",
+  "tags": [
+    "OCE"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5453,6 +5739,9 @@
   "tax": "0.08",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5468,6 +5757,9 @@
   "tax": "0.08",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5483,6 +5775,9 @@
   "tax": "0.10",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5498,6 +5793,9 @@
   "tax": "0.10",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5513,6 +5811,9 @@
   "tax": "0.10",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
+  "tags": [
+    "LIMITED"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {

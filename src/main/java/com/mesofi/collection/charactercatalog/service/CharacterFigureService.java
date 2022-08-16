@@ -40,6 +40,7 @@ public class CharacterFigureService {
     private final String SPACE_REGEX = "\\s+";
 
     private static final Map<Integer, Integer> MAX_DISTANCES = new TreeMap<>();
+    private static List<String> LINE_UPS;
     static {
         // max length -> distance
         MAX_DISTANCES.put(10, 13);
@@ -47,6 +48,8 @@ public class CharacterFigureService {
         MAX_DISTANCES.put(45, 35);
         MAX_DISTANCES.put(60, 42);
         MAX_DISTANCES.put(80, 55);
+
+        LINE_UPS = Stream.of(LineUp.values()).map(LineUp::getFriendlyName).collect(Collectors.toList());
     }
 
     public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
@@ -101,35 +104,30 @@ public class CharacterFigureService {
         log.debug("Finding a character with name: '{}'", name);
         if (!StringUtils.hasLength(name) || name.trim().length() < 2) {
             // throw exception
+            throw new IllegalArgumentException("Provide a valid name");
         } else {
+            // Starts with the first exclusion part.
             String filteredName = filterName(config.getKeywordExclude(), config.getSymbolExclude(), name);
-            log.debug("After applying filtering: '{}'", filteredName);
+            log.debug("After applying filtering exclusion: '{}'", filteredName);
 
+            // finds the corresponding lineUp for the figure.
             LineUp lineUp = findLineUp(filteredName);
-            log.debug("The LineUp associated to this figure is: {}", lineUp);
-            filteredName = removeKeywords(filteredName,
-                    Stream.of(LineUp.values()).map(LineUp::getFriendlyName).collect(Collectors.toList()));
+            log.debug("The LineUp associated to this figure is: '{}'", lineUp.name());
 
+            // removes the lineUp if it exists in the name.
+            filteredName = removeKeywords(filteredName, LINE_UPS);
+            log.debug("After applying line - Up exclusion: '{}'", filteredName);
+
+            // finds all the characters for a given line Up.
             List<CharacterFigure> allCharactersByLineUp = characterRepository.findAllBylineUp(lineUp);
+            log.debug("We found {} characters for a lineUp: {}", allCharactersByLineUp.size(), lineUp.name());
+
             // once we found all the characters for a given lineUp, we keep looking for tags.
-            log.debug("Looking for a match: '{}'", filteredName);
             filterCharactersByTags(filteredName, allCharactersByLineUp);
-            log.debug("We found {} characters matching with the tags", allCharactersByLineUp.size());
+            log.debug("We found {} characters matching the tags", allCharactersByLineUp.size());
 
-            TreeMap<Integer, String> matches = new TreeMap<>();
-            int minDistance;
-            LevenshteinDistance distance = new LevenshteinDistance();
-            for (CharacterFigure figure : allCharactersByLineUp) {
-                // calculate the distance ...
-                minDistance = distance.apply(figure.getName().toLowerCase(), filteredName.toLowerCase());
-                if (matches.containsKey(minDistance)) {
-                    log.warn("[{}] and [{}] have the same distance: {}", figure.getName().toLowerCase(),
-                            matches.get(minDistance).toLowerCase(), minDistance);
-                }
-
-                matches.put(minDistance, figure.getName());
-            }
-
+            // finally, we calculate the distances for the characters.
+            TreeMap<Integer, String> matches = calculateLevenshteinDistance(filteredName, allCharactersByLineUp);
             if (!matches.isEmpty()) {
                 Entry<Integer, String> firstEntry = matches.firstEntry();
                 final int MAX_DISTANCE = findMaxDistance(firstEntry.getValue().length());
@@ -145,7 +143,24 @@ public class CharacterFigureService {
             }
             return Optional.empty();
         }
-        return null;
+    }
+
+    private TreeMap<Integer, String> calculateLevenshteinDistance(String name, List<CharacterFigure> allCharacters) {
+        TreeMap<Integer, String> matches = new TreeMap<>();
+
+        int minDistance;
+        LevenshteinDistance distance = new LevenshteinDistance();
+        for (CharacterFigure figure : allCharacters) {
+            // calculate the distance ...
+            minDistance = distance.apply(figure.getName().toLowerCase(), name.toLowerCase());
+            if (matches.containsKey(minDistance)) {
+                log.warn("[{}] and [{}] have the same distance: {}", figure.getName().toLowerCase(),
+                        matches.get(minDistance).toLowerCase(), minDistance);
+            }
+
+            matches.put(minDistance, figure.getName());
+        }
+        return matches;
     }
 
     private int findMaxDistance(final int characterLength) {
@@ -211,7 +226,7 @@ public class CharacterFigureService {
         String[] allWords = theString.split(SPACE_REGEX);
 
         // exclude those keyword.
-        Arrays.stream(allWords).filter($ -> !exclusionList.stream().anyMatch($::equalsIgnoreCase)).forEach($ -> {
+        Arrays.stream(allWords).filter($ -> exclusionList.stream().noneMatch($::equalsIgnoreCase)).forEach($ -> {
             sb.append($);
             sb.append(SPACE);
         });
@@ -224,7 +239,7 @@ public class CharacterFigureService {
         String[] allWords = theString.split(SPACE_REGEX);
 
         // Convert String Array allWords to LinkedHashSet to remove duplicates
-        LinkedHashSet<String> set = new LinkedHashSet<String>(Arrays.asList(allWords));
+        LinkedHashSet<String> set = new LinkedHashSet<>(Arrays.asList(allWords));
         for (String word : set) {
             sb.append(word);
             sb.append(SPACE);

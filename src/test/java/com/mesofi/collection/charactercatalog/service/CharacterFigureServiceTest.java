@@ -1,5 +1,7 @@
 package com.mesofi.collection.charactercatalog.service;
 
+import static com.mesofi.collection.charactercatalog.MockData.ARIES_MU_OCE;
+import static com.mesofi.collection.charactercatalog.MockData.EX_ARIES_MU_OCE;
 //import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA;
 import static com.mesofi.collection.charactercatalog.MockData.EX_GEMINI_SAGA_GOLD24;
 import static com.mesofi.collection.charactercatalog.MockData.EX_SAGA_SAGA_SET;
@@ -63,6 +65,12 @@ public class CharacterFigureServiceTest {
     @BeforeEach
     public void init() {
         characterFigureService = new CharacterFigureService(config, characterRepository, characterUpdatableRepository);
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = EX_ARIES_MU_OCE, numLinesToSkip = 1)
+    public void isAriesMu_ShouldReturnTrueForAriesMu_OCE_EX(final String name) {
+        testCharacterFigure(ARIES_MU_OCE, name, LineUp.MYTH_CLOTH_EX);
     }
 
     @ParameterizedTest

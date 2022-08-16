@@ -64,15 +64,15 @@ public class CharacterFigureServiceTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = EX_GEMINI_SAGA_GOLD24, numLinesToSkip = 1)
-    public void isSagaGold24_ShouldReturnTrueForSagaGold24_EX(final String name) {
-        testCharacterFigure(GEMINI_SAGA_GOLD24, name, LineUp.MYTH_CLOTH_EX);
-    }
-
-    @ParameterizedTest
     @CsvFileSource(resources = EX_SAGA_SAGA_SET, numLinesToSkip = 1)
     public void isSagaSaga_ShouldReturnTrueForSaga_EX(final String name) {
         testCharacterFigure(SAGA_SAGA_SET, name, LineUp.MYTH_CLOTH_EX);
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = EX_GEMINI_SAGA_GOLD24, numLinesToSkip = 1)
+    public void isSagaGold24_ShouldReturnTrueForSagaGold24_EX(final String name) {
+        testCharacterFigure(GEMINI_SAGA_GOLD24, name, LineUp.MYTH_CLOTH_EX);
     }
 
     private void testCharacterFigure(final String expectedName, final String actualName, final LineUp lineUp) {

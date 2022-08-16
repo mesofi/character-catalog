@@ -1,15 +1,14 @@
 package com.mesofi.collection.charactercatalog.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,6 +39,16 @@ public class CharacterFigureService {
     private final String SPACE = " ";
     private final String SPACE_REGEX = "\\s+";
 
+    private static final Map<Integer, Integer> MAX_DISTANCES = new TreeMap<>();
+    static {
+        // max length -> distance
+        MAX_DISTANCES.put(10, 13);
+        MAX_DISTANCES.put(30, 22);
+        MAX_DISTANCES.put(45, 35);
+        MAX_DISTANCES.put(60, 42);
+        MAX_DISTANCES.put(80, 55);
+    }
+
     public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
         return characterRepository.save(characterFigure);
     }
@@ -47,6 +56,31 @@ public class CharacterFigureService {
     public List<CharacterFigure> retrieveAllCharacters(final String name) {
         if (!StringUtils.hasLength(name)) {
             List<CharacterFigure> allCharacters = characterRepository.findAllByOrderByReleaseDate();
+            /*
+             * for (CharacterFigure cf : allCharacters) {
+             * 
+             * cf.setTax(new BigDecimal("0.08")); characterRepository.save(cf); }
+             */
+
+            /*
+             * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2014);
+             * calendar.set(Calendar.MONTH, 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
+             * 
+             * System.out.println(calendar.getTime());
+             * 
+             * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().before(calendar.getTime())) {
+             * cf.setTax(new BigDecimal("0.05")); characterRepository.save(cf); } }
+             */
+            /*
+             * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2019);
+             * calendar.set(Calendar.MONTH, 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
+             * 
+             * System.out.println(calendar.getTime());
+             * 
+             * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().compareTo(calendar.getTime())>=0) {
+             * cf.setTax(new BigDecimal("0.10")); characterRepository.save(cf); } }
+             */
+
             // the price is calculated here.
             Long totalCharacters = allCharacters.stream().filter($ -> Objects.nonNull($.getTax()))
                     .peek($ -> $.setPrice($.getBasePrice().add($.getBasePrice().multiply($.getTax())))).count();
@@ -74,16 +108,16 @@ public class CharacterFigureService {
             LineUp lineUp = findLineUp(filteredName);
             log.debug("The LineUp associated to this figure is: {}", lineUp);
             filteredName = removeKeywords(filteredName,
-                    Stream.of(LineUp.values()).map($ -> $.getFriendlyName()).collect(Collectors.toList()));
+                    Stream.of(LineUp.values()).map(LineUp::getFriendlyName).collect(Collectors.toList()));
 
             List<CharacterFigure> allCharactersByLineUp = characterRepository.findAllBylineUp(lineUp);
             // once we found all the characters for a given lineUp, we keep looking for tags.
             log.debug("Looking for a match: '{}'", filteredName);
-            filterCharactersByTags(filteredName, allCharactersByLineUp, Tag.values());
+            filterCharactersByTags(filteredName, allCharactersByLineUp);
             log.debug("We found {} characters matching with the tags", allCharactersByLineUp.size());
 
             TreeMap<Integer, String> matches = new TreeMap<>();
-            int minDistance = Integer.MAX_VALUE;
+            int minDistance;
             LevenshteinDistance distance = new LevenshteinDistance();
             for (CharacterFigure characterFigure : allCharactersByLineUp) {
                 // calculate the distance ...
@@ -97,14 +131,16 @@ public class CharacterFigureService {
             }
 
             if (!matches.isEmpty()) {
-                final int MAX_DISTANCE = 13;
                 Entry<Integer, String> firstEntry = matches.firstEntry();
+                final int MAX_DISTANCE = findMaxDistance(firstEntry.getValue().length());
+
                 if (firstEntry.getKey() <= MAX_DISTANCE) {
                     String matchName = firstEntry.getValue();
                     return allCharactersByLineUp.stream().filter($ -> $.getName().equalsIgnoreCase(matchName))
                             .peek($ -> log.debug("Figure found: '{}'", $.getName())).findFirst();
                 } else {
                     log.warn("Distance too far from: {}, actual: {}", MAX_DISTANCE, firstEntry.getKey());
+                    log.warn("[{}] is too different from [{}]", filteredName, firstEntry.getValue());
                 }
             }
             return Optional.empty();
@@ -112,18 +148,40 @@ public class CharacterFigureService {
         return null;
     }
 
-    private void filterCharactersByTags(String name, List<CharacterFigure> allCharacters, Tag[] tags) {
-        Set<String> allTags = new HashSet<>();
-        for (Tag tag : tags) {
-            allTags.add(tag.name());
+    private int findMaxDistance(final int characterLength) {
+        for (Map.Entry<Integer, Integer> entry : MAX_DISTANCES.entrySet()) {
+            if (characterLength <= entry.getKey()) {
+                return entry.getValue();
+            }
         }
 
-        List<String> matchedTags = new ArrayList<>();
+        log.warn("** The length is too long [{}] **", characterLength);
+        return 0;
+    }
+
+    private void filterCharactersByTags(String name, List<CharacterFigure> allCharacters) {
         String[] allWords = name.split(SPACE_REGEX);
-        for (String word : allWords) {
-            if (allTags.contains(word.toUpperCase())) {
-                matchedTags.add(word.toUpperCase());
+        filterCharacters(allWords, 0, allCharacters);
+    }
+
+    private void filterCharacters(String[] allWords, int i, List<CharacterFigure> allCharacters) {
+        if (i < allWords.length) {
+            String currentWord = allWords[i].toUpperCase();
+
+            // finds all the distinct tags for the characters
+            // @formatter:off
+            List<String> allDistinctTags = allCharacters.stream().filter($ -> Objects.nonNull($.getTags()))
+                    .flatMap($ -> $.getTags().stream()).distinct().map(Enum::toString).collect(Collectors.toList());
+            // @formatter:on
+
+            if (allDistinctTags.contains(currentWord)) {
+                Tag inTag = Tag.valueOf(currentWord);
+
+                // finds all the characters matching the same word and delete those who do not.
+                Predicate<CharacterFigure> p = $ -> Objects.nonNull($.getTags()) && $.getTags().contains(inTag);
+                allCharacters.removeIf(p.negate());
             }
+            filterCharacters(allWords, ++i, allCharacters);
         }
     }
 

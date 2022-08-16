@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
@@ -17,6 +18,7 @@ import com.mesofi.collection.charactercatalog.config.CharacterConfig;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Tag;
 
 public class MockData {
     public static final String EX_LINE_UP = "/lineup/mythclothex/";
@@ -26,7 +28,7 @@ public class MockData {
     public static final String EX_GEMINI_SAGA_GOLD24 = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
 
     public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
-    public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
+    public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + SAGA_SAGA_SET + DATA_CSV;
 
     @SuppressWarnings("unchecked")
     public static List<CharacterFigure> loadAllCharacters(String dbPath) throws Exception {
@@ -42,6 +44,7 @@ public class MockData {
         LinkedHashMap<String, String> idMap = (LinkedHashMap<String, String>) item.get("_id");
         LinkedHashMap<String, Object> releaseDateMap = (LinkedHashMap<String, Object>) item.get("releaseDate");
         LinkedHashMap<String, Object> dateMap = (LinkedHashMap<String, Object>) releaseDateMap.get("$date");
+        ArrayList<Object> tagsMap = (ArrayList<Object>) item.get("tags");
 
         characterFigure.setId(idMap.get("$oid"));
         characterFigure.setName((String) item.get("name"));
@@ -51,6 +54,9 @@ public class MockData {
         characterFigure.setLineUp(LineUp.valueOf((String) item.get("lineUp")));
         characterFigure.setDistribution(Distribution.valueOf((String) item.get("distribution")));
         characterFigure.setUrl((String) item.get("url"));
+        if (Objects.nonNull(tagsMap)) {
+            characterFigure.setTags(tagsMap.stream().map($ -> Tag.valueOf((String) $)).collect(Collectors.toList()));
+        }
 
         return characterFigure;
     }

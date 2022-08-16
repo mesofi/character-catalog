@@ -83,6 +83,9 @@
       "remarks": "Lottery sale"
     }
   ],
+  "tags": [
+    "GOLD24"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1624,6 +1627,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11664/",
+  "tags": [
+    "GOD"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5724,6 +5730,9 @@
   "tax": "0.10",
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_NATIONS",
+  "tags": [
+    "GOLD24"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {

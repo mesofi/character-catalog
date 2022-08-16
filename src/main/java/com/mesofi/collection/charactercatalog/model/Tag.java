@@ -1,5 +1,6 @@
 package com.mesofi.collection.charactercatalog.model;
 
 public enum Tag {
-    ACCESORY, GOD, METAL, REVIVAL, OCE, POG, SOG, LIMITED, CAMPAIGN
+    ACCESORY, GOD, SET, METAL, REVIVAL, OCE, POG, SOG, LIMITED, CAMPAIGN, GOLD24
+
 }

@@ -119,15 +119,15 @@ public class CharacterFigureService {
             TreeMap<Integer, String> matches = new TreeMap<>();
             int minDistance;
             LevenshteinDistance distance = new LevenshteinDistance();
-            for (CharacterFigure characterFigure : allCharactersByLineUp) {
+            for (CharacterFigure figure : allCharactersByLineUp) {
                 // calculate the distance ...
-                minDistance = distance.apply(characterFigure.getName().toLowerCase(), filteredName.toLowerCase());
+                minDistance = distance.apply(figure.getName().toLowerCase(), filteredName.toLowerCase());
                 if (matches.containsKey(minDistance)) {
-                    log.warn("[{}] and [{}] have the same distance: {}", characterFigure.getName().toLowerCase(),
+                    log.warn("[{}] and [{}] have the same distance: {}", figure.getName().toLowerCase(),
                             matches.get(minDistance).toLowerCase(), minDistance);
                 }
 
-                matches.put(minDistance, characterFigure.getName());
+                matches.put(minDistance, figure.getName());
             }
 
             if (!matches.isEmpty()) {

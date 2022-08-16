@@ -25,6 +25,9 @@ character:
   - First
   - Bonus
   - Item
+  - BRAND
+  - NEW
+  - USED
 
 logging:
   level:

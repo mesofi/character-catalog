@@ -21,6 +21,10 @@ character:
   - 'No'
   - Modification
   - version
+  - With
+  - First
+  - Bonus
+  - Item
 
 logging:
   level:

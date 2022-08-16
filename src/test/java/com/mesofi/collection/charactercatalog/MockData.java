@@ -24,11 +24,14 @@ public class MockData {
     public static final String EX_LINE_UP = "/lineup/mythclothex/";
     public static final String DATA_CSV = "/data.csv";
 
+    public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
+    public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + SAGA_SAGA_SET + DATA_CSV;
+
     public static final String GEMINI_SAGA_GOLD24 = "Gemini Saga GOLD24";
     public static final String EX_GEMINI_SAGA_GOLD24 = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
 
-    public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
-    public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + SAGA_SAGA_SET + DATA_CSV;
+    public static final String TAURUS_ALDEBARAN_SOG = "Taurus Aldebaran (God Cloth)";
+    public static final String EX_TAURUS_ALDEBARAN_SOG = EX_LINE_UP + TAURUS_ALDEBARAN_SOG + DATA_CSV;
 
     @SuppressWarnings("unchecked")
     public static List<CharacterFigure> loadAllCharacters(String dbPath) throws Exception {

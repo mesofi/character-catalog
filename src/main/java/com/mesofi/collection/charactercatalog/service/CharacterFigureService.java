@@ -1,10 +1,11 @@
 package com.mesofi.collection.charactercatalog.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.mesofi.collection.charactercatalog.config.CharacterConfig;
+import com.mesofi.collection.charactercatalog.exceptions.NoSuchCharacterFound;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.DistanceFigure;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.Restock;
 import com.mesofi.collection.charactercatalog.model.Tag;
@@ -40,7 +43,7 @@ public class CharacterFigureService {
     private final String SPACE_REGEX = "\\s+";
 
     private static final Map<Integer, Integer> MAX_DISTANCES = new TreeMap<>();
-    private static List<String> LINE_UPS;
+    private static final List<String> LINE_UPS;
     static {
         // max length -> distance
         MAX_DISTANCES.put(10, 13);
@@ -57,47 +60,46 @@ public class CharacterFigureService {
     }
 
     public List<CharacterFigure> retrieveAllCharacters(final String name) {
-        if (!StringUtils.hasLength(name)) {
-            List<CharacterFigure> allCharacters = characterRepository.findAllByOrderByReleaseDate();
-            /*
-             * for (CharacterFigure cf : allCharacters) {
-             * 
-             * cf.setTax(new BigDecimal("0.08")); characterRepository.save(cf); }
-             */
-
-            /*
-             * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2014);
-             * calendar.set(Calendar.MONTH, 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
-             * 
-             * System.out.println(calendar.getTime());
-             * 
-             * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().before(calendar.getTime())) {
-             * cf.setTax(new BigDecimal("0.05")); characterRepository.save(cf); } }
-             */
-            /*
-             * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2019);
-             * calendar.set(Calendar.MONTH, 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
-             * 
-             * System.out.println(calendar.getTime());
-             * 
-             * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().compareTo(calendar.getTime())>=0) {
-             * cf.setTax(new BigDecimal("0.10")); characterRepository.save(cf); } }
-             */
-
-            // the price is calculated here.
-            Long totalCharacters = allCharacters.stream().filter($ -> Objects.nonNull($.getTax()))
-                    .peek($ -> $.setPrice($.getBasePrice().add($.getBasePrice().multiply($.getTax())))).count();
-
-            log.debug("Total characters found: {}", totalCharacters);
-            return allCharacters;
+        List<CharacterFigure> allCharacters;
+        if (StringUtils.hasLength(name)) {
+            // tries the best to find the character by its name.
+            allCharacters = new ArrayList<>();
+            allCharacters.add(retrieveCharacterByName(name)
+                    .orElseThrow(() -> new NoSuchCharacterFound("Character not found by name: " + name)));
         } else {
-            String filteredName = name.toLowerCase().trim();
-            if (name.length() > 2) {
-                filteredName = filterName(config.getKeywordExclude(), null, filteredName);
-            }
-            retrieveCharacterByName(name);
+            allCharacters = characterRepository.findAllByOrderByReleaseDate();
         }
-        return null;
+        // the price is calculated here.
+        Long totalCharacters = allCharacters.stream().filter($ -> Objects.nonNull($.getTax()))
+                .peek($ -> $.setPrice($.getBasePrice().add($.getBasePrice().multiply($.getTax())))).count();
+
+        log.debug("Total characters found: {}", totalCharacters);
+        return allCharacters;
+
+        /*
+         * for (CharacterFigure cf : allCharacters) {
+         * 
+         * cf.setTax(new BigDecimal("0.08")); characterRepository.save(cf); }
+         */
+
+        /*
+         * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2014); calendar.set(Calendar.MONTH,
+         * 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
+         * 
+         * System.out.println(calendar.getTime());
+         * 
+         * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().before(calendar.getTime())) { cf.setTax(new
+         * BigDecimal("0.05")); characterRepository.save(cf); } }
+         */
+        /*
+         * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2019); calendar.set(Calendar.MONTH,
+         * 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
+         * 
+         * System.out.println(calendar.getTime());
+         * 
+         * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().compareTo(calendar.getTime())>=0) {
+         * cf.setTax(new BigDecimal("0.10")); characterRepository.save(cf); } }
+         */
     }
 
     public Optional<CharacterFigure> retrieveCharacterByName(final String name) {
@@ -127,42 +129,35 @@ public class CharacterFigureService {
             log.debug("We found {} characters matching the tags", allCharactersByLineUp.size());
 
             // finally, we calculate the distances for the characters.
-            TreeMap<Integer, String> matches = calculateLevenshteinDistance(filteredName, allCharactersByLineUp);
+            List<DistanceFigure> matches = calculateLevenshteinDistance(filteredName, allCharactersByLineUp);
             if (!matches.isEmpty()) {
-                Entry<Integer, String> firstEntry = matches.firstEntry();
-                final int MAX_DISTANCE = findMaxDistance(firstEntry.getValue().length());
+                DistanceFigure firstEntry = matches.get(0);
 
-                if (firstEntry.getKey() <= MAX_DISTANCE) {
-
-                    String matchName = firstEntry.getValue();
-                    return allCharactersByLineUp.stream().filter($ -> $.getName().equalsIgnoreCase(matchName))
-                            .peek($ -> log.debug("=> Figure found: '{}' => [{}]", $.getName(), firstEntry.getKey()))
+                final int MAX_DISTANCE = findMaxDistance(firstEntry.getName().length());
+                if (matches.get(0).getDistance() <= MAX_DISTANCE) {
+                    String matchName = firstEntry.getName();
+                    return allCharactersByLineUp.stream().filter($ -> $.getName().equalsIgnoreCase(matchName)).peek(
+                            $ -> log.debug("=> Figure found: '{}' => [{}]", $.getName(), firstEntry.getDistance()))
                             .findFirst();
                 } else {
-                    log.warn("Distance too far from: {}, actual: {}", MAX_DISTANCE, firstEntry.getKey());
-                    log.warn("[{}] is too different from [{}]", filteredName, firstEntry.getValue());
+                    log.warn("Distance too far from: {}, actual: {}", MAX_DISTANCE, firstEntry.getDistance());
+                    log.warn("[{}] is too different from [{}]", filteredName, firstEntry.getName());
                 }
             }
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
-    private TreeMap<Integer, String> calculateLevenshteinDistance(String name, List<CharacterFigure> allCharacters) {
-        TreeMap<Integer, String> matches = new TreeMap<>();
+    private List<DistanceFigure> calculateLevenshteinDistance(String name, List<CharacterFigure> allCharacters) {
+        List<DistanceFigure> distanceList = new ArrayList<>();
 
-        int minDistance;
         LevenshteinDistance distance = new LevenshteinDistance();
-        for (CharacterFigure figure : allCharacters) {
-            // calculate the distance ...
-            minDistance = distance.apply(figure.getName().toLowerCase(), name.toLowerCase());
-            if (matches.containsKey(minDistance)) {
-                log.warn("[{}] and [{}] have the same distance: {}", figure.getName().toLowerCase(),
-                        matches.get(minDistance).toLowerCase(), minDistance);
-            }
+        allCharacters.forEach($ -> distanceList
+                .add(new DistanceFigure(distance.apply(name.toLowerCase(), $.getName().toLowerCase()), $.getName())));
 
-            matches.put(minDistance, figure.getName());
-        }
-        return matches;
+        return distanceList.stream()
+                .sorted(Comparator.comparing(DistanceFigure::getDistance).thenComparing(DistanceFigure::getName))
+                .collect(Collectors.toList());
     }
 
     private int findMaxDistance(final int characterLength) {
@@ -249,13 +244,14 @@ public class CharacterFigureService {
         return sb.toString().trim();
     }
 
-    public CharacterFigure retrieveCharacterById(String id) {
-        return characterRepository.findById(id).get();
+    public CharacterFigure retrieveCharacterById(final String id) {
+        return characterRepository.findById(id)
+                .orElseThrow(() -> new NoSuchCharacterFound("Character not found: " + id));
     }
 
-    public CharacterFigure updateCharacterRestock(String id, List<Restock> restock) {
+    public CharacterFigure updateCharacterRestock(final String id, List<Restock> restock) {
         characterUpdatableRepository.updateRestocks(id, restock);
-        return characterRepository.findById(id).get();
+        return characterRepository.findById(id)
+                .orElseThrow(() -> new NoSuchCharacterFound("Character not found: " + id));
     }
-
 }

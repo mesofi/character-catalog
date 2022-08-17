@@ -1,9 +1,39 @@
 character:
+  symbol-exclude: '[\[\]"-+.^:,-/]'
   keyword-exclude:
   - Bandai
   - Myth
   - Cloth
   - Saint
+  - Seiya
+  - Spirits
+  - Masami
+  - Kurumada
+  - Tamashi
+  - Nation
+  - '2021'
+  - Cross
+  - Correction
+  - BOX
+  - EDITION
+  - TAMASHII
+  - LIMITED
+  - Japan
+  - 'No'
+  - Modification
+  - version
+  - With
+  - First
+  - Bonus
+  - Item
+  - BRAND
+  - NEW
+  - USED
+  - Copyright
+  - Sticker
+  - Action
+  - Figure
+  - FROM
 
 logging:
   level:

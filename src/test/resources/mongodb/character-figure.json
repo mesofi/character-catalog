@@ -83,10 +83,11 @@
       "remarks": "Lottery sale"
     }
   ],
-  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure",
   "tags": [
-    "GOLD24"
-  ]
+    "GOLD24",
+    "GEMINI"
+  ],
+  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
     "$oid": "62cf1d7e554f57360d8c6a72"
@@ -529,7 +530,7 @@
   "_id": {
     "$oid": "62cf4465554f57360d8c6a8d"
   },
-  "name": "Gemini Saga & Grand Pope",
+  "name": "Gemini Saga & Grand Pope Ares",
   "releaseDate": {
     "$date": {
       "$numberLong": "1135123200000"
@@ -548,6 +549,9 @@
         }
       }
     }
+  ],
+  "tags": [
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -1137,6 +1141,9 @@
   "lineUp": "MYTH_CLOTH",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/1044/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1631,12 +1638,13 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11664/",
-  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure",
   "tags": [
     "GOD",
     "SOG",
-    "SET"
-  ]
+    "SET",
+    "GEMINI"
+  ],
+  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
     "$oid": "62dc925f5e86015074a010e7"
@@ -1684,6 +1692,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/1595/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -1879,7 +1890,8 @@
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/13827/",
   "tags": [
-    "REVIVAL"
+    "REVIVAL",
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -2901,7 +2913,8 @@
   ],
   "tags": [
     "OCE",
-    "ORIGINAL"
+    "ORIGINAL",
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -3254,6 +3267,9 @@
   "lineUp": "LEGEND",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/10752/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3334,6 +3350,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_WEB_SHOP",
   "url": "https://tamashii.jp/item/10876/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -3728,7 +3747,8 @@
   "url": "https://tamashii.jp/item/11665/",
   "tags": [
     "SOG",
-    "GOD"
+    "GOD",
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -3747,7 +3767,8 @@
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11666/",
   "tags": [
-    "REVIVAL"
+    "REVIVAL",
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -4067,6 +4088,9 @@
         }
       }
     }
+  ],
+  "tags": [
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -4415,6 +4439,9 @@
       "remarks": "Release first in TAMASHII_NATIONS 2012"
     }
   ],
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4696,6 +4723,9 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/10537/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4775,6 +4805,9 @@
   "lineUp": "DDP",
   "distribution": "GENERAL",
   "url": "https://tamashii.jp/item/11241/",
+  "tags": [
+    "GEMINI"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -4984,7 +5017,8 @@
   "distribution": "TAMASHII_NATIONS",
   "tags": [
     "OCE",
-    "ORIGINAL"
+    "ORIGINAL",
+    "GEMINI"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{

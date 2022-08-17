@@ -3275,7 +3275,7 @@
   "_id": {
     "$oid": "62f2a5e27b1da7352ea751ab"
   },
-  "name": "Aqueronte Karon",
+  "name": "Acheron Karon",
   "releaseDate": {
     "$date": {
       "$numberLong": "1424822400000"

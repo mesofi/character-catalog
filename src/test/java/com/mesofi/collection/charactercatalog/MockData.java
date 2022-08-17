@@ -22,7 +22,11 @@ import com.mesofi.collection.charactercatalog.model.Tag;
 
 public class MockData {
     public static final String EX_LINE_UP = "/lineup/mythclothex/";
+    public static final String _LINE_UP = "/lineup/mythcloth/";
     public static final String DATA_CSV = "/data.csv";
+
+    public static final String ACHERON_KARON = "Acheron Karon";
+    public static final String _ACHERON_KARON = _LINE_UP + ACHERON_KARON + DATA_CSV;
 
     public static final String ARIES_MU_OCE = "Aries Mu ~ Original Color Edition ~";
     public static final String EX_ARIES_MU_OCE = EX_LINE_UP + ARIES_MU_OCE + DATA_CSV;
@@ -32,6 +36,9 @@ public class MockData {
 
     public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
     public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + SAGA_SAGA_SET + DATA_CSV;
+
+    public static final String GEMINI_SAGA_REV = "Gemini Saga <Revival Version>";
+    public static final String EX_GEMINI_SAGA_REV = EX_LINE_UP + GEMINI_SAGA_REV + DATA_CSV;
 
     public static final String GEMINI_SAGA_GOLD24 = "Gemini Saga GOLD24";
     public static final String EX_GEMINI_SAGA_GOLD24 = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;

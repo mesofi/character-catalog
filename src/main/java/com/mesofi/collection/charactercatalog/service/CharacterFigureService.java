@@ -133,9 +133,11 @@ public class CharacterFigureService {
                 final int MAX_DISTANCE = findMaxDistance(firstEntry.getValue().length());
 
                 if (firstEntry.getKey() <= MAX_DISTANCE) {
+
                     String matchName = firstEntry.getValue();
                     return allCharactersByLineUp.stream().filter($ -> $.getName().equalsIgnoreCase(matchName))
-                            .peek($ -> log.debug("Figure found: '{}'", $.getName())).findFirst();
+                            .peek($ -> log.debug("=> Figure found: '{}' => [{}]", $.getName(), firstEntry.getKey()))
+                            .findFirst();
                 } else {
                     log.warn("Distance too far from: {}, actual: {}", MAX_DISTANCE, firstEntry.getKey());
                     log.warn("[{}] is too different from [{}]", filteredName, firstEntry.getValue());

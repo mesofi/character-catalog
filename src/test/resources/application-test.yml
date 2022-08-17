@@ -29,6 +29,11 @@ character:
   - BRAND
   - NEW
   - USED
+  - Copyright
+  - Sticker
+  - Action
+  - Figure
+  - FROM
 
 logging:
   level:

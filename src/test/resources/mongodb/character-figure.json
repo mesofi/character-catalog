@@ -1592,6 +1592,10 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
   "url": "https://tamashii.jp/item/13650/",
+  "tags": [
+    "LIMITED",
+    "GOLDEN"
+  ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
   "_id": {
@@ -5802,7 +5806,8 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
   "tags": [
-    "LIMITED"
+    "LIMITED",
+    "GOLDEN"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -5820,7 +5825,8 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
   "tags": [
-    "LIMITED"
+    "LIMITED",
+    "GOLDEN"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -5838,7 +5844,8 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
   "tags": [
-    "LIMITED"
+    "LIMITED",
+    "GOLDEN"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{
@@ -5856,25 +5863,8 @@
   "lineUp": "MYTH_CLOTH_EX",
   "distribution": "TAMASHII_STORE",
   "tags": [
-    "LIMITED"
-  ],
-  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
-},{
-  "_id": {
-    "$oid": "62f50de5454b4e537b9fac78"
-  },
-  "name": "Phoenix Ikki (New Bronze Cloth) ~ Golden Limited Edition ~",
-  "releaseDate": {
-    "$date": {
-      "$numberLong": "1570838400000"
-    }
-  },
-  "basePrice": "8800",
-  "tax": "0.10",
-  "lineUp": "MYTH_CLOTH_EX",
-  "distribution": "TAMASHII_STORE",
-  "tags": [
-    "LIMITED"
+    "LIMITED",
+    "GOLDEN"
   ],
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 },{

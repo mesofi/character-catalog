@@ -1,8 +1,9 @@
 package com.mesofi.collection.charactercatalog.service;
 
 import static com.mesofi.collection.charactercatalog.MockData.ARIES_MU_OCE;
+import static com.mesofi.collection.charactercatalog.MockData.DRAGON_SHIRYU_GOLDEN_LIMITED;
 import static com.mesofi.collection.charactercatalog.MockData.EX_ARIES_MU_OCE;
-//import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA;
+import static com.mesofi.collection.charactercatalog.MockData.EX_DRAGON_SHIRYU_GOLDEN_LIMITED;
 import static com.mesofi.collection.charactercatalog.MockData.EX_GEMINI_SAGA_GOLD24;
 import static com.mesofi.collection.charactercatalog.MockData.EX_SAGA_SAGA_SET;
 import static com.mesofi.collection.charactercatalog.MockData.EX_TAURUS_ALDEBARAN_SOG;
@@ -71,6 +72,12 @@ public class CharacterFigureServiceTest {
     @CsvFileSource(resources = EX_ARIES_MU_OCE, numLinesToSkip = 1)
     public void isAriesMu_ShouldReturnTrueForAriesMu_OCE_EX(final String name) {
         testCharacterFigure(ARIES_MU_OCE, name, LineUp.MYTH_CLOTH_EX);
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = EX_DRAGON_SHIRYU_GOLDEN_LIMITED, numLinesToSkip = 1)
+    public void isDragonShiryu_ShouldReturnTrueForDragonShiryu_Limited_EX(final String name) {
+        testCharacterFigure(DRAGON_SHIRYU_GOLDEN_LIMITED, name, LineUp.MYTH_CLOTH_EX);
     }
 
     @ParameterizedTest

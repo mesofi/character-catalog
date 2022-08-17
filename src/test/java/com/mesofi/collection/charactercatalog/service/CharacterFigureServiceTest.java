@@ -5,9 +5,11 @@ import static com.mesofi.collection.charactercatalog.MockData.DRAGON_SHIRYU_GOLD
 import static com.mesofi.collection.charactercatalog.MockData.EX_ARIES_MU_OCE;
 import static com.mesofi.collection.charactercatalog.MockData.EX_DRAGON_SHIRYU_GOLDEN_LIMITED;
 import static com.mesofi.collection.charactercatalog.MockData.EX_GEMINI_SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.EX_PISCES_APHRODITE_OCE;
 import static com.mesofi.collection.charactercatalog.MockData.EX_SAGA_SAGA_SET;
 import static com.mesofi.collection.charactercatalog.MockData.EX_TAURUS_ALDEBARAN_SOG;
 import static com.mesofi.collection.charactercatalog.MockData.GEMINI_SAGA_GOLD24;
+import static com.mesofi.collection.charactercatalog.MockData.PISCES_APHRODITE_OCE;
 import static com.mesofi.collection.charactercatalog.MockData.SAGA_SAGA_SET;
 import static com.mesofi.collection.charactercatalog.MockData.TAURUS_ALDEBARAN_SOG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,6 +92,12 @@ public class CharacterFigureServiceTest {
     @CsvFileSource(resources = EX_GEMINI_SAGA_GOLD24, numLinesToSkip = 1)
     public void isSagaGold24_ShouldReturnTrueForSagaGold24_EX(final String name) {
         testCharacterFigure(GEMINI_SAGA_GOLD24, name, LineUp.MYTH_CLOTH_EX);
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = EX_PISCES_APHRODITE_OCE, numLinesToSkip = 1)
+    public void isPiscesAphrodite_ShouldReturnTrueForPiscesAphrodite_OCE_EX(final String name) {
+        testCharacterFigure(PISCES_APHRODITE_OCE, name, LineUp.MYTH_CLOTH_EX);
     }
 
     @ParameterizedTest

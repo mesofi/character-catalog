@@ -26,15 +26,18 @@ public class MockData {
 
     public static final String ARIES_MU_OCE = "Aries Mu ~ Original Color Edition ~";
     public static final String EX_ARIES_MU_OCE = EX_LINE_UP + ARIES_MU_OCE + DATA_CSV;
-    
+
     public static final String DRAGON_SHIRYU_GOLDEN_LIMITED = "Dragon Shiryu (New Bronze Cloth) ~ Golden Limited Edition ~";
     public static final String EX_DRAGON_SHIRYU_GOLDEN_LIMITED = EX_LINE_UP + DRAGON_SHIRYU_GOLDEN_LIMITED + DATA_CSV;
-    
+
     public static final String SAGA_SAGA_SET = "Gemini Saga (God Cloth) Saga Saga premium set";
     public static final String EX_SAGA_SAGA_SET = EX_LINE_UP + SAGA_SAGA_SET + DATA_CSV;
 
     public static final String GEMINI_SAGA_GOLD24 = "Gemini Saga GOLD24";
     public static final String EX_GEMINI_SAGA_GOLD24 = EX_LINE_UP + GEMINI_SAGA_GOLD24 + DATA_CSV;
+
+    public static final String PISCES_APHRODITE_OCE = "Pisces Aphrodite ~ Original Color Edition ~";
+    public static final String EX_PISCES_APHRODITE_OCE = EX_LINE_UP + PISCES_APHRODITE_OCE + DATA_CSV;
 
     public static final String TAURUS_ALDEBARAN_SOG = "Taurus Aldebaran (God Cloth)";
     public static final String EX_TAURUS_ALDEBARAN_SOG = EX_LINE_UP + TAURUS_ALDEBARAN_SOG + DATA_CSV;

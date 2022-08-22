@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.mesofi.collection.charactercatalog.config.CharacterConfig;
-import com.mesofi.collection.charactercatalog.exceptions.NoSuchCharacterFound;
+import com.mesofi.collection.charactercatalog.exceptions.NoSuchCharacterFoundException;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.DistanceFigure;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -56,6 +56,10 @@ public class CharacterFigureService {
     }
 
     public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
+        if (Objects.isNull(characterFigure)) {
+            throw new IllegalArgumentException("Unable to create a new Character");
+        }
+
         return characterRepository.save(characterFigure);
     }
 
@@ -65,7 +69,7 @@ public class CharacterFigureService {
             // tries the best to find the character by its name.
             allCharacters = new ArrayList<>();
             allCharacters.add(retrieveCharacterByName(name)
-                    .orElseThrow(() -> new NoSuchCharacterFound("Character not found by name: " + name)));
+                    .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found by name: " + name)));
         } else {
             allCharacters = characterRepository.findAllByOrderByReleaseDate();
         }
@@ -246,12 +250,12 @@ public class CharacterFigureService {
 
     public CharacterFigure retrieveCharacterById(final String id) {
         return characterRepository.findById(id)
-                .orElseThrow(() -> new NoSuchCharacterFound("Character not found: " + id));
+                .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
     }
 
     public CharacterFigure updateCharacterRestock(final String id, List<Restock> restock) {
         characterUpdatableRepository.updateRestocks(id, restock);
         return characterRepository.findById(id)
-                .orElseThrow(() -> new NoSuchCharacterFound("Character not found: " + id));
+                .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
     }
 }

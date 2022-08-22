@@ -2,6 +2,8 @@ package com.mesofi.collection.charactercatalog.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -28,7 +30,8 @@ public class CharacterFigureController {
     private final CharacterFigureService service;
 
     @PostMapping("/characters")
-    public ResponseEntity<CharacterFigure> createNewCharacter(@RequestBody CharacterFigure characterFigure) {
+    public ResponseEntity<CharacterFigure> createNewCharacter(@Valid @RequestBody CharacterFigure characterFigure) {
+        log.debug("Creating a new character using: {}", characterFigure);
         return new ResponseEntity<>(service.createNewCharacter(characterFigure), HttpStatus.OK);
     }
 

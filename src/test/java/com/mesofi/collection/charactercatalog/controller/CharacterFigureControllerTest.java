@@ -1,8 +1,12 @@
 package com.mesofi.collection.charactercatalog.controller;
 
+import static com.mesofi.collection.charactercatalog.MockData.fromObjectToJson;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,12 +14,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -35,6 +42,220 @@ public class CharacterFigureControllerTest {
     private CharacterFigureService characterFigureService;
 
     final String BASE_URL = "/characters";
+
+    @Test
+    public void should_ReturnBadRequest_WhenBodyIsMissing() throws Exception {
+        mockMvc.perform(post(BASE_URL)).andDo(print()).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Required request body is missing")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors").isEmpty());
+    }
+
+    @Test
+    public void should_ReturnUnsupportedMediaType_WhenBodyIsEmpty() throws Exception {
+        mockMvc.perform(post(BASE_URL).content("{}")).andDo(print()).andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.UNSUPPORTED_MEDIA_TYPE.name()))
+                .andExpect(jsonPath("$.message").value(containsString("'application/octet-stream' not supported")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors").isEmpty());
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenBodyIsEmpty() throws Exception {
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content("{}")).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(6)))
+                .andExpect(jsonPath("$.errors", hasItem("name: is required with at least 2 characters")))
+                .andExpect(jsonPath("$.errors", hasItem(
+                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenNameIsOutOfBounds() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("A"); // name is too short
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(6)))
+                .andExpect(jsonPath("$.errors", hasItem("name: must be between 2 and 200")))
+                .andExpect(jsonPath("$.errors", hasItem(
+                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenReleaseDateIsTooOld() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2000, 0, 1);
+        characterFigure.setReleaseDate(calendar.getTime());
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(5)))
+                .andExpect(jsonPath("$.errors", hasItem(
+                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenReleaseDateIsInTheFuture() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, calendar.get(Calendar.MONTH) + 7);
+        characterFigure.setReleaseDate(calendar.getTime());
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(5)))
+                .andExpect(jsonPath("$.errors", hasItem(
+                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenBasePriceIsNegative() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        characterFigure.setReleaseDate(new Date());
+        characterFigure.setBasePrice(new BigDecimal(-1));
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(4)))
+                .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenTaxIsNegative() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        characterFigure.setReleaseDate(new Date());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal(-1));
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(3)))
+                .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenLineUpIsMissing() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        characterFigure.setReleaseDate(new Date());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal("0.10"));
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(2)))
+                .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenDistributionIsMissing() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        characterFigure.setReleaseDate(new Date());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal("0.10"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+    }
+
+    @Test
+    public void should_CreateNewCharacter_WhenDataIsProvided() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, 3, 3);
+        characterFigure.setReleaseDate(calendar.getTime());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal("0.10"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setDistribution(Distribution.GENERAL);
+        characterFigure.setUrl("https://tamashii.jp/item/13721/");
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        CharacterFigure characterFigureCreated = new CharacterFigure();
+        characterFigureCreated.setId("62d4658bff17ae100e217e50");
+        characterFigureCreated.setName(characterFigure.getName());
+        characterFigureCreated.setReleaseDate(characterFigure.getReleaseDate());
+        characterFigureCreated.setBasePrice(characterFigure.getBasePrice());
+        characterFigureCreated.setTax(characterFigure.getTax());
+        characterFigureCreated.setPrice(new BigDecimal("7700"));
+        characterFigureCreated.setLineUp(characterFigure.getLineUp());
+        characterFigureCreated.setDistribution(characterFigure.getDistribution());
+        characterFigureCreated.setUrl(characterFigure.getUrl());
+
+        when(characterFigureService.createNewCharacter(characterFigure)).thenReturn(characterFigureCreated);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("62d4658bff17ae100e217e50"))
+                .andExpect(jsonPath("$.name").value(characterFigureCreated.getName()))
+                .andExpect(jsonPath("$.releaseDate").value(containsString("2022-04-03")))
+                .andExpect(jsonPath("$.basePrice").value("7000")).andExpect(jsonPath("$.tax").value("0.1"))
+                .andExpect(jsonPath("$.price").value("7700")).andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
+                .andExpect(jsonPath("$.distribution").value("GENERAL"))
+                .andExpect(jsonPath("$.url").value("https://tamashii.jp/item/13721/"));
+    }
 
     @Test
     public void should_ReturnStatusesOK_WhenDataFound() throws Exception {

@@ -13,7 +13,10 @@ import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mesofi.collection.charactercatalog.config.CharacterConfig;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
@@ -95,5 +98,12 @@ public class MockData {
         config.setKeywordExclude(keywords);
 
         return config;
+    }
+
+    public static String fromObjectToJson(Object object) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        return ow.writeValueAsString(object);
     }
 }

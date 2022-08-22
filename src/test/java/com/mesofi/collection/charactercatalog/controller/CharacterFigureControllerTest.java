@@ -100,7 +100,7 @@ public class CharacterFigureControllerTest {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setName("Seiya");
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2000, 0, 1);
+        calendar.set(2000, Calendar.JANUARY, 1);
         characterFigure.setReleaseDate(calendar.getTime());
 
         String requestJson = fromObjectToJson(characterFigure);
@@ -224,7 +224,7 @@ public class CharacterFigureControllerTest {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setName("Seiya");
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, 3, 3);
+        calendar.set(2022, Calendar.APRIL, 3);
         characterFigure.setReleaseDate(calendar.getTime());
         characterFigure.setBasePrice(new BigDecimal(7000));
         characterFigure.setTax(new BigDecimal("0.10"));
@@ -292,7 +292,7 @@ public class CharacterFigureControllerTest {
 
     private CharacterFigure createBasicEXCharacterFigure(String id, String name, BigDecimal basePrice) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, 9, 27, 11, 11, 11);
+        calendar.set(2022, Calendar.OCTOBER, 27, 11, 11, 11);
 
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setId(id);

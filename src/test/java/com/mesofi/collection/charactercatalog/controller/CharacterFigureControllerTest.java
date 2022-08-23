@@ -46,34 +46,44 @@ public class CharacterFigureControllerTest {
 
     @Test
     public void should_ReturnBadRequest_WhenBodyIsMissing() throws Exception {
-        mockMvc.perform(post(BASE_URL)).andDo(print()).andExpect(status().isBadRequest())
+        // @formatter:off
+        mockMvc.perform(post(BASE_URL)).andDo(print())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Required request body is missing")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors").isEmpty());
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isEmpty());
+        // @formatter:on
     }
 
     @Test
     public void should_ReturnUnsupportedMediaType_WhenBodyIsEmpty() throws Exception {
-        mockMvc.perform(post(BASE_URL).content("{}")).andDo(print()).andExpect(status().isUnsupportedMediaType())
+        // @formatter:off
+        mockMvc.perform(post(BASE_URL).content("{}")).andDo(print())
+                .andExpect(status().isUnsupportedMediaType())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.UNSUPPORTED_MEDIA_TYPE.name()))
                 .andExpect(jsonPath("$.message").value(containsString("'application/octet-stream' not supported")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors").isEmpty());
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isEmpty());
+        // @formatter:on
     }
 
     @Test
     public void should_ReturnBadRequest_WhenBodyIsEmpty() throws Exception {
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content("{}")).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(6)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(6)))
                 .andExpect(jsonPath("$.errors", hasItem("name: is required with at least 2 characters")))
-                .andExpect(jsonPath("$.errors", hasItem(
-                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
                 .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -82,18 +92,20 @@ public class CharacterFigureControllerTest {
         characterFigure.setName("A"); // name is too short
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(6)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(6)))
                 .andExpect(jsonPath("$.errors", hasItem("name: must be between 2 and 200")))
-                .andExpect(jsonPath("$.errors", hasItem(
-                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors", hasItem("releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
                 .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -106,17 +118,19 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(5)))
-                .andExpect(jsonPath("$.errors", hasItem(
-                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(5)))
+                .andExpect(jsonPath("$.errors", hasItem("releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
                 .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -129,17 +143,19 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(5)))
-                .andExpect(jsonPath("$.errors", hasItem(
-                        "releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(5)))
+                .andExpect(jsonPath("$.errors", hasItem("releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")))
                 .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -151,15 +167,18 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(4)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(4)))
                 .andExpect(jsonPath("$.errors", hasItem("basePrice: is required and must have a positive value")))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -172,14 +191,17 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(3)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(3)))
                 .andExpect(jsonPath("$.errors", hasItem("tax: is required and must have a decimal value")))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -192,13 +214,16 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(2)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors", hasItem("lineUp: is required")))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -212,12 +237,15 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem("distribution: is required")));
+        // @formatter:on
     }
 
     @Test
@@ -248,14 +276,19 @@ public class CharacterFigureControllerTest {
 
         when(characterFigureService.createNewCharacter(characterFigure)).thenReturn(characterFigureCreated);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("62d4658bff17ae100e217e50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("62d4658bff17ae100e217e50"))
                 .andExpect(jsonPath("$.name").value(characterFigureCreated.getName()))
                 .andExpect(jsonPath("$.releaseDate").value(containsString("2022-04-03")))
-                .andExpect(jsonPath("$.basePrice").value("7000")).andExpect(jsonPath("$.tax").value("0.1"))
-                .andExpect(jsonPath("$.price").value("7700")).andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
+                .andExpect(jsonPath("$.basePrice").value("7000"))
+                .andExpect(jsonPath("$.tax").value("0.1"))
+                .andExpect(jsonPath("$.price").value("7700"))
+                .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
                 .andExpect(jsonPath("$.distribution").value("GENERAL"))
                 .andExpect(jsonPath("$.url").value("https://tamashii.jp/item/13721/"));
+        // @formatter:on
     }
 
     @Test
@@ -278,13 +311,15 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed for argument")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]").value(
-                        "restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0]").value("restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
+        // @formatter:on
     }
 
     @Test
@@ -313,13 +348,15 @@ public class CharacterFigureControllerTest {
 
         String requestJson = fromObjectToJson(characterFigure);
 
+        // @formatter:off
         mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
                 .andExpect(jsonPath("$.message").value(containsString("Validation failed for argument")))
-                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]").value(
-                        "restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0]").value("restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
+        // @formatter:on
     }
 
     @Test
@@ -335,12 +372,15 @@ public class CharacterFigureControllerTest {
 
         when(characterFigureService.retrieveAllCharacters(null)).thenReturn(list);
 
+        // @formatter:off
         mockMvc.perform(get(BASE_URL)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(6))).andExpect(jsonPath("$[0].id").value("62f3209c7b1da7352ea751b7"))
+                .andExpect(jsonPath("$", hasSize(6)))
+                .andExpect(jsonPath("$[0].id").value("62f3209c7b1da7352ea751b7"))
                 .andExpect(jsonPath("$[0].name").value("Siren Sorrento"))
                 .andExpect(jsonPath("$[0].basePrice").value("9500"))
                 .andExpect(jsonPath("$[1].id").value("62dc96905e86015074a010eb"))
-                .andExpect(jsonPath("$[1].name").value("Aries Mu")).andExpect(jsonPath("$[1].basePrice").value("6000"))
+                .andExpect(jsonPath("$[1].name").value("Aries Mu"))
+                .andExpect(jsonPath("$[1].basePrice").value("6000"))
                 .andExpect(jsonPath("$[2].id").value("62dc99715e86015074a010ef"))
                 .andExpect(jsonPath("$[2].name").value("Sagittarius"))
                 .andExpect(jsonPath("$[2].basePrice").value("6500"))
@@ -353,6 +393,7 @@ public class CharacterFigureControllerTest {
                 .andExpect(jsonPath("$[5].id").value("62f438127b1da7352ea751e7"))
                 .andExpect(jsonPath("$[5].name").value("Virgo Shaka"))
                 .andExpect(jsonPath("$[5].basePrice").value("6500"));
+        // @formatter:on
     }
 
     private CharacterFigure createBasicEXCharacterFigure(String id, String name, BigDecimal basePrice) {

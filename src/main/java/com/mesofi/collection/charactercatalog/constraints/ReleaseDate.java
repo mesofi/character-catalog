@@ -20,6 +20,8 @@ public @interface ReleaseDate {
 
     String message();
 
+    boolean failOnFutureDate() default false;
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};

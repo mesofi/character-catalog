@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Restock;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
 @ActiveProfiles("test")
@@ -123,7 +124,7 @@ public class CharacterFigureControllerTest {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setName("Seiya");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, calendar.get(Calendar.MONTH) + 7);
+        calendar.add(Calendar.MONTH, 7);
         characterFigure.setReleaseDate(calendar.getTime());
 
         String requestJson = fromObjectToJson(characterFigure);
@@ -255,6 +256,70 @@ public class CharacterFigureControllerTest {
                 .andExpect(jsonPath("$.price").value("7700")).andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
                 .andExpect(jsonPath("$.distribution").value("GENERAL"))
                 .andExpect(jsonPath("$.url").value("https://tamashii.jp/item/13721/"));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenRestockReleaseDateIsMissing() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.APRIL, 3);
+        characterFigure.setReleaseDate(calendar.getTime());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal("0.10"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setDistribution(Distribution.GENERAL);
+        characterFigure.setUrl("https://tamashii.jp/item/13721/");
+
+        List<Restock> restocks = new ArrayList<>();
+        restocks.add(new Restock()); // it's missing
+
+        characterFigure.setRestocks(restocks);
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed for argument")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0]").value(
+                        "restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
+    }
+
+    @Test
+    public void should_ReturnBadRequest_WhenRestockReleaseDateIsFutureDay() throws Exception {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.APRIL, 3);
+        characterFigure.setReleaseDate(calendar.getTime());
+        characterFigure.setBasePrice(new BigDecimal(7000));
+        characterFigure.setTax(new BigDecimal("0.10"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setDistribution(Distribution.GENERAL);
+        characterFigure.setUrl("https://tamashii.jp/item/13721/");
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.add(Calendar.MONTH, 1); // 1 month is added
+
+        Restock restock = new Restock();
+        restock.setReleaseDate(calendar2.getTime());// future day
+
+        List<Restock> restocks = new ArrayList<>();
+        restocks.add(restock); // future date
+
+        characterFigure.setRestocks(restocks);
+
+        String requestJson = fromObjectToJson(characterFigure);
+
+        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.message").value(containsString("Validation failed for argument")))
+                .andExpect(jsonPath("$.errors").isArray()).andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0]").value(
+                        "restocks[0].releaseDate: is required yyyy-MM-dd and should not be less than 2003-11-01 or a future date"));
     }
 
     @Test

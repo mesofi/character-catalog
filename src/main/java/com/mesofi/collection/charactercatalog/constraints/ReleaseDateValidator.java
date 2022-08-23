@@ -9,35 +9,51 @@ import javax.validation.ConstraintValidatorContext;
 
 public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, Date> {
 
+    private boolean failOnFutureDate;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void initialize(ReleaseDate constraintAnnotation) {
+        failOnFutureDate = constraintAnnotation.failOnFutureDate();
     }
 
     /**
      * {@inheritDoc}
      */
+
     @Override
     public boolean isValid(Date value, ConstraintValidatorContext context) {
-        if (Objects.nonNull(value)) {
-            // The release date should not be less than 2003-11-01 or greater than 6 months from now",
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(2003, 10, 01);
+        if (Objects.isNull(value)) {
+            // if the annotation is present but the value is null.
+            return false;
+        } else {
+            // The release date should not be less than 2003-11-01 or greater than 6 months from now".
+            Calendar calendarStart = Calendar.getInstance();
+            calendarStart.set(2003, 10, 01);
 
-            if (value.before(calendar.getTime())) {
+            // before 2003-11-01 ??
+            if (value.before(calendarStart.getTime())) {
                 return false;
             }
-            calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, calendar.get(Calendar.MONTH) + 6);
 
-            if (value.after(calendar.getTime())) {
-                return false;
+            Calendar calendarToday = Calendar.getInstance();
+            if (failOnFutureDate) {
+                if (value.after(calendarToday.getTime())) {
+                    return false;
+                }
+            } else {
+                calendarToday.add(Calendar.MONTH, 6);
+
+                // after 6 months from now
+                if (value.after(calendarToday.getTime())) {
+                    return false;
+                }
             }
 
+            // all is good
             return true;
         }
-        return false;
     }
 }

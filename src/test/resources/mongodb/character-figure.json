@@ -2059,7 +2059,7 @@
   "name": "Land Cloth Daichi <Revival Version>",
   "releaseDate": {
     "$date": {
-      "$numberLong": "1659312000000"
+      "$numberLong": "1661126400000"
     }
   },
   "basePrice": "8000",
@@ -5330,7 +5330,7 @@
   "_id": {
     "$oid": "62f4f63e454b4e537b9fac56"
   },
-  "name": "Dragon Shiryu ~ Limited Gold ~",
+  "name": "Dragon Shiryu ~ Limited Gold ~ Asia",
   "releaseDate": {
     "$date": {
       "$numberLong": "1339459200000"
@@ -5975,5 +5975,21 @@
   "tax": "0.05",
   "lineUp": "MYTH_CLOTH",
   "distribution": "TAMASHII_NATIONS",
+  "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
+},{
+  "_id": {
+    "$oid": "63060aa8406a3e718eae1de7"
+  },
+  "name": "Dragon Shiryu ~ Limited Gold ~",
+  "releaseDate": {
+    "$date": {
+      "$numberLong": "1664582400000"
+    }
+  },
+  "basePrice": "8000",
+  "tax": "0.10",
+  "lineUp": "MYTH_CLOTH_EX",
+  "distribution": "TAMASHII_WEB_SHOP",
+  "url": "https://tamashii.jp/item/14137/",
   "_class": "com.mesofi.collection.charactercatalog.model.CharacterFigure"
 }]

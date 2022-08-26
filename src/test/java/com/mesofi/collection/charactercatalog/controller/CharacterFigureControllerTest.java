@@ -431,7 +431,6 @@ public class CharacterFigureControllerTest {
                 .andExpect(jsonPath("$.message").value(containsString(msg)))
                 .andExpect(jsonPath("$.errors").isArray())
                 .andExpect(jsonPath("$.errors").isEmpty());
-        ;
         // @formatter:on
     }
 

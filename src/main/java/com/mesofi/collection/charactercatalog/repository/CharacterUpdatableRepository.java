@@ -1,6 +1,7 @@
 package com.mesofi.collection.charactercatalog.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,19 +18,14 @@ import lombok.AllArgsConstructor;
 @Repository
 @AllArgsConstructor
 public class CharacterUpdatableRepository {
-    final MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
-    public void updateRestocks(String id, List<Restock> restoks) {
+    public Optional<UpdateResult> updateRestocks(String id, List<Restock> restoks) {
         Query query = new Query(Criteria.where("id").is(id));
+
         Update update = new Update();
         update.set("restocks", restoks);
 
-        UpdateResult result = mongoTemplate.updateFirst(query, update, CharacterFigure.class);
-
-        if (result == null)
-            System.out.println("No documents updated");
-        else
-            System.out.println(result.getModifiedCount() + " document(s) updated..");
-
+        return Optional.ofNullable(mongoTemplate.updateFirst(query, update, CharacterFigure.class));
     }
 }

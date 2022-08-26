@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.mesofi.collection.charactercatalog.exceptions.NoSuchCharacterFoundException;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -360,7 +362,7 @@ public class CharacterFigureControllerTest {
     }
 
     @Test
-    public void should_ReturnStatusesOK_WhenDataFound() throws Exception {
+    public void should_ReturnOK_WhenDataFound() throws Exception {
 
         List<CharacterFigure> list = new ArrayList<>();
         list.add(createBasicEXCharacterFigure("62f3209c7b1da7352ea751b7", "Siren Sorrento", new BigDecimal("9500")));
@@ -373,7 +375,8 @@ public class CharacterFigureControllerTest {
         when(characterFigureService.retrieveAllCharacters(null)).thenReturn(list);
 
         // @formatter:off
-        mockMvc.perform(get(BASE_URL)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$").isArray())
+        mockMvc.perform(get(BASE_URL)).andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(6)))
                 .andExpect(jsonPath("$[0].id").value("62f3209c7b1da7352ea751b7"))
                 .andExpect(jsonPath("$[0].name").value("Siren Sorrento"))
@@ -394,6 +397,140 @@ public class CharacterFigureControllerTest {
                 .andExpect(jsonPath("$[5].name").value("Virgo Shaka"))
                 .andExpect(jsonPath("$[5].basePrice").value("6500"));
         // @formatter:on
+    }
+
+    @Test
+    public void should_ReturnOK_WhenDataFoundByName() throws Exception {
+        String theName = "Aries Mu";
+        List<CharacterFigure> list = new ArrayList<>();
+        list.add(createBasicEXCharacterFigure("62dc96905e86015074a010eb", theName, new BigDecimal("6000")));
+
+        when(characterFigureService.retrieveAllCharacters(theName)).thenReturn(list);
+
+        // @formatter:off
+        mockMvc.perform(get(BASE_URL).param("name", theName)).andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value("62dc96905e86015074a010eb"))
+                .andExpect(jsonPath("$[0].name").value(theName))
+                .andExpect(jsonPath("$[0].basePrice").value("6000"));
+        // @formatter:on
+    }
+
+    @Test
+    public void should_ReturnNotFound_WhenIdDoesNotExist() throws Exception {
+        String id = "incorrectId";
+
+        String msg = "Character not found: " + id;
+        when(characterFigureService.retrieveCharacterById(id)).thenThrow(new NoSuchCharacterFoundException(msg));
+
+        // @formatter:off
+        mockMvc.perform(get(BASE_URL + "/" + id)).andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.httpStatus").value(HttpStatus.NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(containsString(msg)))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isEmpty());
+        ;
+        // @formatter:on
+    }
+
+    @Test
+    public void should_ReturnOK_WhenCharacterExists() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.MAY, 1);
+
+        String id = "62d4658bff17ae100e217e50";
+
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setId(id);
+        characterFigure.setName("Hypnos");
+        characterFigure.setReleaseDate(calendar.getTime());
+        characterFigure.setBasePrice(new BigDecimal("7800"));
+        characterFigure.setTax(new BigDecimal("0.05"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+        characterFigure.setDistribution(Distribution.GENERAL);
+        characterFigure.setUrl("https://tamashii.jp/item/982/");
+        List<Restock> restocks = new ArrayList<>();
+        Restock restock = new Restock();
+        restock.setReleaseDate(calendar.getTime());
+        restocks.add(restock);
+        characterFigure.setRestocks(restocks);
+
+        when(characterFigureService.retrieveCharacterById(id)).thenReturn(characterFigure);
+
+        // @formatter:off
+        mockMvc.perform(get(BASE_URL + "/" + id)).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("Hypnos"))
+                .andExpect(jsonPath("$.releaseDate").value(containsString("2022-05-01")))
+                .andExpect(jsonPath("$.basePrice").value("7800"))
+                .andExpect(jsonPath("$.tax").value("0.05"))
+                .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH"))
+                .andExpect(jsonPath("$.distribution").value("GENERAL"))
+                .andExpect(jsonPath("$.url").value("https://tamashii.jp/item/982/"))
+                .andExpect(jsonPath("$.restocks").isArray())
+                .andExpect(jsonPath("$.restocks", hasSize(1)))
+                .andExpect(jsonPath("$.restocks[0].releaseDate").value(containsString("2022-05-01")));
+        // @formatter:on
+    }
+
+    @Test
+    public void should_UpdateAndReturnOK_WhenCharacterExists() throws Exception {
+        List<Restock> restocks = new ArrayList<>();
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.set(2022, Calendar.JANUARY, 7);
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.set(2022, Calendar.JULY, 8);
+
+        restocks.add(createBasicRestock(calendar1.getTime(), "https://tamashii.jp/item/13721/", "Some comment"));
+        restocks.add(createBasicRestock(calendar2.getTime(), "https://tamashii.jp/item/13333/", "Another comment"));
+
+        String requestJson = fromObjectToJson(restocks);
+        String id = "62d4658bff17ae100e217e50";
+
+        CharacterFigure characterFigureUpdated = new CharacterFigure();
+        characterFigureUpdated.setId(id);
+        characterFigureUpdated.setName("Seiya");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.APRIL, 3);
+        characterFigureUpdated.setReleaseDate(calendar.getTime());
+        characterFigureUpdated.setBasePrice(new BigDecimal(7000));
+        characterFigureUpdated.setTax(new BigDecimal("0.10"));
+        characterFigureUpdated.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigureUpdated.setDistribution(Distribution.GENERAL);
+        characterFigureUpdated.setUrl("https://tamashii.jp/item/13721/");
+        characterFigureUpdated.setRestocks(restocks);
+
+        when(characterFigureService.updateCharacterRestock(id, restocks)).thenReturn(characterFigureUpdated);
+
+        // @formatter:off
+        mockMvc.perform(patch(BASE_URL + "/" + id + "/restocks").contentType(MediaType.APPLICATION_JSON).content(requestJson)).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.restocks").isArray())
+                .andExpect(jsonPath("$.restocks", hasSize(2)))
+                .andExpect(jsonPath("$.restocks[0].releaseDate").value(containsString("2022-01-08")))
+                .andExpect(jsonPath("$.restocks[0].basePrice").doesNotExist())
+                .andExpect(jsonPath("$.restocks[0].distribution").value("GENERAL"))
+                .andExpect(jsonPath("$.restocks[0].url").value("https://tamashii.jp/item/13721/"))
+                .andExpect(jsonPath("$.restocks[0].remarks").value("Some comment"))
+                .andExpect(jsonPath("$.restocks[1].releaseDate").value(containsString("2022-07-08")))
+                .andExpect(jsonPath("$.restocks[1].basePrice").doesNotExist())
+                .andExpect(jsonPath("$.restocks[1].distribution").value("GENERAL"))
+                .andExpect(jsonPath("$.restocks[1].url").value("https://tamashii.jp/item/13333/"))
+                .andExpect(jsonPath("$.restocks[1].remarks").value("Another comment"))
+        ;
+        // @formatter:on
+    }
+
+    private Restock createBasicRestock(Date releaseDate, String url, String remarks) {
+        Restock restock = new Restock();
+        restock.setReleaseDate(releaseDate);
+        restock.setRemarks(remarks);
+        restock.setUrl(url);
+        restock.setDistribution(Distribution.GENERAL);
+        return restock;
     }
 
     private CharacterFigure createBasicEXCharacterFigure(String id, String name, BigDecimal basePrice) {

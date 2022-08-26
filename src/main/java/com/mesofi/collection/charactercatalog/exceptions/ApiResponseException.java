@@ -47,10 +47,10 @@ public abstract class ApiResponseException extends ResponseEntityExceptionHandle
         return handleApiException(ex, headers, status, errors);
     }
 
-    private ResponseEntity<Object> handleApiException(Exception ex, HttpHeaders headers, HttpStatus status,
+    protected ResponseEntity<Object> handleApiException(Exception ex, HttpHeaders headers, HttpStatus status,
             List<String> errors) {
         if (Objects.isNull(errors)) {
-            errors = new ArrayList<String>();
+            errors = new ArrayList<>();
         }
 
         ApiException apiException = new ApiException(status, ex.getLocalizedMessage(), errors);

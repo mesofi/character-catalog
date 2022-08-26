@@ -12,13 +12,13 @@ public class RestApiResponseException extends ApiResponseException {
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = ex.getMessage();
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+        return handleApiException(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
     }
 
     @ExceptionHandler(value = { NoSuchCharacterFoundException.class })
     protected ResponseEntity<Object> handleNotFoundRequest(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = ex.getMessage();
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+
+        return handleApiException(ex, new HttpHeaders(), HttpStatus.NOT_FOUND, null);
     }
 }

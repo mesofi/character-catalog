@@ -26,6 +26,7 @@ import com.mesofi.collection.charactercatalog.model.Restock;
 import com.mesofi.collection.charactercatalog.model.Tag;
 import com.mesofi.collection.charactercatalog.repository.CharacterRepository;
 import com.mesofi.collection.charactercatalog.repository.CharacterUpdatableRepository;
+import com.mongodb.client.result.UpdateResult;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -254,7 +255,12 @@ public class CharacterFigureService {
     }
 
     public CharacterFigure updateCharacterRestock(final String id, List<Restock> restock) {
-        characterUpdatableRepository.updateRestocks(id, restock);
+        Optional<UpdateResult> result = characterUpdatableRepository.updateRestocks(id, restock);
+        UpdateResult updateResult = result
+                .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
+
+        log.debug("Number of records found: {}", updateResult.getModifiedCount());
+
         return characterRepository.findById(id)
                 .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
     }

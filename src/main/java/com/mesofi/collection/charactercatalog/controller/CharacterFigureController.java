@@ -48,12 +48,24 @@ public class CharacterFigureController {
 
     @GetMapping("/characters/{id}")
     public ResponseEntity<CharacterFigure> retrieveCharacterById(@PathVariable String id) {
+        log.debug("Retrieving a character using id: {}", id);
         return new ResponseEntity<>(service.retrieveCharacterById(id), HttpStatus.OK);
     }
 
+    /**
+     * Update the list of restocks for a given figure.
+     * 
+     * @param id
+     *            The unique identifier for a character.
+     * @param restocks
+     *            The list of restocks that will replace the existing ones.
+     * @return The character updated.
+     */
     @PatchMapping("/characters/{id}/restocks")
-    public ResponseEntity<CharacterFigure> updateCharacterRestock(@PathVariable String id,
-            @RequestBody List<Restock> restock) {
-        return new ResponseEntity<>(service.updateCharacterRestock(id, restock), HttpStatus.OK);
+    public ResponseEntity<CharacterFigure> updateCharacterRestocks(final @PathVariable String id,
+            final @RequestBody List<Restock> restocks) {
+
+        log.debug("Updating character restocks using id: {}", id);
+        return new ResponseEntity<>(service.updateCharacterRestock(id, restocks), HttpStatus.OK);
     }
 }

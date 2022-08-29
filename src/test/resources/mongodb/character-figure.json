@@ -2027,7 +2027,7 @@
   "name": "Andromeda Shun (Final Bronze Cloth)",
   "releaseDate": {
     "$date": {
-      "$numberLong": "1661990400000"
+      "$numberLong": "1663372800000"
     }
   },
   "basePrice": "10000",

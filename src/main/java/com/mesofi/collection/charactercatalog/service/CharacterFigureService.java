@@ -254,12 +254,28 @@ public class CharacterFigureService {
                 .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
     }
 
+    /**
+     * Updates the character restocks.
+     * 
+     * @param id
+     *            The unique identifier for the character.
+     * @param restock
+     *            The list of restocks.
+     * @return The character updated.
+     */
     public CharacterFigure updateCharacterRestock(final String id, List<Restock> restock) {
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a valid id for the character to update");
+        }
+        if (Objects.isNull(restock)) {
+            throw new IllegalArgumentException("Provide a valid list of restocks");
+        }
+
         Optional<UpdateResult> result = characterUpdatableRepository.updateRestocks(id, restock);
         UpdateResult updateResult = result
                 .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
 
-        log.debug("Number of records found: {}", updateResult.getModifiedCount());
+        log.debug("Number of records updated: {}", updateResult.getModifiedCount());
 
         return characterRepository.findById(id)
                 .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));

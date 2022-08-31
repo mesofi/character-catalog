@@ -1,5 +1,7 @@
 package com.mesofi.collection.charactercatalog.controller;
 
+import static com.mesofi.collection.charactercatalog.MockData.createBasicEXCharacterFigure;
+import static com.mesofi.collection.charactercatalog.MockData.createBasicRestock;
 import static com.mesofi.collection.charactercatalog.MockData.fromObjectToJson;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
@@ -34,6 +36,12 @@ import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.Restock;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
+/**
+ * Testing for {@link CharacterFigureController}
+ * 
+ * @author armandorivasarzaluz
+ *
+ */
 @ActiveProfiles("test")
 @WebMvcTest(CharacterFigureController.class)
 public class CharacterFigureControllerTest {
@@ -255,7 +263,7 @@ public class CharacterFigureControllerTest {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setName("Seiya");
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, Calendar.APRIL, 3);
+        calendar.set(2022, Calendar.APRIL, 3, 0, 0, 0);
         characterFigure.setReleaseDate(calendar.getTime());
         characterFigure.setBasePrice(new BigDecimal(7000));
         characterFigure.setTax(new BigDecimal("0.10"));
@@ -437,7 +445,7 @@ public class CharacterFigureControllerTest {
     @Test
     public void should_ReturnOK_WhenCharacterExists() throws Exception {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, Calendar.MAY, 1);
+        calendar.set(2022, Calendar.MAY, 1, 0, 0, 0);
 
         String id = "62d4658bff17ae100e217e50";
 
@@ -479,9 +487,9 @@ public class CharacterFigureControllerTest {
     public void should_UpdateAndReturnOK_WhenCharacterExists() throws Exception {
         List<Restock> restocks = new ArrayList<>();
         Calendar calendar1 = Calendar.getInstance();
-        calendar1.set(2022, Calendar.JANUARY, 7);
+        calendar1.set(2022, Calendar.JANUARY, 8, 0, 0, 0);
         Calendar calendar2 = Calendar.getInstance();
-        calendar2.set(2022, Calendar.JULY, 8);
+        calendar2.set(2022, Calendar.JULY, 8, 0, 0, 0);
 
         restocks.add(createBasicRestock(calendar1.getTime(), "https://tamashii.jp/item/13721/", "Some comment"));
         restocks.add(createBasicRestock(calendar2.getTime(), "https://tamashii.jp/item/13333/", "Another comment"));
@@ -521,31 +529,5 @@ public class CharacterFigureControllerTest {
                 .andExpect(jsonPath("$.restocks[1].remarks").value("Another comment"))
         ;
         // @formatter:on
-    }
-
-    private Restock createBasicRestock(Date releaseDate, String url, String remarks) {
-        Restock restock = new Restock();
-        restock.setReleaseDate(releaseDate);
-        restock.setRemarks(remarks);
-        restock.setUrl(url);
-        restock.setDistribution(Distribution.GENERAL);
-        return restock;
-    }
-
-    private CharacterFigure createBasicEXCharacterFigure(String id, String name, BigDecimal basePrice) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, Calendar.OCTOBER, 27, 11, 11, 11);
-
-        CharacterFigure characterFigure = new CharacterFigure();
-        characterFigure.setId(id);
-        characterFigure.setName(name);
-        characterFigure.setReleaseDate(calendar.getTime());
-        characterFigure.setBasePrice(basePrice);
-        characterFigure.setPrice(new BigDecimal("99.99"));
-        characterFigure.setTax(new BigDecimal(".10"));
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
-        characterFigure.setDistribution(Distribution.GENERAL);
-
-        return characterFigure;
     }
 }

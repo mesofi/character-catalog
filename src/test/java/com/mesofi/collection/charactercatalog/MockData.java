@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.mesofi.collection.charactercatalog.config.CharacterConfig;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Restock;
 import com.mesofi.collection.charactercatalog.model.Tag;
 
 public class MockData {
@@ -105,5 +107,31 @@ public class MockData {
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
         return ow.writeValueAsString(object);
+    }
+
+    public static CharacterFigure createBasicEXCharacterFigure(String id, String name, BigDecimal basePrice) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.OCTOBER, 27, 11, 11, 11);
+
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setId(id);
+        characterFigure.setName(name);
+        characterFigure.setReleaseDate(calendar.getTime());
+        characterFigure.setBasePrice(basePrice);
+        characterFigure.setPrice(new BigDecimal("99.99"));
+        characterFigure.setTax(new BigDecimal(".10"));
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setDistribution(Distribution.GENERAL);
+
+        return characterFigure;
+    }
+
+    public static Restock createBasicRestock(Date releaseDate, String url, String remarks) {
+        Restock restock = new Restock();
+        restock.setReleaseDate(releaseDate);
+        restock.setRemarks(remarks);
+        restock.setUrl(url);
+        restock.setDistribution(Distribution.GENERAL);
+        return restock;
     }
 }

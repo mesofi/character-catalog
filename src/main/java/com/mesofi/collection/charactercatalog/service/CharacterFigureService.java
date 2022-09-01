@@ -80,31 +80,6 @@ public class CharacterFigureService {
 
         log.debug("Total characters found: {}", totalCharacters);
         return allCharacters;
-
-        /*
-         * for (CharacterFigure cf : allCharacters) {
-         * 
-         * cf.setTax(new BigDecimal("0.08")); characterRepository.save(cf); }
-         */
-
-        /*
-         * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2014); calendar.set(Calendar.MONTH,
-         * 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
-         * 
-         * System.out.println(calendar.getTime());
-         * 
-         * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().before(calendar.getTime())) { cf.setTax(new
-         * BigDecimal("0.05")); characterRepository.save(cf); } }
-         */
-        /*
-         * Calendar calendar = Calendar.getInstance(); calendar.set(Calendar.YEAR, 2019); calendar.set(Calendar.MONTH,
-         * 0); calendar.set(Calendar.DAY_OF_MONTH, 1);
-         * 
-         * System.out.println(calendar.getTime());
-         * 
-         * for (CharacterFigure cf : allCharacters) { if(cf.getReleaseDate().compareTo(calendar.getTime())>=0) {
-         * cf.setTax(new BigDecimal("0.10")); characterRepository.save(cf); } }
-         */
     }
 
     public Optional<CharacterFigure> retrieveCharacterByName(final String name) {
@@ -249,7 +224,18 @@ public class CharacterFigureService {
         return sb.toString().trim();
     }
 
+    /**
+     * Retrieves a character by its id.
+     * 
+     * @param id
+     *            The unique identifier for the character.
+     * @return The character.
+     */
     public CharacterFigure retrieveCharacterById(final String id) {
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a valid id for the character");
+        }
+
         return characterRepository.findById(id)
                 .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
     }
@@ -278,6 +264,6 @@ public class CharacterFigureService {
         log.debug("Number of records updated: {}", updateResult.getModifiedCount());
 
         return characterRepository.findById(id)
-                .orElseThrow(() -> new NoSuchCharacterFoundException("Character not found: " + id));
+                .orElseThrow(() -> new NoSuchCharacterFoundException("Unable to find character: " + id));
     }
 }

@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
@@ -87,6 +89,102 @@ public class CharacterFigureServiceTest {
     @BeforeEach
     public void init() {
         characterFigureService = new CharacterFigureService(config, characterRepository, characterUpdatableRepository);
+    }
+
+    @Test
+    public void should_AssertWithError_WhenCharacterIsNull() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            // method to be tested
+            characterFigureService.createNewCharacter(null);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Unable to create a new Character", actualMessage);
+    }
+
+    @Test
+    public void should_CreateCharacter_WhenDataIsProvided() {
+        CharacterFigure characterFigure = createBasicEXCharacterFigure(null, "Seiya", new BigDecimal("5000"));
+        CharacterFigure characterFigureCreated = createBasicEXCharacterFigure("239873278238943", "Seiya",
+                new BigDecimal("5000"));
+
+        when(characterRepository.save(characterFigure)).thenReturn(characterFigureCreated);
+        // method to be tested
+        CharacterFigure result = characterFigureService.createNewCharacter(characterFigure);
+        assertNotNull(result);
+        assertEquals("239873278238943", characterFigureCreated.getId());
+        assertEquals("Seiya", characterFigureCreated.getName());
+        assertEquals(new BigDecimal("5000"), characterFigureCreated.getBasePrice());
+        assertEquals(new BigDecimal("99.99"), characterFigureCreated.getPrice());
+    }
+
+    @Test
+    public void should_AssertWithError_WhenCharacterNameDoesNotExist() {
+        final String name = "unknown character";
+        Exception exception = assertThrows(NoSuchCharacterFoundException.class, () -> {
+            // method to be tested
+            characterFigureService.retrieveAllCharacters(name);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Character not found by name: unknown character", actualMessage);
+    }
+
+    @Test
+    public void should_ReturnCharacter_WhenCharacterNameExists() {
+        final String name = "Aries";
+
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        allCharacters.add(createBasicEXCharacterFigure("62d4658bff17ae100e217e50", "Aries", new BigDecimal("5000")));
+
+        when(characterRepository.findAllBylineUp(LineUp.MYTH_CLOTH)).thenReturn(allCharacters);
+
+        // method to be tested
+        List<CharacterFigure> found = characterFigureService.retrieveAllCharacters(name);
+        assertNotNull(found);
+        assertTrue(found.size() == 1);
+        assertEquals("62d4658bff17ae100e217e50", found.get(0).getId());
+        assertEquals("Aries", found.get(0).getName());
+        assertEquals(new BigDecimal("5000"), found.get(0).getBasePrice());
+        assertEquals(new BigDecimal("5500.00"), found.get(0).getPrice());
+    }
+
+    @Test
+    public void should_ReturnAllCharacters_WhenTheyExist() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        allCharacters.add(createBasicEXCharacterFigure("62d4658bff17ae100e217e50", "Aries", new BigDecimal("5000")));
+        allCharacters.add(createBasicEXCharacterFigure("62d4658bff17ae100e217e51", "Gemini", new BigDecimal("6000")));
+        allCharacters.add(createBasicEXCharacterFigure("62d4658bff17ae100e217e52", "Leo", new BigDecimal("7000")));
+
+        when(characterRepository.findAllByOrderByReleaseDate()).thenReturn(allCharacters);
+
+        // method to be tested
+        List<CharacterFigure> found = characterFigureService.retrieveAllCharacters(null);
+        assertNotNull(found);
+        assertTrue(found.size() == 3);
+        assertEquals("62d4658bff17ae100e217e50", found.get(0).getId());
+        assertEquals("Aries", found.get(0).getName());
+        assertEquals(new BigDecimal("5000"), found.get(0).getBasePrice());
+        assertEquals(new BigDecimal("5500.00"), found.get(0).getPrice());
+
+        assertEquals("62d4658bff17ae100e217e51", found.get(1).getId());
+        assertEquals("Gemini", found.get(1).getName());
+        assertEquals(new BigDecimal("6000"), found.get(1).getBasePrice());
+        assertEquals(new BigDecimal("6600.00"), found.get(1).getPrice());
+
+        assertEquals("62d4658bff17ae100e217e52", found.get(2).getId());
+        assertEquals("Leo", found.get(2).getName());
+        assertEquals(new BigDecimal("7000"), found.get(2).getBasePrice());
+        assertEquals(new BigDecimal("7700.00"), found.get(2).getPrice());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "", " ", "   ", "a" })
+    public void should_AssertIdWithError_WhenCharacterNameIsNullEmptyOrSingleCharacter(String input) {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            // method to be tested
+            characterFigureService.retrieveCharacterByName(input);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Provide a valid name", actualMessage);
     }
 
     @ParameterizedTest
@@ -149,6 +247,46 @@ public class CharacterFigureServiceTest {
     }
 
     @Test
+    public void should_AssertIdWithError_WhenCharacterIdIsNull() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            // method to be tested
+            characterFigureService.retrieveCharacterById(null);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Provide a valid id for the character", actualMessage);
+    }
+
+    @Test
+    public void should_AssertIdWithError_WhenCharacterIdWasNotFound() {
+        String id = "11111111";
+
+        when(characterRepository.findById(id)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(NoSuchCharacterFoundException.class, () -> {
+            // method to be tested
+            characterFigureService.retrieveCharacterById(id);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Character not found: 11111111", actualMessage);
+    }
+
+    @Test
+    public void should_AssertTrue_WhenCharacterIdExists() {
+        String id = "11111111";
+
+        Optional<CharacterFigure> found = Optional
+                .of(createBasicEXCharacterFigure(id, "Aries", new BigDecimal("5000")));
+        when(characterRepository.findById(id)).thenReturn(found);
+
+        // method to be tested
+        CharacterFigure characterFound = characterFigureService.retrieveCharacterById(id);
+
+        assertEquals("11111111", characterFound.getId());
+        assertEquals("Aries", characterFound.getName());
+        assertEquals(new BigDecimal("5000"), characterFound.getBasePrice());
+    }
+
+    @Test
     public void should_AssertIdWithError_WhenIdIsNull() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             // method to be tested
@@ -191,6 +329,52 @@ public class CharacterFigureServiceTest {
         });
         String actualMessage = exception.getMessage();
         assertEquals("Character not found: 9999999", actualMessage);
+    }
+
+    @Test
+    public void should_AssertIdWithError_WhenCharacterWasNotFoundInDB() {
+        List<Restock> restocks = new ArrayList<>();
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.set(2022, Calendar.JANUARY, 8, 0, 0, 0);
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.set(2022, Calendar.JULY, 8, 0, 0, 0);
+
+        restocks.add(createBasicRestock(calendar1.getTime(), "https://tamashii.jp/item/13721/", "Some comment"));
+        restocks.add(createBasicRestock(calendar2.getTime(), "https://tamashii.jp/item/13333/", "Another comment"));
+        String id = "9999999";
+
+        Optional<UpdateResult> result = Optional.of(new UpdateResult() {
+
+            @Override
+            public boolean wasAcknowledged() {
+                return true;
+            }
+
+            @Override
+            public BsonValue getUpsertedId() {
+                return null;
+            }
+
+            @Override
+            public long getModifiedCount() {
+                return 1;
+            }
+
+            @Override
+            public long getMatchedCount() {
+                return 1;
+            }
+        });
+
+        when(characterUpdatableRepository.updateRestocks(id, restocks)).thenReturn(result);
+        when(characterRepository.findById(id)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(NoSuchCharacterFoundException.class, () -> {
+            // method to be tested
+            characterFigureService.updateCharacterRestock(id, restocks);
+        });
+        String actualMessage = exception.getMessage();
+        assertEquals("Unable to find character: 9999999", actualMessage);
     }
 
     @Test

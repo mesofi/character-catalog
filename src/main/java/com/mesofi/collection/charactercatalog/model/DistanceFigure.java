@@ -1,13 +1,9 @@
 package com.mesofi.collection.charactercatalog.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 public class DistanceFigure {
     private int distance;

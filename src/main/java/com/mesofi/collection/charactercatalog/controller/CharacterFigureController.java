@@ -66,6 +66,7 @@ public class CharacterFigureController {
             final @RequestBody List<Restock> restocks) {
 
         log.debug("Updating character restocks using id: {}", id);
-        return new ResponseEntity<>(service.updateCharacterRestock(id, restocks), HttpStatus.OK);
+        CharacterFigure updatedCharacter = service.updateCharacterRestock(id, restocks);
+        return new ResponseEntity<>(updatedCharacter, HttpStatus.OK);
     }
 }

@@ -1,60 +1,34 @@
 package com.mesofi.collection.charactercatalog.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.mesofi.collection.charactercatalog.constraints.Amount;
-import com.mesofi.collection.charactercatalog.constraints.ReleaseDate;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "character-figure")
-public class CharacterFigure {
+@EqualsAndHashCode(callSuper = true)
+public class CharacterFigure extends Figure {
+    private String baseName; // Name of the character
+    private String displayedName; // Names to be displayed based on attributes of the figure.
 
-    @Id
-    private String id;
+    private LineUp lineUp; // MythCloth ... MythCloth EX etc.
+    private Group group = Group.OTHER; // This figure belongs to a certain group
 
-    @NotBlank(message = "is required with at least 2 characters")
-    @Size(min = 2, max = 200, message = "must be between 2 and 200")
-    private String name;
-
-    @ReleaseDate(message = "is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")
-    private Date releaseDate;
-
-    @Amount(message = "is required and must have a positive value")
-    private BigDecimal basePrice;
-
-    @Transient
-    private BigDecimal price;
-
-    @Amount(message = "is required and must have a decimal value")
-    private BigDecimal tax;
-
-    @NotNull(message = "is required")
-    private LineUp lineUp;
-
-    @NotNull(message = "is required")
-    private Distribution distribution;
-
-    private String url;
-    @Valid
-    private List<Restock> restocks;
-    private List<Tag> tags;
+    private boolean metalBody;
+    private boolean oce;
+    private boolean revival;
+    private boolean plainCloth;
+    private boolean broken;
+    private boolean golden;
+    private boolean gold;
+    private boolean hk;
+    private boolean manga;
+    private boolean surplice;
+    private boolean set;
+    private Integer anniversary;
+    private List<RestockFigure> restocks;
 }

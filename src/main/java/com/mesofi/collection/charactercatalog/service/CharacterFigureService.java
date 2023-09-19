@@ -1,12 +1,19 @@
+/*
+ * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
+ * via any medium is strictly prohibited Proprietary and confidential Written by
+ * Armando Rivas, Sep 19, 2023.
+ */
 package com.mesofi.collection.charactercatalog.service;
 
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.repository.CharacterRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +23,30 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CharacterFigureService {
 
-    private final String SPACE = " ";
+    private final CharacterRepository characterRepository;
+
+    /**
+     * Creates a new character.
+     * 
+     * @param characterFigure The new character to be created.
+     * @return The character created.
+     */
+    public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
+        log.debug("Creating a new character ...");
+        if (Objects.isNull(characterFigure)) {
+            throw new IllegalArgumentException("Unable to create a new character, provide a valid reference");
+        }
+        if (!StringUtils.hasText(characterFigure.getBaseName())) {
+            throw new IllegalArgumentException("Provide a base name for the character to be created");
+        }
+
+        if (Objects.isNull(characterFigure.getLineUp())) {
+            throw new IllegalArgumentException("Provide a valid LineUp for the character");
+        }
+
+        // saves the new record in the BD.
+        return characterRepository.save(characterFigure);
+    }
 
     public void calculateFigureName(final CharacterFigure figure) {
         StringBuilder sb = new StringBuilder();
@@ -93,7 +123,7 @@ public class CharacterFigureService {
     }
 
     private void appendAttr(StringBuilder sb, String attribute) {
-        sb.append(SPACE);
+        sb.append(" ");
         sb.append(attribute);
     }
 }

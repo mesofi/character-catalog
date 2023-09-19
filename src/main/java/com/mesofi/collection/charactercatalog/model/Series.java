@@ -5,15 +5,15 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-public enum LineUp {
+public enum Series {
     // @formatting:off
-    MYTH_CLOTH("Myth Cloth"), MYTH_CLOTH_EX("Myth Cloth EX"), APPENDIX("Appendix"), CROWN("Saint Cloth Crown"),
-    LEGEND("Saint Cloth Legend"), DDP("DD Panoramation"), FIGUARTS("Figuarts");
+    SAINT_SEIYA("Saint Seiya"), SAINTIA_SHO("Saintia Sho"), SOG("Soul of Gold"), LEYEND("Legend Of Santuary"),
+    OMEGA("Omega"), LL("Lost Canvas");
     // @formatting:on
 
     private final String friendlyName;
 
-    LineUp(String friendlyName) {
+    Series(String friendlyName) {
         this.friendlyName = friendlyName;
     }
 

@@ -5,8 +5,40 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
+import lombok.Getter;
+
+/**
+ * 
+ */
+@Getter
 public enum Group {
-    // @formatting:off
-    V1, V2, V3, V4, V5, SECONDARY, BLACK_SAINT, STEEL, SILVER, GOLD, SCALE, SURPLICE, SPECTER, JUDGE, GOD, OTHER
-    // @formatting:on
+    // @formatter:off
+    V1("Bronze Saint V1"),
+    V2("Bronze Saint V2"),
+    V3("Bronze Saint V3"),
+    V4("Bronze Saint V4"),
+    V5("Bronze Saint V5"),
+    SECONDARY("Bronze Secondary"),
+    BLACK("Black Saint"),
+    STEEL("Steel"),
+    SILVER("Silver Saint"),
+    GOLD("Gold Saint"),
+    ROBE("God Robe"),
+    SCALE("Poseidon Scale"),
+    SURPLICE("Saint Surplice"),
+    SPECTER("Specter"),
+    JUDGE("Judge"),
+    GOD("God"),
+    OTHER("-");
+    // @formatter:on
+
+    private final String friendlyName;
+
+    Group(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
+
+    public String toString() {
+        return this.friendlyName;
+    }
 }

@@ -5,20 +5,23 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Series {
-    // @formatting:off
-    SAINT_SEIYA("Saint Seiya"), SAINTIA_SHO("Saintia Sho"), SOG("Soul of Gold"), LEYEND("Legend Of Santuary"),
-    OMEGA("Omega"), LL("Lost Canvas");
-    // @formatting:on
+    // @formatter:off
+    SAINT_SEIYA("Saint Seiya"),
+    SAINTIA_SHO("Saintia Sho"),
+    SOG("Soul of Gold"),
+    LEGEND("Legend Of Sanctuary"),
+    OMEGA("Omega"),
+    LL("Lost Canvas");
+    // @formatter:on
 
     private final String friendlyName;
 
     Series(String friendlyName) {
         this.friendlyName = friendlyName;
-    }
-
-    public String getFriendlyName() {
-        return this.friendlyName;
     }
 
     public String toString() {

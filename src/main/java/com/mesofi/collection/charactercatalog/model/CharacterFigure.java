@@ -9,19 +9,26 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+/**
+ * 
+ */
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString
 public class CharacterFigure extends Figure {
     @Id
+    @EqualsAndHashCode.Exclude
     public String id;
     private String baseName; // Name of the character
+    @EqualsAndHashCode.Exclude
     private String displayedName; // Names to be displayed based on attributes of the figure.
 
     private LineUp lineUp; // MythCloth ... MythCloth EX etc.
@@ -32,13 +39,19 @@ public class CharacterFigure extends Figure {
     private boolean oce;
     private boolean revival;
     private boolean plainCloth;
+    @EqualsAndHashCode.Exclude
     private boolean broken;
+    @EqualsAndHashCode.Exclude
     private boolean golden;
+    @EqualsAndHashCode.Exclude
     private boolean gold;
     private boolean hk;
     private boolean manga;
     private boolean surplice;
+    @EqualsAndHashCode.Exclude
     private boolean set;
     private Integer anniversary;
+    @EqualsAndHashCode.Exclude
     private List<RestockFigure> restocks;
+
 }

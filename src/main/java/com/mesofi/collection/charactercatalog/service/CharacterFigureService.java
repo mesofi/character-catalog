@@ -14,16 +14,21 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mesofi.collection.charactercatalog.controllers.CarMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.CharacterFigureResponse;
 import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
@@ -41,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CharacterFigureService {
 
     private final CharacterRepository characterRepository;
+    private final CarMapper carMapper;
 
     public void loadAllRecords(final MultipartFile file) {
         InputStream inputStream;
@@ -86,6 +92,7 @@ public class CharacterFigureService {
 
         // now the base info is updated.
         copyCommonInfo(restock, source);
+        source.setOriginalName(restock.getOriginalName());
         source.setBaseName(restock.getBaseName());
         source.setLineUp(restock.getLineUp());
         source.setSeries(restock.getSeries());
@@ -117,56 +124,50 @@ public class CharacterFigureService {
         target.setRemarks(from.getRemarks());
     }
 
-    private void handleLine(String line) {
-        CharacterFigure characterFigure = fromLineToCharacterFigure(line);
-        characterRepository.save(characterFigure);
-    }
-
     private CharacterFigure fromLineToCharacterFigure(final String line) {
-        System.out.println(line);
         String[] columns = line.split("\t");
 
         CharacterFigure characterFigure = new CharacterFigure();
 
-        String baseName = columns[0]; // base name
-        characterFigure.setBaseName(baseName);
-        characterFigure.setBasePrice(getAmount(columns[1]));
-        characterFigure.setFirstAnnouncementDate(getDate(columns[3], true));
+        characterFigure.setOriginalName(columns[0]);
+        characterFigure.setBaseName(columns[1]);
+        characterFigure.setBasePrice(getAmount(columns[2]));
+        characterFigure.setFirstAnnouncementDate(getDate(columns[4], true));
 
-        String preorderDate = columns[4];
+        String preorderDate = columns[5];
         Boolean preorderConfirmedDay = isConfirmedDay(preorderDate);
         characterFigure.setPreOrderConfirmedDayDate(preorderConfirmedDay);
         characterFigure.setPreOrderDate(getDate(preorderDate, preorderConfirmedDay));
 
-        String releaseDate = columns[5];
+        String releaseDate = columns[6];
         Boolean releaseConfirmedDay = isConfirmedDay(releaseDate);
         characterFigure.setReleaseConfirmedDayDate(releaseConfirmedDay);
         characterFigure.setReleaseDate(getDate(releaseDate, releaseConfirmedDay));
 
-        characterFigure.setDistribution(getDistribution(columns[6]));
+        characterFigure.setDistribution(getDistribution(columns[7]));
 
-        characterFigure.setUrl(columns[7]);
-        characterFigure.setLineUp(getLineUp(columns[8]));
-        characterFigure.setSeries(getSeries(columns[9]));
-        characterFigure.setGroup(getGroup(columns[10]));
-        characterFigure.setMetalBody(getFlag(columns[11]));
-        characterFigure.setOce(getFlag(columns[12]));
-        characterFigure.setRevival(getFlag(columns[13]));
-        characterFigure.setPlainCloth(getFlag(columns[15]));
-        characterFigure.setBroken(getFlag(columns[16]));
-        characterFigure.setGolden(getFlag(columns[17]));
-        characterFigure.setGold(getFlag(columns[18]));
-        characterFigure.setHk(getFlag(columns[19]));
-        characterFigure.setManga(getFlag(columns[20]));
-        characterFigure.setSurplice(getFlag(columns[21]));
-        characterFigure.setSet(getFlag(columns[22]));
+        characterFigure.setUrl(columns[8]);
+        characterFigure.setLineUp(getLineUp(columns[9]));
+        characterFigure.setSeries(getSeries(columns[10]));
+        characterFigure.setGroup(getGroup(columns[11]));
+        characterFigure.setMetalBody(getFlag(columns[12]));
+        characterFigure.setOce(getFlag(columns[13]));
+        characterFigure.setRevival(getFlag(columns[14]));
+        characterFigure.setPlainCloth(getFlag(columns[16]));
+        characterFigure.setBroken(getFlag(columns[17]));
+        characterFigure.setGolden(getFlag(columns[18]));
+        characterFigure.setGold(getFlag(columns[19]));
+        characterFigure.setHk(getFlag(columns[20]));
+        characterFigure.setManga(getFlag(columns[21]));
+        characterFigure.setSurplice(getFlag(columns[22]));
+        characterFigure.setSet(getFlag(columns[23]));
 
-        if (columns.length == 24) {
-            characterFigure.setAnniversary(getNumber(columns[23]));
-        }
         if (columns.length == 25) {
-            characterFigure.setAnniversary(getNumber(columns[23]));
-            characterFigure.setRemarks(columns[24]);
+            characterFigure.setAnniversary(getNumber(columns[24]));
+        }
+        if (columns.length == 26) {
+            characterFigure.setAnniversary(getNumber(columns[24]));
+            characterFigure.setRemarks(columns[25]);
         }
 
         return characterFigure;
@@ -361,4 +362,20 @@ public class CharacterFigureService {
         sb.append(attribute);
     }
 
+    public List<CharacterFigureResponse> getAll() {
+        return characterRepository.findAll().stream().map(this::ddss).collect(Collectors.toList());
+    }
+
+    private CharacterFigureResponse ddss(CharacterFigure d) {
+
+        return carMapper.toDto(d);
+
+    }
+
+    private LocalDate aa(Date firstAnnouncementDate) {
+        if (Objects.nonNull(firstAnnouncementDate)) {
+            return firstAnnouncementDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return null;
+    }
 }

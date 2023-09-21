@@ -35,7 +35,7 @@ public class CharacterFigureServiceTest {
 
     @BeforeEach
     public void before_each() {
-        characterFigureService = new CharacterFigureService(characterRepository);
+        characterFigureService = new CharacterFigureService(characterRepository, null);
     }
 
     @AfterEach

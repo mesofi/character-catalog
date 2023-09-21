@@ -27,7 +27,9 @@ public class CharacterFigure extends Figure {
     @Id
     @EqualsAndHashCode.Exclude
     public String id;
-    private String baseName; // Name of the character
+    private String originalName; // Name of the character
+    @EqualsAndHashCode.Exclude
+    private String baseName; // Basic name of the character
     @EqualsAndHashCode.Exclude
     private String displayedName; // Names to be displayed based on attributes of the figure.
 

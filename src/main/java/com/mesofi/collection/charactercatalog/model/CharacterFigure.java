@@ -8,7 +8,6 @@ package com.mesofi.collection.charactercatalog.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * The actual value object used to hold the info.
@@ -17,7 +16,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class CharacterFigure {
     private String originalName; // Name of the character.

@@ -20,5 +20,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class CharacterFigure {
-    private String originalName; // Name of the character
+    private String originalName; // Name of the character.
+    @EqualsAndHashCode.Exclude
+    private String baseName; // Base name of the character.
 }

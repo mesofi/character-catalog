@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Test for {@link FileUtils}
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
  * @author armandorivasarzaluz
  *
  */
+@ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {
 
     @Test

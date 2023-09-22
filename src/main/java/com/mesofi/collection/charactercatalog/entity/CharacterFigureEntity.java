@@ -24,4 +24,5 @@ public class CharacterFigureEntity {
     @Id
     private String id;
     private String originalName;
+    private String baseName;
 }

@@ -11,11 +11,11 @@ import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 
 /**
- * The actual Character Figure mapper.
+ * The actual Character Figure model mapper.
  *
  * @author armandorivasarzaluz
  */
 @Mapper(componentModel = "spring")
-public interface CharacterFigureMapper {
+public interface CharacterFigureModelMapper {
     CharacterFigureEntity toEntity(CharacterFigure characterFigure);
 }

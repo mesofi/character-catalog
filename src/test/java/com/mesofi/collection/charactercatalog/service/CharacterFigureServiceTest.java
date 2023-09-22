@@ -8,7 +8,9 @@ package com.mesofi.collection.charactercatalog.service;
 import static com.mesofi.collection.charactercatalog.utils.FileUtils.getPathFromClassPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +23,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mesofi.collection.charactercatalog.mappers.CharacterFigureMapper;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
+import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 /**
@@ -36,13 +40,15 @@ public class CharacterFigureServiceTest {
     @Mock
     private CharacterFigureRepository characterFigureRepository;
     @Mock
-    private CharacterFigureMapper characterFigureMapper;
+    private CharacterFigureModelMapper modelMapper;
+    @Mock
+    private CharacterFigureFileMapper fileMapper;
 
     private CharacterFigureService characterFigureService;
 
     @BeforeEach
     public void init() {
-        characterFigureService = new CharacterFigureService(characterFigureRepository, characterFigureMapper);
+        characterFigureService = new CharacterFigureService(characterFigureRepository, modelMapper, fileMapper);
     }
 
     @Test
@@ -56,14 +62,13 @@ public class CharacterFigureServiceTest {
     public void should_load_all_records() throws IOException {
 
         doNothing().when(characterFigureRepository).deleteAll();
+        when(fileMapper.fromLineToCharacterFigure(anyString())).thenReturn(new CharacterFigure());
 
         final String folder = "characters/";
         final String name = "MythCloth Catalog - CatalogMyth-min.tsv";
         final byte[] bytes = Files.readAllBytes(getPathFromClassPath(folder + name));
-
         MultipartFile result = new MockMultipartFile(name, name, "text/plain", bytes);
 
         characterFigureService.loadAllCharacters(result);
-
     }
 }

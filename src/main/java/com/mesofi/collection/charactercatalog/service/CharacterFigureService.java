@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
-import com.mesofi.collection.charactercatalog.mappers.CharacterFigureMapper;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
@@ -38,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CharacterFigureService {
 
     private CharacterFigureRepository characterFigureRepository;
-    private CharacterFigureMapper characterFigureMapper;
+    private CharacterFigureModelMapper modelMapper;
+    private CharacterFigureFileMapper fileMapper;
 
     /**
      * Loads all the characters.
@@ -65,7 +67,7 @@ public class CharacterFigureService {
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
                 .skip(1) // we don't consider the header
-                .map(this::fromLineToCharacterFigure)
+                .map($ -> fileMapper.fromLineToCharacterFigure($))
                 .toList();
         // @formatter:on
 
@@ -84,22 +86,9 @@ public class CharacterFigureService {
         // performs a mapping and saves the records in the DB ...
         // @formatter:off
         long total = characterFigureRepository.saveAll(effectiveCharacters.stream()
-                        .map($ -> characterFigureMapper.toEntity($))
+                        .map($ -> modelMapper.toEntity($))
                         .collect(Collectors.toList())).size();
         // @formatter:on
         log.debug("Total of figures saved: {}", total);
-    }
-
-    /**
-     * Converts a plain line to a character figure object.
-     * 
-     * @param line The line to be parsed and converted.
-     * @return The character figure.
-     */
-    private CharacterFigure fromLineToCharacterFigure(String line) {
-        String[] columns = line.split("\t");
-        CharacterFigure characterFigure = new CharacterFigure();
-        characterFigure.setOriginalName(columns[0]);
-        return characterFigure;
     }
 }

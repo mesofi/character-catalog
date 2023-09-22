@@ -19,8 +19,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @SpringBootTest
-@ActiveProfiles("cloud-test")
+@ActiveProfiles("test")
 public class CharacterCatalogApplicationIT {
+
     @Test
     void contextLoads() {
         log.debug("Loaded correctly!!");

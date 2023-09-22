@@ -5,9 +5,25 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureMapper;
+import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,14 +34,67 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class CharacterFigureService {
+
+    private CharacterFigureRepository characterFigureRepository;
+    private CharacterFigureMapper characterFigureMapper;
 
     /**
      * Loads all the characters.
      * 
      * @param file The reference to the file with all the records.
      */
-    public void loadAllCharacters(MultipartFile file) {
+    public void loadAllCharacters(final MultipartFile file) {
         log.debug("Loading all the records ...");
+
+        if (Objects.isNull(file)) {
+            throw new IllegalArgumentException("The uploaded file is missing...");
+        }
+        InputStream inputStream;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            throw new CharacterFigureException("Unable to read characters from file");
+        }
+        // first, removes all the records.
+        characterFigureRepository.deleteAll();
+
+        List<CharacterFigure> effectiveCharacters = new ArrayList<>();
+        // @formatter:off
+        List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .lines()
+                .skip(1) // we don't consider the header
+                .map(this::fromLineToCharacterFigure)
+                .toList();
+        // @formatter:on
+        for (CharacterFigure curr : allCharacters) {
+            if (!effectiveCharacters.contains(curr)) {
+                effectiveCharacters.add(curr);
+            } else {
+                // add this character as re-stock
+                CharacterFigure other = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
+            }
+        }
+        // @formatter:off
+        // performs a mapping and saves the records in the DB ...
+        characterFigureRepository.saveAll(
+                effectiveCharacters.stream()
+                        .map($ -> characterFigureMapper.toEntity($))
+                        .collect(Collectors.toList()));
+        // @formatter:on
+    }
+
+    /**
+     * Converts a plain line to a character figure object.
+     * 
+     * @param line The line to be parsed and converted.
+     * @return The character figure.
+     */
+    private CharacterFigure fromLineToCharacterFigure(String line) {
+        String[] columns = line.split("\t");
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setOriginalName(columns[0]);
+        return characterFigure;
     }
 }

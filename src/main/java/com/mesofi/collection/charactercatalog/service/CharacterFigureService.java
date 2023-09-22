@@ -68,21 +68,26 @@ public class CharacterFigureService {
                 .map(this::fromLineToCharacterFigure)
                 .toList();
         // @formatter:on
+
+        log.debug("Total of figures loaded: {}", allCharacters.size());
         for (CharacterFigure curr : allCharacters) {
             if (!effectiveCharacters.contains(curr)) {
                 effectiveCharacters.add(curr);
             } else {
                 // add this character as re-stock
                 CharacterFigure other = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
+                log.debug("Found potential restock: [{}]", other.getOriginalName());
             }
         }
-        // @formatter:off
+        log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
+
         // performs a mapping and saves the records in the DB ...
-        characterFigureRepository.saveAll(
-                effectiveCharacters.stream()
+        // @formatter:off
+        long total = characterFigureRepository.saveAll(effectiveCharacters.stream()
                         .map($ -> characterFigureMapper.toEntity($))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList())).size();
         // @formatter:on
+        log.debug("Total of figures saved: {}", total);
     }
 
     /**

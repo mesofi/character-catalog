@@ -53,7 +53,7 @@ public class CharacterFigureServiceTest {
     }
 
     @Test
-    public void should_fail_when_input_file_is_missingg_() throws IOException {
+    public void should_load_all_records() throws IOException {
 
         doNothing().when(characterFigureRepository).deleteAll();
 

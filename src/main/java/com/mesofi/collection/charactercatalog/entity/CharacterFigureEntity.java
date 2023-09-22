@@ -6,6 +6,7 @@
 package com.mesofi.collection.charactercatalog.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Document("CharacterFigure")
 public class CharacterFigureEntity {
     @Id
-    public String id;
+    private String id;
+    private String originalName;
 }

@@ -37,5 +37,17 @@ public class CharacterFigure {
     private LocalDate preorderDate; // Date when the figure was set to pre-order.
 
     @EqualsAndHashCode.Exclude
-    private LocalDate releaseDate; // Date when the figure was release.
+    private LocalDate releaseDate; // Date when the figure was released.
+
+    @EqualsAndHashCode.Exclude
+    private String tamashiiUrl; // URL for the Tamashii website.
+
+    @EqualsAndHashCode.Exclude
+    private Distribution distribution; // how this figure was distributed.
+
+    private LineUp lineUp; // MythCloth ... MythCloth EX etc.
+
+    private Series series; // Saint Seiya, Lost Canvas etc.
+
+    private Group group; // Group of the character.
 }

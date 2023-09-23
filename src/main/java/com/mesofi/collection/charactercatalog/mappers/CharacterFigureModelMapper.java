@@ -6,6 +6,7 @@
 package com.mesofi.collection.charactercatalog.mappers;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -17,5 +18,6 @@ import com.mesofi.collection.charactercatalog.model.CharacterFigure;
  */
 @Mapper(componentModel = "spring")
 public interface CharacterFigureModelMapper {
+    @Mapping(source = "tamashiiUrl", target = "url")
     CharacterFigureEntity toEntity(CharacterFigure characterFigure);
 }

@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.Distribution;
+import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Series;
 
 /**
  * The actual Character Figure file mapper.
@@ -40,6 +44,26 @@ public class CharacterFigureFileMapper {
         characterFigure.setFirstAnnouncementDate(toDate(columns[4]));
         characterFigure.setPreorderDate(toDate(columns[5]));
         characterFigure.setReleaseDate(toDate(columns[6]));
+        characterFigure.setTamashiiUrl(columns[7]);
+        characterFigure.setDistribution(toValues(columns[8], Distribution.class));
+        characterFigure.setLineUp(toValues(columns[9], LineUp.class));
+        characterFigure.setSeries(toValues(columns[10], Series.class));
+        characterFigure.setGroup(toValues(columns[11], Group.class));
+
         return characterFigure;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T toValues(String value, Class<?> clazz) {
+        if (clazz.isEnum()) {
+            Object[] constants = clazz.getEnumConstants();
+            for (Object object : constants) {
+                Enum<?> e = (Enum<?>) object;
+                if (e.toString().equals(value)) {
+                    return (T) e;
+                }
+            }
+        }
+        return null;
     }
 }

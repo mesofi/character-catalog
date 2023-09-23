@@ -11,6 +11,11 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.mesofi.collection.charactercatalog.model.Distribution;
+import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Series;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,4 +37,9 @@ public class CharacterFigureEntity {
     private Date firstAnnouncementDate;
     private Date preorderDate;
     private Date releaseDate;
+    private String url;
+    private Distribution distribution;
+    private LineUp lineUp;
+    private Series series;
+    private Group group;
 }

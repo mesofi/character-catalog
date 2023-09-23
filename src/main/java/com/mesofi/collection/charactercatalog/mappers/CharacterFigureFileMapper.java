@@ -5,6 +5,9 @@
  */
 package com.mesofi.collection.charactercatalog.mappers;
 
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toDate;
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +23,7 @@ public class CharacterFigureFileMapper {
 
     /**
      * Converts a plain line to a character figure object.
-     * 
+     *
      * @param line The line to be parsed and converted.
      * @return The character figure.
      */
@@ -33,6 +36,10 @@ public class CharacterFigureFileMapper {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setOriginalName(columns[0]);
         characterFigure.setBaseName(columns[1]);
+        characterFigure.setBasePrice(toPrice(columns[2]));
+        characterFigure.setFirstAnnouncementDate(toDate(columns[4]));
+        characterFigure.setPreorderDate(toDate(columns[5]));
+        characterFigure.setReleaseDate(toDate(columns[6]));
         return characterFigure;
     }
 }

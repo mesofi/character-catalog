@@ -5,6 +5,9 @@
  */
 package com.mesofi.collection.charactercatalog.entity;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -25,4 +28,8 @@ public class CharacterFigureEntity {
     private String id;
     private String originalName;
     private String baseName;
+    private BigDecimal basePrice;
+    private Date firstAnnouncementDate;
+    private Date preorderDate;
+    private Date releaseDate;
 }

@@ -42,4 +42,17 @@ public class CharacterFigureEntity {
     private LineUp lineUp;
     private Series series;
     private Group group;
+    private boolean metal;
+    private boolean oce;
+    private boolean revival;
+    private boolean plainCloth;
+    private boolean brokenCloth;
+    private boolean golden;
+    private boolean gold;
+    private boolean hk;
+    private boolean manga;
+    private boolean surplice;
+    private boolean set;
+    private Integer anniversary;
+    private String remarks;
 }

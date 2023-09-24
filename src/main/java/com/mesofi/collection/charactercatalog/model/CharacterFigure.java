@@ -50,4 +50,37 @@ public class CharacterFigure {
     private Series series; // Saint Seiya, Lost Canvas etc.
 
     private Group group; // Group of the character.
+
+    private boolean metalBody; // Has a metal body.
+
+    private boolean oce; // Is Original Color Edition?.
+
+    private boolean revival; // Is revival?.
+
+    private boolean plainCloth; // Is plain cloth?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean brokenCloth; // Contains broken armor parts?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean brozeToGold; // Does the bronze cloth become gold?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean gold; // Contains true gold?.
+
+    private boolean hongKongVersion; // Is it HK version?.
+
+    private boolean manga; // Is it manga version?.
+
+    private boolean surplice; // Is it a surplice?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean set; // Is it part of a set?.
+
+    @EqualsAndHashCode.Exclude
+    private Integer anniversary; // Is it part of an anniversary?.
+
+    @EqualsAndHashCode.Exclude
+    private String remarks; // remarks or comments.
+
 }

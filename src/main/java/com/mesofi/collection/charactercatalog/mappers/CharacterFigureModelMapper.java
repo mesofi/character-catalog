@@ -19,5 +19,8 @@ import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 @Mapper(componentModel = "spring")
 public interface CharacterFigureModelMapper {
     @Mapping(source = "tamashiiUrl", target = "url")
+    @Mapping(source = "metalBody", target = "metal")
+    @Mapping(source = "brozeToGold", target = "golden")
+    @Mapping(source = "hongKongVersion", target = "hk")
     CharacterFigureEntity toEntity(CharacterFigure characterFigure);
 }

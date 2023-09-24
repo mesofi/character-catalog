@@ -5,9 +5,13 @@
  */
 package com.mesofi.collection.charactercatalog.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -45,5 +49,21 @@ public class CommonUtilsTest {
     @ValueSource(strings = { "9/15/2023", "10/30/2020", "7/3/2020", "11/2022", "5/2021" })
     public void should_return_valid_local_date(String input) {
         assertNotNull(CommonUtils.toDate(input));
+    }
+
+    @Test
+    public void should_return_valid_boolean_value() {
+        assertFalse(CommonUtils.toBoolean(null));
+        assertFalse(CommonUtils.toBoolean(""));
+        assertFalse(CommonUtils.toBoolean("dsf"));
+        assertFalse(CommonUtils.toBoolean("true"));
+        assertTrue(CommonUtils.toBoolean("TRUE"));
+    }
+
+    @Test
+    public void should_return_valid_integer_value() {
+        assertNull(CommonUtils.toInteger(null));
+        assertNull(CommonUtils.toInteger(""));
+        assertEquals(5, CommonUtils.toInteger("5"));
     }
 }

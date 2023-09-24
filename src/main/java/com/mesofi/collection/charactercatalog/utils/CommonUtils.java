@@ -66,13 +66,39 @@ public class CommonUtils {
     }
 
     /**
+     * Gets the boolean value based on a string value.
+     * 
+     * @param value TRUE, true, false otherwise.
+     * @return true or false.
+     */
+    public static boolean toBoolean(final String value) {
+        if (StringUtils.hasText(value)) {
+            return "TRUE".equals(value);
+        }
+        return false;
+    }
+
+    /**
+     * Gets the integer value based on a string value.
+     * 
+     * @param An integer value.
+     * @return The integer.
+     */
+    public static Integer toInteger(final String value) {
+        if (StringUtils.hasText(value)) {
+            return Integer.parseInt(value);
+        }
+        return null;
+    }
+
+    /**
      * Test if the value passed in represents a date compound of year, month and
      * day.
      * 
      * @param value The value to be tested.
      * @return true, if it's a valid date.
      */
-    public static Boolean isDayMonthYear(final String value) {
+    private static Boolean isDayMonthYear(final String value) {
         int count = 0;
         if (StringUtils.hasText(value)) {
             for (int i = 0; i < value.length(); i++) {

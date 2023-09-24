@@ -5,7 +5,9 @@
  */
 package com.mesofi.collection.charactercatalog.mappers;
 
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toBoolean;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toDate;
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
 
 import org.springframework.stereotype.Component;
@@ -45,16 +47,33 @@ public class CharacterFigureFileMapper {
         characterFigure.setPreorderDate(toDate(columns[5]));
         characterFigure.setReleaseDate(toDate(columns[6]));
         characterFigure.setTamashiiUrl(columns[7]);
-        characterFigure.setDistribution(toValues(columns[8], Distribution.class));
-        characterFigure.setLineUp(toValues(columns[9], LineUp.class));
-        characterFigure.setSeries(toValues(columns[10], Series.class));
-        characterFigure.setGroup(toValues(columns[11], Group.class));
+        characterFigure.setDistribution(toEnum(columns[8], Distribution.class));
+        characterFigure.setLineUp(toEnum(columns[9], LineUp.class));
+        characterFigure.setSeries(toEnum(columns[10], Series.class));
+        characterFigure.setGroup(toEnum(columns[11], Group.class));
+        characterFigure.setMetalBody(toBoolean(columns[12]));
+        characterFigure.setOce(toBoolean(columns[13]));
+        characterFigure.setRevival(toBoolean(columns[14]));
+        characterFigure.setPlainCloth(toBoolean(columns[16]));
+        characterFigure.setBrokenCloth(toBoolean(columns[17]));
+        characterFigure.setBrozeToGold(toBoolean(columns[18]));
+        characterFigure.setGold(toBoolean(columns[19]));
+        characterFigure.setHongKongVersion(toBoolean(columns[20]));
+        characterFigure.setManga(toBoolean(columns[21]));
+        characterFigure.setSurplice(toBoolean(columns[22]));
+        characterFigure.setSet(toBoolean(columns[23]));
+        if (columns.length >= 25) {
+            characterFigure.setAnniversary(toInteger(columns[24]));
+        }
+        if (columns.length >= 26) {
+            characterFigure.setRemarks(columns[25]);
+        }
 
         return characterFigure;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T toValues(String value, Class<?> clazz) {
+    private <T> T toEnum(String value, Class<?> clazz) {
         if (clazz.isEnum()) {
             Object[] constants = clazz.getEnumConstants();
             for (Object object : constants) {

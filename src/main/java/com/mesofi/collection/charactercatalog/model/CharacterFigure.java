@@ -5,8 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,31 +18,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
-public class CharacterFigure {
+@EqualsAndHashCode(callSuper = true)
+public class CharacterFigure extends Figure {
 
     private String originalName; // Name of the character.
 
     @EqualsAndHashCode.Exclude
     private String baseName; // Base name of the character.
-
-    @EqualsAndHashCode.Exclude
-    private BigDecimal basePrice; // The price without taxes.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate firstAnnouncementDate; // Date when the figure was first announced.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate preorderDate; // Date when the figure was set to pre-order.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate releaseDate; // Date when the figure was released.
-
-    @EqualsAndHashCode.Exclude
-    private String tamashiiUrl; // URL for the Tamashii website.
-
-    @EqualsAndHashCode.Exclude
-    private Distribution distribution; // how this figure was distributed.
 
     private LineUp lineUp; // MythCloth ... MythCloth EX etc.
 
@@ -81,6 +62,5 @@ public class CharacterFigure {
     private Integer anniversary; // Is it part of an anniversary?.
 
     @EqualsAndHashCode.Exclude
-    private String remarks; // remarks or comments.
-
+    private List<RestockFigure> restocks;
 }

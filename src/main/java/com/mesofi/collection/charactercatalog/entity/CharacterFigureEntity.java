@@ -5,15 +5,15 @@
  */
 package com.mesofi.collection.charactercatalog.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.mesofi.collection.charactercatalog.model.Distribution;
+import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.RestockFigure;
 import com.mesofi.collection.charactercatalog.model.Series;
 
 import lombok.Getter;
@@ -28,17 +28,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Document("CharacterFigure")
-public class CharacterFigureEntity {
+public class CharacterFigureEntity extends Figure {
     @Id
     private String id;
     private String originalName;
     private String baseName;
-    private BigDecimal basePrice;
-    private Date firstAnnouncementDate;
-    private Date preorderDate;
-    private Date releaseDate;
-    private String url;
-    private Distribution distribution;
     private LineUp lineUp;
     private Series series;
     private Group group;
@@ -54,5 +48,5 @@ public class CharacterFigureEntity {
     private boolean surplice;
     private boolean set;
     private Integer anniversary;
-    private String remarks;
+    private List<RestockFigure> restockFigures;
 }

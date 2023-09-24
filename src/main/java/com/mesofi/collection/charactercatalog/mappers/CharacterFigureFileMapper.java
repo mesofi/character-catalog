@@ -46,7 +46,7 @@ public class CharacterFigureFileMapper {
         characterFigure.setFirstAnnouncementDate(toDate(columns[4]));
         characterFigure.setPreorderDate(toDate(columns[5]));
         characterFigure.setReleaseDate(toDate(columns[6]));
-        characterFigure.setTamashiiUrl(columns[7]);
+        characterFigure.setUrl(columns[7]);
         characterFigure.setDistribution(toEnum(columns[8], Distribution.class));
         characterFigure.setLineUp(toEnum(columns[9], LineUp.class));
         characterFigure.setSeries(toEnum(columns[10], Series.class));

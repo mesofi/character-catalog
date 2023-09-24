@@ -48,5 +48,5 @@ public class CharacterFigureEntity extends Figure {
     private boolean surplice;
     private boolean set;
     private Integer anniversary;
-    private List<RestockFigure> restockFigures;
+    private List<RestockFigure> restocks;
 }

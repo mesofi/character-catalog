@@ -81,12 +81,25 @@ public class CommonUtils {
     /**
      * Gets the integer value based on a string value.
      * 
-     * @param An integer value.
+     * @param value An integer value.
      * @return The integer.
      */
     public static Integer toInteger(final String value) {
         if (StringUtils.hasText(value)) {
             return Integer.parseInt(value);
+        }
+        return null;
+    }
+
+    /**
+     * Gets the String representation based on another String value.
+     * 
+     * @param value String value to be converted into another String value.
+     * @return A null value if the input String is empty.
+     */
+    public static String toStringValue(final String value) {
+        if (StringUtils.hasText(value)) {
+            return value.trim();
         }
         return null;
     }
@@ -98,7 +111,7 @@ public class CommonUtils {
      * @param value The value to be tested.
      * @return true, if it's a valid date.
      */
-    private static Boolean isDayMonthYear(final String value) {
+    public static Boolean isDayMonthYear(final String value) {
         int count = 0;
         if (StringUtils.hasText(value)) {
             for (int i = 0; i < value.length(); i++) {

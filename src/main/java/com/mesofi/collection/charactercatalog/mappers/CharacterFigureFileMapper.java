@@ -5,10 +5,12 @@
  */
 package com.mesofi.collection.charactercatalog.mappers;
 
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.isDayMonthYear;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toBoolean;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toDate;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toStringValue;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -45,8 +47,10 @@ public class CharacterFigureFileMapper {
         characterFigure.setBasePrice(toPrice(columns[2]));
         characterFigure.setFirstAnnouncementDate(toDate(columns[4]));
         characterFigure.setPreorderDate(toDate(columns[5]));
+        characterFigure.setPreorderConfirmationDay(isDayMonthYear(columns[5]));
         characterFigure.setReleaseDate(toDate(columns[6]));
-        characterFigure.setUrl(columns[7]);
+        characterFigure.setReleaseConfirmationDay(isDayMonthYear(columns[6]));
+        characterFigure.setUrl(toStringValue(columns[7]));
         characterFigure.setDistribution(toEnum(columns[8], Distribution.class));
         characterFigure.setLineUp(toEnum(columns[9], LineUp.class));
         characterFigure.setSeries(toEnum(columns[10], Series.class));
@@ -56,7 +60,7 @@ public class CharacterFigureFileMapper {
         characterFigure.setRevival(toBoolean(columns[14]));
         characterFigure.setPlainCloth(toBoolean(columns[16]));
         characterFigure.setBrokenCloth(toBoolean(columns[17]));
-        characterFigure.setBrozeToGold(toBoolean(columns[18]));
+        characterFigure.setBronzeToGold(toBoolean(columns[18]));
         characterFigure.setGold(toBoolean(columns[19]));
         characterFigure.setHongKongVersion(toBoolean(columns[20]));
         characterFigure.setManga(toBoolean(columns[21]));
@@ -66,7 +70,7 @@ public class CharacterFigureFileMapper {
             characterFigure.setAnniversary(toInteger(columns[24]));
         }
         if (columns.length >= 26) {
-            characterFigure.setRemarks(columns[25]);
+            characterFigure.setRemarks(toStringValue(columns[25]));
         }
 
         return characterFigure;

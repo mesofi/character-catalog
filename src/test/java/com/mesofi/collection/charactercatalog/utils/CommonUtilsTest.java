@@ -66,4 +66,11 @@ public class CommonUtilsTest {
         assertNull(CommonUtils.toInteger(""));
         assertEquals(5, CommonUtils.toInteger("5"));
     }
+
+    @Test
+    public void should_return_valid_string_value() {
+        assertNull(CommonUtils.toStringValue(null));
+        assertNull(CommonUtils.toStringValue(""));
+        assertEquals("5", CommonUtils.toStringValue("5"));
+    }
 }

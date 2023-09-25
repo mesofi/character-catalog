@@ -18,8 +18,14 @@ import com.mesofi.collection.charactercatalog.model.CharacterFigure;
  */
 @Mapper(componentModel = "spring")
 public interface CharacterFigureModelMapper {
+
     @Mapping(source = "metalBody", target = "metal")
-    @Mapping(source = "brozeToGold", target = "golden")
+    @Mapping(source = "bronzeToGold", target = "golden")
     @Mapping(source = "hongKongVersion", target = "hk")
     CharacterFigureEntity toEntity(CharacterFigure characterFigure);
+
+    @Mapping(source = "metal", target = "metalBody")
+    @Mapping(source = "golden", target = "bronzeToGold")
+    @Mapping(source = "hk", target = "hongKongVersion")
+    CharacterFigure toModel(CharacterFigureEntity characterFigureEntity);
 }

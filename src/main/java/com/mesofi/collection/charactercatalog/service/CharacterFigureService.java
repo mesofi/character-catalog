@@ -9,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +25,8 @@ import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Figure;
+import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
@@ -95,6 +99,125 @@ public class CharacterFigureService {
         log.debug("Total of figures saved: {}", total);
     }
 
+    /**
+     * Retrieve all the characters.
+     * 
+     * @return The list of characters.
+     */
+    public List<CharacterFigure> retrieveAllCharacters() {
+        // @formatter:off
+        List<CharacterFigure> figureList = characterFigureRepository.findAll().stream()
+                .map($ -> modelMapper.toModel($))
+                .peek($ -> $.setDisplayableName(calculateFigureDisplayableName($)))
+                .peek($ -> $.setReleasePrice(calculateReleasePrice($.getBasePrice(), $.getReleaseDate())))
+                .peek($ -> {
+                    $.setOriginalName(null);
+                    $.setBaseName(null);
+                })
+                .toList();
+        // @formatter:on
+        log.debug("Total of characters found: {}", figureList.size());
+        return figureList;
+    }
+
+    private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {
+        BigDecimal releasePrice;
+        if (Objects.nonNull(basePrice) && Objects.nonNull(releaseDate)) {
+            LocalDate october12019 = LocalDate.of(2019, 10, 1);
+            if (releaseDate.isBefore(october12019)) {
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".08")));
+            } else {
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".10")));
+            }
+            return releasePrice;
+        }
+        return null;
+    }
+
+    /**
+     * Calculate the figure name.
+     * 
+     * @param figure The figure name object.
+     * @return The displayable name.
+     */
+    public String calculateFigureDisplayableName(final CharacterFigure figure) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(figure.getBaseName());
+
+        switch (figure.getGroup()) {
+        case V1:
+            appendAttr(sb, "~Initial Bronze Cloth~");
+            break;
+        case V2:
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+                appendAttr(sb, "~New Bronze Cloth~");
+            }
+            break;
+        case V3:
+            appendAttr(sb, "~Final Bronze Cloth~");
+            break;
+        case V4:
+            appendAttr(sb, "(God Cloth)");
+            break;
+        case V5:
+            appendAttr(sb, "(Heaven Chapter)");
+            break;
+        default:
+            break;
+        }
+        if (figure.isPlainCloth()) {
+            appendAttr(sb, "(Plain Clothes)");
+        }
+
+        if (figure.isBronzeToGold()) {
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH) {
+                if (figure.getGroup() == Group.V1) {
+                    sb = replacePatter(sb.toString());
+                    appendAttr(sb, "~Limited Gold~");
+                }
+                if (figure.getGroup() == Group.V2) {
+                    appendAttr(sb, "~Power of Gold~");
+                }
+            }
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+                if (figure.getGroup() == Group.V2 || figure.getGroup() == Group.V3) {
+                    sb = replacePatter(sb.toString());
+                    appendAttr(sb, "~Golden Limited Edition~");
+                }
+            }
+        }
+
+        if (figure.isManga()) {
+            appendAttr(sb, "~Comic Version~");
+        }
+        if (figure.isOce()) {
+            sb = replacePatter(sb.toString());
+            appendAttr(sb, "~Original Color Edition~");
+        }
+        if (Objects.nonNull(figure.getAnniversary())) {
+            sb = replacePatter(sb.toString());
+            appendAttr(sb, "~" + figure.getAnniversary() + "th Anniversary Ver.~");
+        }
+        if (figure.isHongKongVersion()) {
+            appendAttr(sb, "~HK Version~");
+        }
+
+        if (figure.isSurplice()) {
+            appendAttr(sb, "(Surplice)");
+        }
+
+        return sb.toString();
+    }
+
+    private StringBuilder replacePatter(String name) {
+        return new StringBuilder(name.replaceFirst("~", "(").replaceFirst("~", ")"));
+    }
+
+    private void appendAttr(StringBuilder sb, String attribute) {
+        sb.append(" ");
+        sb.append(attribute);
+    }
+
     private void copyRestock(CharacterFigure restock, CharacterFigure source) {
         List<RestockFigure> restockList = source.getRestocks();
         if (Objects.isNull(restockList)) {
@@ -118,7 +241,7 @@ public class CharacterFigureService {
         source.setRevival(restock.isRevival());
         source.setPlainCloth(restock.isPlainCloth());
         source.setBrokenCloth(restock.isBrokenCloth());
-        source.setBrozeToGold(restock.isBrozeToGold());
+        source.setBronzeToGold(restock.isBronzeToGold());
         source.setGold(restock.isGold());
         source.setHongKongVersion(restock.isHongKongVersion());
         source.setManga(restock.isManga());
@@ -129,11 +252,15 @@ public class CharacterFigureService {
 
     private void copyCommonInfo(Figure from, Figure target) {
         target.setBasePrice(from.getBasePrice());
+        target.setReleasePrice(from.getReleasePrice());
         target.setFirstAnnouncementDate(from.getFirstAnnouncementDate());
         target.setPreorderDate(from.getPreorderDate());
+        target.setPreorderConfirmationDay(from.getPreorderConfirmationDay());
         target.setReleaseDate(from.getReleaseDate());
+        target.setReleaseConfirmationDay(from.getReleaseConfirmationDay());
         target.setUrl(from.getUrl());
         target.setDistribution(from.getDistribution());
         target.setRemarks(from.getRemarks());
     }
+
 }

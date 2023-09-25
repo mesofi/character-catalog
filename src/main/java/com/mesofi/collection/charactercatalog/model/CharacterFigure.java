@@ -7,6 +7,8 @@ package com.mesofi.collection.charactercatalog.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +21,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CharacterFigure extends Figure {
 
     private String originalName; // Name of the character.
 
     @EqualsAndHashCode.Exclude
     private String baseName; // Base name of the character.
+
+    @EqualsAndHashCode.Exclude
+    private String displayableName; // <== Calculated == name to be displayed.
 
     private LineUp lineUp; // MythCloth ... MythCloth EX etc.
 
@@ -44,7 +50,7 @@ public class CharacterFigure extends Figure {
     private boolean brokenCloth; // Contains broken armor parts?.
 
     @EqualsAndHashCode.Exclude
-    private boolean brozeToGold; // Does the bronze cloth become gold?.
+    private boolean bronzeToGold; // Does the bronze cloth become gold?.
 
     @EqualsAndHashCode.Exclude
     private boolean gold; // Contains true gold?.

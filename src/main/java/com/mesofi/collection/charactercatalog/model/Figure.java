@@ -26,13 +26,22 @@ public abstract class Figure {
     private BigDecimal basePrice; // The price without taxes.
 
     @EqualsAndHashCode.Exclude
+    private BigDecimal releasePrice; // <== Calculated == The price with taxes.
+
+    @EqualsAndHashCode.Exclude
     private LocalDate firstAnnouncementDate; // Date when the figure was first announced.
 
     @EqualsAndHashCode.Exclude
     private LocalDate preorderDate; // Date when the figure was set to pre-order.
 
     @EqualsAndHashCode.Exclude
+    private Boolean preorderConfirmationDay; // <== Calculated == Used to determine if the day was confirmed.
+
+    @EqualsAndHashCode.Exclude
     private LocalDate releaseDate; // Date when the figure was released in Japan.
+
+    @EqualsAndHashCode.Exclude
+    private Boolean releaseConfirmationDay; // <== Calculated == Used to determine if the day was confirmed.
 
     @EqualsAndHashCode.Exclude
     private String url; // URL for the Tamashii website.

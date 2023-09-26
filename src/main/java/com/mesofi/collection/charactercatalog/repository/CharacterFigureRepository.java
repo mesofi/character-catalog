@@ -5,6 +5,8 @@
  */
 package com.mesofi.collection.charactercatalog.repository;
 
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
@@ -16,5 +18,5 @@ import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
  *
  */
 public interface CharacterFigureRepository extends MongoRepository<CharacterFigureEntity, String> {
-
+    List<CharacterFigureEntity> findAllByOrderByReleaseDateDesc();
 }

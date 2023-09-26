@@ -68,26 +68,19 @@ public class CharacterFigureService {
         // first, removes all the records.
         characterFigureRepository.deleteAll();
 
-        List<CharacterFigure> effectiveCharacters = new ArrayList<>();
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
                 .skip(1) // we don't consider the header
                 .map($ -> fileMapper.fromLineToCharacterFigure($))
-                .toList();
+                .collect(Collectors.toList());
         // @formatter:on
 
+        // reverse the list so that we can add re-stocks easily ...
+        reverseCharacters(allCharacters);
+
         log.debug("Total of figures loaded: {}", allCharacters.size());
-        for (CharacterFigure curr : allCharacters) {
-            if (!effectiveCharacters.contains(curr)) {
-                effectiveCharacters.add(curr);
-            } else {
-                // add this character as re-stock
-                CharacterFigure other = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
-                log.debug("Found potential restock: [{}]", other.getOriginalName());
-                copyRestock(curr, other);
-            }
-        }
+        List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
         log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
 
         // performs a mapping and saves the records in the DB ...
@@ -99,6 +92,46 @@ public class CharacterFigureService {
         log.debug("Total of figures saved: {}", total);
     }
 
+    private <T> void reverseCharacters(List<T> allCharacters) {
+        if (Objects.nonNull(allCharacters) && !allCharacters.isEmpty()) {
+            T value = allCharacters.remove(0);
+
+            // call the recursive function to reverse
+            // the list after removing the first element
+            reverseCharacters(allCharacters);
+
+            // now after the rest of the list has been
+            // reversed by the upper recursive call,
+            // add the first value at the end
+            allCharacters.add(value);
+        }
+    }
+
+    /**
+     * Gets the effective characters, this list contains the records to be saved in
+     * DB.
+     * 
+     * @param allCharacters All the characters.
+     * @return The effective characters.
+     */
+    public List<CharacterFigure> getEffectiveCharacters(final List<CharacterFigure> allCharacters) {
+        if (Objects.nonNull(allCharacters)) {
+            List<CharacterFigure> effectiveCharacters = new ArrayList<>();
+            for (CharacterFigure curr : allCharacters) {
+                if (effectiveCharacters.contains(curr)) {
+                    // add the current character as re-stock.
+                    CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
+                    log.debug("Found potential restock: [{}]", curr.getOriginalName());
+                    addRestock(existing, curr);
+                } else {
+                    effectiveCharacters.add(curr);
+                }
+            }
+            return effectiveCharacters;
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Retrieve all the characters.
      * 
@@ -106,7 +139,7 @@ public class CharacterFigureService {
      */
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
-        List<CharacterFigure> figureList = characterFigureRepository.findAll().stream()
+        List<CharacterFigure> figureList = characterFigureRepository.findAllByOrderByReleaseDateDesc().stream()
                 .map($ -> modelMapper.toModel($))
                 .peek($ -> $.setDisplayableName(calculateFigureDisplayableName($)))
                 .peek($ -> $.setReleasePrice(calculateReleasePrice($.getBasePrice(), $.getReleaseDate())))
@@ -172,7 +205,7 @@ public class CharacterFigureService {
         if (figure.isBronzeToGold()) {
             if (figure.getLineUp() == LineUp.MYTH_CLOTH) {
                 if (figure.getGroup() == Group.V1) {
-                    sb = replacePatter(sb.toString());
+                    sb = replacePattern(sb.toString());
                     appendAttr(sb, "~Limited Gold~");
                 }
                 if (figure.getGroup() == Group.V2) {
@@ -181,7 +214,7 @@ public class CharacterFigureService {
             }
             if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
                 if (figure.getGroup() == Group.V2 || figure.getGroup() == Group.V3) {
-                    sb = replacePatter(sb.toString());
+                    sb = replacePattern(sb.toString());
                     appendAttr(sb, "~Golden Limited Edition~");
                 }
             }
@@ -191,11 +224,11 @@ public class CharacterFigureService {
             appendAttr(sb, "~Comic Version~");
         }
         if (figure.isOce()) {
-            sb = replacePatter(sb.toString());
+            sb = replacePattern(sb.toString());
             appendAttr(sb, "~Original Color Edition~");
         }
         if (Objects.nonNull(figure.getAnniversary())) {
-            sb = replacePatter(sb.toString());
+            sb = replacePattern(sb.toString());
             appendAttr(sb, "~" + figure.getAnniversary() + "th Anniversary Ver.~");
         }
         if (figure.isHongKongVersion()) {
@@ -209,13 +242,32 @@ public class CharacterFigureService {
         return sb.toString();
     }
 
-    private StringBuilder replacePatter(String name) {
+    private StringBuilder replacePattern(String name) {
         return new StringBuilder(name.replaceFirst("~", "(").replaceFirst("~", ")"));
     }
 
     private void appendAttr(StringBuilder sb, String attribute) {
         sb.append(" ");
         sb.append(attribute);
+    }
+
+    private void addRestock(CharacterFigure current, CharacterFigure restock) {
+        if (Objects.isNull(current.getRestocks())) {
+            current.setRestocks(new ArrayList<>());
+        }
+        List<RestockFigure> restockList = current.getRestocks();
+        RestockFigure restockFigure = new RestockFigure();
+        restockFigure.setBasePrice(restock.getBasePrice());
+        restockFigure.setReleasePrice(restock.getReleasePrice());
+        restockFigure.setFirstAnnouncementDate(restock.getFirstAnnouncementDate());
+        restockFigure.setPreorderDate(restock.getPreorderDate());
+        restockFigure.setPreorderConfirmationDay(restock.getPreorderConfirmationDay());
+        restockFigure.setReleaseDate(restock.getReleaseDate());
+        restockFigure.setReleaseConfirmationDay(restock.getReleaseConfirmationDay());
+        restockFigure.setUrl(restock.getUrl());
+        restockFigure.setDistribution(restock.getDistribution());
+        restockFigure.setRemarks(restock.getRemarks());
+        restockList.add(restockFigure);
     }
 
     private void copyRestock(CharacterFigure restock, CharacterFigure source) {

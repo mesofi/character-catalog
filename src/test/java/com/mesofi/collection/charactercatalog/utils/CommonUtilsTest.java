@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -72,5 +75,41 @@ public class CommonUtilsTest {
         assertNull(CommonUtils.toStringValue(null));
         assertNull(CommonUtils.toStringValue(""));
         assertEquals("5", CommonUtils.toStringValue("5"));
+    }
+
+    @Test
+    public void should_validate_day_month_date() {
+        assertNull(CommonUtils.isDayMonthYear(null));
+
+        assertFalse(CommonUtils.isDayMonthYear("03/4"));
+
+        assertTrue(CommonUtils.isDayMonthYear("03/4/2023"));
+    }
+
+    @Test
+    public void should_reverse_list() {
+        List<String> myList = null;
+        CommonUtils.reverseListElements(myList);
+        assertNull(myList);
+
+        myList = new ArrayList<>();
+
+        CommonUtils.reverseListElements(myList);
+        assertNotNull(myList);
+
+        myList.add("1");
+        CommonUtils.reverseListElements(myList);
+        assertEquals("1", myList.get(0));
+
+        myList.add("a");
+        myList.add("b");
+        myList.add("c");
+        myList.add("d");
+        CommonUtils.reverseListElements(myList);
+        assertEquals("d", myList.get(0));
+        assertEquals("c", myList.get(1));
+        assertEquals("b", myList.get(2));
+        assertEquals("a", myList.get(3));
+        assertEquals("1", myList.get(4));
     }
 }

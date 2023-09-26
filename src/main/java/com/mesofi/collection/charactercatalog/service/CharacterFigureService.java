@@ -5,6 +5,8 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.reverseListElements;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +26,6 @@ import com.mesofi.collection.charactercatalog.exception.CharacterFigureException
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
@@ -52,8 +53,9 @@ public class CharacterFigureService {
      * Loads all the characters.
      * 
      * @param file The reference to the file with all the records.
+     * @return The total of records loaded.
      */
-    public void loadAllCharacters(final MultipartFile file) {
+    public long loadAllCharacters(final MultipartFile file) {
         log.debug("Loading all the records ...");
 
         if (Objects.isNull(file)) {
@@ -77,7 +79,7 @@ public class CharacterFigureService {
         // @formatter:on
 
         // reverse the list so that we can add re-stocks easily ...
-        reverseCharacters(allCharacters);
+        reverseListElements(allCharacters);
 
         log.debug("Total of figures loaded: {}", allCharacters.size());
         List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
@@ -89,22 +91,8 @@ public class CharacterFigureService {
                         .map($ -> modelMapper.toEntity($))
                         .collect(Collectors.toList())).size();
         // @formatter:on
-        log.debug("Total of figures saved: {}", total);
-    }
-
-    private <T> void reverseCharacters(List<T> allCharacters) {
-        if (Objects.nonNull(allCharacters) && !allCharacters.isEmpty()) {
-            T value = allCharacters.remove(0);
-
-            // call the recursive function to reverse
-            // the list after removing the first element
-            reverseCharacters(allCharacters);
-
-            // now after the rest of the list has been
-            // reversed by the upper recursive call,
-            // add the first value at the end
-            allCharacters.add(value);
-        }
+        log.debug("Total of figures loaded: {}", total);
+        return total;
     }
 
     /**
@@ -269,50 +257,4 @@ public class CharacterFigureService {
         restockFigure.setRemarks(restock.getRemarks());
         restockList.add(restockFigure);
     }
-
-    private void copyRestock(CharacterFigure restock, CharacterFigure source) {
-        List<RestockFigure> restockList = source.getRestocks();
-        if (Objects.isNull(restockList)) {
-            source.setRestocks(new ArrayList<>());
-        }
-        // the source is added itself as re-stock.
-        List<RestockFigure> restocks = source.getRestocks();
-        RestockFigure restockFigure = new RestockFigure();
-        copyCommonInfo(source, restockFigure);
-        restocks.add(restockFigure);
-
-        // now the base info is updated.
-        copyCommonInfo(restock, source);
-        source.setOriginalName(restock.getOriginalName());
-        source.setBaseName(restock.getBaseName());
-        source.setLineUp(restock.getLineUp());
-        source.setSeries(restock.getSeries());
-        source.setGroup(restock.getGroup());
-        source.setMetalBody(restock.isMetalBody());
-        source.setOce(restock.isOce());
-        source.setRevival(restock.isRevival());
-        source.setPlainCloth(restock.isPlainCloth());
-        source.setBrokenCloth(restock.isBrokenCloth());
-        source.setBronzeToGold(restock.isBronzeToGold());
-        source.setGold(restock.isGold());
-        source.setHongKongVersion(restock.isHongKongVersion());
-        source.setManga(restock.isManga());
-        source.setSurplice(restock.isSurplice());
-        source.setSet(restock.isSet());
-        source.setAnniversary(restock.getAnniversary());
-    }
-
-    private void copyCommonInfo(Figure from, Figure target) {
-        target.setBasePrice(from.getBasePrice());
-        target.setReleasePrice(from.getReleasePrice());
-        target.setFirstAnnouncementDate(from.getFirstAnnouncementDate());
-        target.setPreorderDate(from.getPreorderDate());
-        target.setPreorderConfirmationDay(from.getPreorderConfirmationDay());
-        target.setReleaseDate(from.getReleaseDate());
-        target.setReleaseConfirmationDay(from.getReleaseConfirmationDay());
-        target.setUrl(from.getUrl());
-        target.setDistribution(from.getDistribution());
-        target.setRemarks(from.getRemarks());
-    }
-
 }

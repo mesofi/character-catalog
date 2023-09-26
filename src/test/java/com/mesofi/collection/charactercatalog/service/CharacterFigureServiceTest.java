@@ -261,18 +261,79 @@ public class CharacterFigureServiceTest {
      * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
      */
     @Test
-    public void should_create_new_character() {
+    public void should_create_new_character_with_default_values() {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setBaseName("Pegasus Seiya");
         characterFigure.setGroup(Group.V1);
 
         CharacterFigureEntity entity = new CharacterFigureEntity();
-        entity.setBaseName(characterFigure.getBaseName());
-        entity.setGroup(characterFigure.getGroup());
+        entity.setBaseName("Pegasus Seiya");
+        entity.setGroup(Group.V1);
         when(modelMapper.toEntity(characterFigure)).thenReturn(entity);
 
+        CharacterFigureEntity entity1 = new CharacterFigureEntity();
+        entity1.setId("123");
+        entity1.setBaseName("Pegasus Seiya");
+        entity1.setGroup(Group.V1);
+        when(characterFigureRepository.save(entity)).thenReturn(entity1);
+
+        CharacterFigure characterFigureResult = new CharacterFigure();
+        characterFigureResult.setId("123");
+        characterFigureResult.setBaseName("Pegasus Seiya");
+        characterFigureResult.setGroup(Group.V1);
+        when(modelMapper.toModel(entity1)).thenReturn(characterFigureResult);
+
         CharacterFigure characterFigureExpected = service.createNewCharacter(characterFigure);
-        //assertNotNull(characterFigureExpected);
+        assertNotNull(characterFigureExpected);
+        assertEquals("123", characterFigureExpected.getId());
+        assertEquals("Pegasus Seiya", characterFigureExpected.getBaseName());
+        assertEquals(Group.V1, characterFigureExpected.getGroup());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_create_new_character() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Hypnos");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setOriginalName("Hypnos");
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setSeries(Series.SAINT_SEIYA);
+
+        CharacterFigureEntity entity = new CharacterFigureEntity();
+        entity.setBaseName("Hypnos");
+        entity.setGroup(Group.V1);
+        entity.setOriginalName("Hypnos");
+        entity.setLineUp(LineUp.MYTH_CLOTH_EX);
+        entity.setSeries(Series.SAINT_SEIYA);
+        when(modelMapper.toEntity(characterFigure)).thenReturn(entity);
+
+        CharacterFigureEntity entity1 = new CharacterFigureEntity();
+        entity1.setId("123");
+        entity1.setBaseName("Hypnos");
+        entity1.setGroup(Group.V1);
+        entity1.setOriginalName("Hypnos");
+        entity1.setLineUp(LineUp.MYTH_CLOTH_EX);
+        entity1.setSeries(Series.SAINT_SEIYA);
+        when(characterFigureRepository.save(entity)).thenReturn(entity1);
+
+        CharacterFigure characterFigureResult = new CharacterFigure();
+        characterFigureResult.setId("123");
+        characterFigureResult.setBaseName("Hypnos");
+        characterFigureResult.setGroup(Group.V1);
+        characterFigureResult.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigureResult.setSeries(Series.SAINT_SEIYA);
+        when(modelMapper.toModel(entity1)).thenReturn(characterFigureResult);
+
+        CharacterFigure characterFigureExpected = service.createNewCharacter(characterFigure);
+        assertNotNull(characterFigureExpected);
+        assertEquals("123", characterFigureExpected.getId());
+        assertEquals("Hypnos", characterFigureExpected.getBaseName());
+        assertEquals(Group.V1, characterFigureExpected.getGroup());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
     }
 
     private CharacterFigureEntity createCharacterFigure(String originalName, String baseName) {

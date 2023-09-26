@@ -44,6 +44,9 @@ public abstract class Figure {
     private Boolean releaseConfirmationDay; // <== Calculated == Used to determine if the day was confirmed.
 
     @EqualsAndHashCode.Exclude
+    private boolean futureRelease; // <== Calculated == Used to determine if the figure is in the future or not.
+
+    @EqualsAndHashCode.Exclude
     private String url; // URL for the Tamashii website.
 
     @EqualsAndHashCode.Exclude

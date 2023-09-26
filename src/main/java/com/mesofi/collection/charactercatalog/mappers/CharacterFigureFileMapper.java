@@ -50,6 +50,7 @@ public class CharacterFigureFileMapper {
         characterFigure.setPreorderConfirmationDay(isDayMonthYear(columns[5]));
         characterFigure.setReleaseDate(toDate(columns[6]));
         characterFigure.setReleaseConfirmationDay(isDayMonthYear(columns[6]));
+        characterFigure.setFutureRelease(!StringUtils.hasText(columns[6]));
         characterFigure.setUrl(toStringValue(columns[7]));
         characterFigure.setDistribution(toEnum(columns[8], Distribution.class));
         characterFigure.setLineUp(toEnum(columns[9], LineUp.class));

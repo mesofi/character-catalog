@@ -24,6 +24,8 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CharacterFigure extends Figure {
 
+    private String id; // identifier of the record.
+
     private String originalName; // Name of the character.
 
     @EqualsAndHashCode.Exclude

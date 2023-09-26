@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
@@ -29,6 +30,7 @@ import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
+import com.mesofi.collection.charactercatalog.model.Series;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 import lombok.AllArgsConstructor;
@@ -45,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CharacterFigureService {
 
-    private CharacterFigureRepository characterFigureRepository;
+    private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
     private CharacterFigureFileMapper fileMapper;
 
@@ -68,7 +70,7 @@ public class CharacterFigureService {
             throw new CharacterFigureException("Unable to read characters from file");
         }
         // first, removes all the records.
-        characterFigureRepository.deleteAll();
+        repository.deleteAll();
 
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
@@ -87,7 +89,7 @@ public class CharacterFigureService {
 
         // performs a mapping and saves the records in the DB ...
         // @formatter:off
-        long total = characterFigureRepository.saveAll(effectiveCharacters.stream()
+        long total = repository.saveAll(effectiveCharacters.stream()
                         .map($ -> modelMapper.toEntity($))
                         .collect(Collectors.toList())).size();
         // @formatter:on
@@ -127,7 +129,7 @@ public class CharacterFigureService {
      */
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
-        List<CharacterFigure> figureList = characterFigureRepository.findAllByOrderByReleaseDateDesc().stream()
+        List<CharacterFigure> figureList = repository.findAllByOrderByFutureReleaseDescReleaseDateDesc().stream()
                 .map($ -> modelMapper.toModel($))
                 .peek($ -> $.setDisplayableName(calculateFigureDisplayableName($)))
                 .peek($ -> $.setReleasePrice(calculateReleasePrice($.getBasePrice(), $.getReleaseDate())))
@@ -230,6 +232,42 @@ public class CharacterFigureService {
         return sb.toString();
     }
 
+    /**
+     * Creates a new character.
+     * 
+     * @param characterFigure The character to be persisted.
+     * @return The saved character.
+     */
+    public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
+        log.debug("Creating a new character ...");
+        if (Objects.isNull(characterFigure)) {
+            throw new IllegalArgumentException("Provide a valid character");
+        }
+        if (!StringUtils.hasText(characterFigure.getBaseName())) {
+            throw new IllegalArgumentException("Provide a valid base name");
+        }
+        if (Objects.isNull(characterFigure.getGroup())) {
+            throw new IllegalArgumentException("Provide a valid group");
+        }
+
+        if (!StringUtils.hasText(characterFigure.getOriginalName())) {
+            characterFigure.setOriginalName(characterFigure.getBaseName());
+        }
+
+        if (Objects.isNull(characterFigure.getLineUp())) {
+            characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        }
+
+        if (Objects.isNull(characterFigure.getSeries())) {
+            characterFigure.setSeries(Series.SAINT_SEIYA);
+        }
+
+        // the character is persisted.
+        CharacterFigure figureSaved = modelMapper.toModel(repository.save(modelMapper.toEntity(characterFigure)));
+        log.debug("A new character has been saved with id: {}", characterFigure.getId());
+        return figureSaved;
+    }
+
     private StringBuilder replacePattern(String name) {
         return new StringBuilder(name.replaceFirst("~", "(").replaceFirst("~", ")"));
     }
@@ -257,4 +295,5 @@ public class CharacterFigureService {
         restockFigure.setRemarks(restock.getRemarks());
         restockList.add(restockFigure);
     }
+
 }

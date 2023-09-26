@@ -213,13 +213,66 @@ public class CharacterFigureServiceTest {
                 Series.SOG, Group.GOLD, false, false);
 
         mockList.add(entity1);
-        when(characterFigureRepository.findAllByOrderByReleaseDateDesc()).thenReturn(mockList);
+        when(characterFigureRepository.findAllByOrderByFutureReleaseDescReleaseDateDesc()).thenReturn(mockList);
         when(modelMapper.toModel(entity1)).thenReturn(figure1);
 
         List<CharacterFigure> list = service.retrieveAllCharacters();
         assertNotNull(list);
         assertFalse(list.isEmpty());
         assertEquals("Pegasus Seiya", list.get(0).getDisplayableName());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_fail_when_new_character_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.createNewCharacter(null));
+        assertEquals("Provide a valid character", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_fail_when_new_character_base_name_is_missing() {
+        CharacterFigure characterFigure = new CharacterFigure();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.createNewCharacter(characterFigure));
+        assertEquals("Provide a valid base name", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_fail_when_new_character_group_is_missing() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.createNewCharacter(characterFigure));
+        assertEquals("Provide a valid group", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_create_new_character() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+
+        CharacterFigureEntity entity = new CharacterFigureEntity();
+        entity.setBaseName(characterFigure.getBaseName());
+        entity.setGroup(characterFigure.getGroup());
+        when(modelMapper.toEntity(characterFigure)).thenReturn(entity);
+
+        CharacterFigure characterFigureExpected = service.createNewCharacter(characterFigure);
+        //assertNotNull(characterFigureExpected);
     }
 
     private CharacterFigureEntity createCharacterFigure(String originalName, String baseName) {

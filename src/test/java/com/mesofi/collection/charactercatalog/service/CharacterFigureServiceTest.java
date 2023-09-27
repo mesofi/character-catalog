@@ -11,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyIterable;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -23,21 +22,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mesofi.collection.charactercatalog.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
-import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.model.Group;
-import com.mesofi.collection.charactercatalog.model.LineUp;
-import com.mesofi.collection.charactercatalog.model.Series;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 /**
@@ -213,7 +210,7 @@ public class CharacterFigureServiceTest {
                 Series.SOG, Group.GOLD, false, false);
 
         mockList.add(entity1);
-        when(characterFigureRepository.findAllByOrderByFutureReleaseDescReleaseDateDesc()).thenReturn(mockList);
+        when(characterFigureRepository.findAll(any(Sort.class))).thenReturn(mockList);
         when(modelMapper.toModel(entity1)).thenReturn(figure1);
 
         List<CharacterFigure> list = service.retrieveAllCharacters();
@@ -343,14 +340,16 @@ public class CharacterFigureServiceTest {
         return characterFigure;
     }
 
-    private CharacterFigure createCharacter(String originalName, LocalDate releasePrice, LineUp lineUp, Series series,
+    private CharacterFigure createCharacter(String originalName, LocalDate releaseDate, LineUp lineUp, Series series,
             Group group, boolean oce, boolean revival) {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setOriginalName(originalName);
         characterFigure.setBaseName(originalName);
-        characterFigure.setReleaseConfirmationDay(true);
-        characterFigure.setReleaseDate(releasePrice);
-        characterFigure.setBasePrice(new BigDecimal("12000"));
+        Issuance issuanceJPY = new Issuance();
+        issuanceJPY.setReleaseConfirmationDay(true);
+        issuanceJPY.setReleaseDate(releaseDate);
+        issuanceJPY.setBasePrice(new BigDecimal("12000"));
+        characterFigure.setIssuanceJPY(issuanceJPY);
         characterFigure.setLineUp(lineUp);
         characterFigure.setSeries(series);
         characterFigure.setGroup(group);

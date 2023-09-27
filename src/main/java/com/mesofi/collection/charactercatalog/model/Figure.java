@@ -5,8 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,28 +19,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class Figure {
 
     @EqualsAndHashCode.Exclude
-    private BigDecimal basePrice; // The price without taxes.
+    private Issuance issuanceJPY;
 
     @EqualsAndHashCode.Exclude
-    private BigDecimal releasePrice; // <== Calculated == The price with taxes.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate firstAnnouncementDate; // Date when the figure was first announced.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate preorderDate; // Date when the figure was set to pre-order.
-
-    @EqualsAndHashCode.Exclude
-    private Boolean preorderConfirmationDay; // <== Calculated == Used to determine if the day was confirmed.
-
-    @EqualsAndHashCode.Exclude
-    private LocalDate releaseDate; // Date when the figure was released in Japan.
-
-    @EqualsAndHashCode.Exclude
-    private Boolean releaseConfirmationDay; // <== Calculated == Used to determine if the day was confirmed.
+    private Issuance issuanceMXN;
 
     @EqualsAndHashCode.Exclude
     private boolean futureRelease; // <== Calculated == Used to determine if the figure is in the future or not.

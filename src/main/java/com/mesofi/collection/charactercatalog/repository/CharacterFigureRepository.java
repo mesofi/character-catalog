@@ -18,5 +18,4 @@ import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
  *
  */
 public interface CharacterFigureRepository extends MongoRepository<CharacterFigureEntity, String> {
-    List<CharacterFigureEntity> findAllByOrderByFutureReleaseDescReleaseDateDesc();
 }

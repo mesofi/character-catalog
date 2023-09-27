@@ -39,7 +39,7 @@ public class CharacterFigureFileMapperTest {
 
     @Test
     public void should_map_character() {
-        String line = "Dragon Shiryu ~New Bronze Cloth~\tDragon Shiryu\t¥6,000\t¥6,600\t\t\t8/24/2013\tStores\thttps://tamashiiweb.com/item/10372\tMyth Cloth EX\tSaint Seiya\tBronze Saint V2\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE";
+        String line = "Dragon Shiryu ~New Bronze Cloth~\tDragon Shiryu\t¥6,000\t¥6,600\t\t\t8/24/2013\t\t\t\thttps://tamashiiweb.com/item/10372\tStores\tMyth Cloth EX\tSaint Seiya\tBronze Saint V2\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
         assertEquals("Dragon Shiryu ~New Bronze Cloth~", figure.getOriginalName());
         assertEquals("Dragon Shiryu", figure.getBaseName());

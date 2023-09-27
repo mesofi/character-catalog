@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
 import com.mesofi.collection.charactercatalog.model.Series;
@@ -132,7 +134,11 @@ public class CharacterFigureService {
      */
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
-        List<CharacterFigure> figureList = repository.findAllByOrderByFutureReleaseDescReleaseDateDesc().stream()
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
+
+        List<CharacterFigure> figureList = repository.findAll(Sort.by(orders)).stream()
                 .map($ -> modelMapper.toModel($))
                 .peek(this::prepareCharacterFigure)
                 .toList();
@@ -147,8 +153,17 @@ public class CharacterFigureService {
      * @param figure The character figure to be shown.
      */
     private void prepareCharacterFigure(CharacterFigure figure) {
+        Issuance jpy = figure.getIssuanceJPY();
+        Issuance mxn = figure.getIssuanceMXN();
+
         figure.setDisplayableName(calculateFigureDisplayableName(figure));
-        figure.setReleasePrice(calculateReleasePrice(figure.getBasePrice(), figure.getReleaseDate()));
+        if (Objects.nonNull(jpy)) {
+            jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
+        }
+        if (Objects.nonNull(mxn)) {
+            mxn.setReleasePrice(mxn.getBasePrice());
+        }
+
         figure.setOriginalName(null);
         figure.setBaseName(null);
     }
@@ -294,17 +309,11 @@ public class CharacterFigureService {
         }
         List<RestockFigure> restockList = current.getRestocks();
         RestockFigure restockFigure = new RestockFigure();
-        restockFigure.setBasePrice(restock.getBasePrice());
-        restockFigure.setReleasePrice(restock.getReleasePrice());
-        restockFigure.setFirstAnnouncementDate(restock.getFirstAnnouncementDate());
-        restockFigure.setPreorderDate(restock.getPreorderDate());
-        restockFigure.setPreorderConfirmationDay(restock.getPreorderConfirmationDay());
-        restockFigure.setReleaseDate(restock.getReleaseDate());
-        restockFigure.setReleaseConfirmationDay(restock.getReleaseConfirmationDay());
+        restockFigure.setIssuanceJPY(restock.getIssuanceJPY());
+        restockFigure.setIssuanceMXN(restock.getIssuanceMXN());
         restockFigure.setUrl(restock.getUrl());
         restockFigure.setDistribution(restock.getDistribution());
         restockFigure.setRemarks(restock.getRemarks());
         restockList.add(restockFigure);
     }
-
 }

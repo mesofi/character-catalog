@@ -9,9 +9,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_BASE_NAME;
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_GROUP;
 
 /**
  * The actual value object used to hold the info.
@@ -28,6 +33,7 @@ public class CharacterFigure extends Figure {
 
     private String originalName; // Name of the character.
 
+    @NotBlank(message = INVALID_BASE_NAME)
     @EqualsAndHashCode.Exclude
     private String baseName; // Base name of the character.
 
@@ -38,6 +44,7 @@ public class CharacterFigure extends Figure {
 
     private Series series; // Saint Seiya, Lost Canvas etc.
 
+    @NotNull(message = INVALID_GROUP)
     private Group group; // Group of the character.
 
     private boolean metalBody; // Has a metal body.

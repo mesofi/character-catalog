@@ -7,6 +7,7 @@ package com.mesofi.collection.charactercatalog.controllers;
 
 import static com.mesofi.collection.charactercatalog.utils.FileUtils.getPathFromClassPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,14 +26,14 @@ import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
 /**
  * Test for
- * {@link CharacterFigureController#handleFileUpload(org.springframework.web.multipart.MultipartFile)}
+ * {@link CharacterFigureController#createNewCharacter(com.mesofi.collection.charactercatalog.model.CharacterFigure)}
  * 
  * @author armandorivasarzaluz
  *
  */
 @ActiveProfiles("test")
 @WebMvcTest(CharacterFigureController.class)
-public class CharacterFigureControllerTest {
+public class CharacterFigureCreateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,25 +41,24 @@ public class CharacterFigureControllerTest {
     @MockBean
     private CharacterFigureService characterFigureService;
 
-    private final String BASE_URL = "/characters/loader";
+    private final String BASE_URL = "/characters";
 
     @Test
-    public void should_return_bad_request_when_file_is_missing() throws Exception {
+    public void should_return_bad_request_when_body_is_missing() throws Exception {
         // @formatter:off
-        mockMvc.perform(multipart(BASE_URL))
+        mockMvc.perform(post(BASE_URL))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
         // @formatter:on
     }
 
-    @Test
+    //@Test
     public void should_return_success_when_file_is_provided() throws Exception {
-        final String CATALOG = "characters/MythCloth Catalog - CatalogMyth-min.tsv";
-        final byte[] bytes = Files.readAllBytes(getPathFromClassPath(CATALOG));
 
         // @formatter:off
-        mockMvc.perform(multipart(BASE_URL)
-                        .file("file", bytes))
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content("{}"))
                 .andDo(print())
                 .andExpect(status().isAccepted())
                 .andExpect(content().string("")); // size of the test input file

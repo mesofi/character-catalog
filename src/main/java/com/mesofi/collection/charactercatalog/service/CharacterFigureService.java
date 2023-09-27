@@ -47,6 +47,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CharacterFigureService {
 
+    public static final String INVALID_BASE_NAME = "Provide a non empty base name";
+    public static final String INVALID_GROUP = "Provide a valid group";
+
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
     private CharacterFigureFileMapper fileMapper;
@@ -131,16 +134,23 @@ public class CharacterFigureService {
         // @formatter:off
         List<CharacterFigure> figureList = repository.findAllByOrderByFutureReleaseDescReleaseDateDesc().stream()
                 .map($ -> modelMapper.toModel($))
-                .peek($ -> $.setDisplayableName(calculateFigureDisplayableName($)))
-                .peek($ -> $.setReleasePrice(calculateReleasePrice($.getBasePrice(), $.getReleaseDate())))
-                .peek($ -> {
-                    $.setOriginalName(null);
-                    $.setBaseName(null);
-                })
+                .peek(this::prepareCharacterFigure)
                 .toList();
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
         return figureList;
+    }
+
+    /**
+     * This method is used to prepare the figure to be displayed in the response.
+     * 
+     * @param figure The character figure to be shown.
+     */
+    private void prepareCharacterFigure(CharacterFigure figure) {
+        figure.setDisplayableName(calculateFigureDisplayableName(figure));
+        figure.setReleasePrice(calculateReleasePrice(figure.getBasePrice(), figure.getReleaseDate()));
+        figure.setOriginalName(null);
+        figure.setBaseName(null);
     }
 
     private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {
@@ -244,10 +254,10 @@ public class CharacterFigureService {
             throw new IllegalArgumentException("Provide a valid character");
         }
         if (!StringUtils.hasText(characterFigure.getBaseName())) {
-            throw new IllegalArgumentException("Provide a valid base name");
+            throw new IllegalArgumentException(INVALID_BASE_NAME);
         }
         if (Objects.isNull(characterFigure.getGroup())) {
-            throw new IllegalArgumentException("Provide a valid group");
+            throw new IllegalArgumentException(INVALID_GROUP);
         }
 
         if (!StringUtils.hasText(characterFigure.getOriginalName())) {
@@ -264,6 +274,7 @@ public class CharacterFigureService {
 
         // the character is persisted.
         CharacterFigure figureSaved = modelMapper.toModel(repository.save(modelMapper.toEntity(characterFigure)));
+        prepareCharacterFigure(figureSaved);
         log.debug("A new character has been saved with id: {}", characterFigure.getId());
         return figureSaved;
     }

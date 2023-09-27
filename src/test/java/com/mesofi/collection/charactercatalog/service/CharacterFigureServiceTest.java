@@ -208,7 +208,7 @@ public class CharacterFigureServiceTest {
     @Test
     public void should_get_all_characters() {
         List<CharacterFigureEntity> mockList = new ArrayList<>();
-        CharacterFigureEntity entity1 = createCharacterFigure("Pegasus Seiya", "Pegasus Seiya");
+        CharacterFigureEntity entity1 = createCharacterFigure();
         CharacterFigure figure1 = createCharacter("Pegasus Seiya", LocalDate.of(2018, 1, 27), LineUp.MYTH_CLOTH_EX,
                 Series.SOG, Group.GOLD, false, false);
 
@@ -241,7 +241,7 @@ public class CharacterFigureServiceTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.createNewCharacter(characterFigure));
-        assertEquals("Provide a valid base name", exception.getMessage());
+        assertEquals("Provide a non empty base name", exception.getMessage());
     }
 
     /**
@@ -286,7 +286,7 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigureExpected = service.createNewCharacter(characterFigure);
         assertNotNull(characterFigureExpected);
         assertEquals("123", characterFigureExpected.getId());
-        assertEquals("Pegasus Seiya", characterFigureExpected.getBaseName());
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~", characterFigureExpected.getDisplayableName());
         assertEquals(Group.V1, characterFigureExpected.getGroup());
     }
 
@@ -330,16 +330,16 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigureExpected = service.createNewCharacter(characterFigure);
         assertNotNull(characterFigureExpected);
         assertEquals("123", characterFigureExpected.getId());
-        assertEquals("Hypnos", characterFigureExpected.getBaseName());
+        assertEquals("Hypnos ~Initial Bronze Cloth~", characterFigureExpected.getDisplayableName());
         assertEquals(Group.V1, characterFigureExpected.getGroup());
         assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
         assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
     }
 
-    private CharacterFigureEntity createCharacterFigure(String originalName, String baseName) {
+    private CharacterFigureEntity createCharacterFigure() {
         CharacterFigureEntity characterFigure = new CharacterFigureEntity();
-        characterFigure.setOriginalName(originalName);
-        characterFigure.setBaseName(baseName);
+        characterFigure.setOriginalName("Pegasus Seiya");
+        characterFigure.setBaseName("Pegasus Seiya");
         return characterFigure;
     }
 

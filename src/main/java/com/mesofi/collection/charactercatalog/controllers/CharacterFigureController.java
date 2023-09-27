@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping("/characters")
@@ -51,8 +53,15 @@ public class CharacterFigureController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
+    /**
+     * Creates a new character.
+     * 
+     * @param characterFigure The character to be created.
+     * @return The created character.
+     */
     @PostMapping
-    public CharacterFigure createNewCharacter(@RequestBody @Validated CharacterFigure characterFigure) {
+    public CharacterFigure createNewCharacter(@Valid @RequestBody CharacterFigure characterFigure) {
+        log.debug("Creating a new character ...");
         return service.createNewCharacter(characterFigure);
     }
 

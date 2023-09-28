@@ -6,6 +6,7 @@
 package com.mesofi.collection.charactercatalog.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -49,4 +50,18 @@ public class CharacterFigureEntity extends Figure {
     private boolean set;
     private Integer anniversary;
     private List<RestockFigure> restocks;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CharacterFigureEntity that = (CharacterFigureEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id);
+    }
 }

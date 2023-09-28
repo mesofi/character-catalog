@@ -52,15 +52,14 @@ public class CharacterFigureCreateControllerTest {
         // @formatter:on
     }
 
-    //@Test
+    @Test
     public void should_return_success_when_file_is_provided() throws Exception {
-
         // @formatter:off
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content("{}"))
                 .andDo(print())
-                .andExpect(status().isAccepted())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().string("")); // size of the test input file
         // @formatter:on
     }

@@ -12,9 +12,15 @@ import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toStringValue;
 
-import com.mesofi.collection.charactercatalog.model.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.Distribution;
+import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.Issuance;
+import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.Series;
 
 /**
  * The actual Character Figure file mapper.
@@ -69,14 +75,18 @@ public class CharacterFigureFileMapper {
     }
 
     private Issuance createIssuance(String price, String announcement, String preorder, String release) {
-        Issuance issuance = new Issuance();
-        issuance.setBasePrice(toPrice(price));
-        issuance.setFirstAnnouncementDate(toDate(announcement));
-        issuance.setPreorderDate(toDate(preorder));
-        issuance.setPreorderConfirmationDay(isDayMonthYear(preorder));
-        issuance.setReleaseDate(toDate(release));
-        issuance.setReleaseConfirmationDay(isDayMonthYear(release));
-        return issuance;
+        if (StringUtils.hasText(price) || StringUtils.hasText(announcement) || StringUtils.hasText(preorder)
+                || StringUtils.hasText(release)) {
+            Issuance issuance = new Issuance();
+            issuance.setBasePrice(toPrice(price));
+            issuance.setFirstAnnouncementDate(toDate(announcement));
+            issuance.setPreorderDate(toDate(preorder));
+            issuance.setPreorderConfirmationDay(isDayMonthYear(preorder));
+            issuance.setReleaseDate(toDate(release));
+            issuance.setReleaseConfirmationDay(isDayMonthYear(release));
+            return issuance;
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

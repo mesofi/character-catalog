@@ -29,6 +29,7 @@ import static com.mesofi.collection.charactercatalog.service.CharacterFigureServ
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CharacterFigure extends Figure {
 
+    @EqualsAndHashCode.Exclude
     private String id; // identifier of the record.
 
     private String originalName; // Name of the character.

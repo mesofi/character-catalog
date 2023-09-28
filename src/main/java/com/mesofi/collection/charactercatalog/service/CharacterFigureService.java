@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
@@ -116,7 +118,6 @@ public class CharacterFigureService {
                 if (effectiveCharacters.contains(curr)) {
                     // add the current character as re-stock.
                     CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
-                    log.debug("Found potential restock: [{}]", curr.getOriginalName());
                     addRestock(existing, curr);
                 } else {
                     effectiveCharacters.add(curr);
@@ -134,13 +135,9 @@ public class CharacterFigureService {
      */
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
-        List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
-        orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
-
-        List<CharacterFigure> figureList = repository.findAll(Sort.by(orders)).stream()
+        List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
                 .map($ -> modelMapper.toModel($))
-                .peek(this::prepareCharacterFigure)
+                .peek(this::calculatePriceAndDisplayableName)
                 .toList();
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
@@ -152,11 +149,13 @@ public class CharacterFigureService {
      * 
      * @param figure The character figure to be shown.
      */
-    private void prepareCharacterFigure(CharacterFigure figure) {
+    private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
         Issuance jpy = figure.getIssuanceJPY();
         Issuance mxn = figure.getIssuanceMXN();
 
+        // the displayable name is calculated here
         figure.setDisplayableName(calculateFigureDisplayableName(figure));
+        // the price is set here.
         if (Objects.nonNull(jpy)) {
             jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
         }
@@ -260,38 +259,64 @@ public class CharacterFigureService {
     /**
      * Creates a new character.
      * 
-     * @param characterFigure The character to be persisted.
+     * @param newCharacter The character to be persisted.
      * @return The saved character.
      */
-    public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
+    public CharacterFigure createNewCharacter(final CharacterFigure newCharacter) {
         log.debug("Creating a new character ...");
-        if (Objects.isNull(characterFigure)) {
+        if (Objects.isNull(newCharacter)) {
             throw new IllegalArgumentException("Provide a valid character");
         }
-        if (!StringUtils.hasText(characterFigure.getBaseName())) {
+        if (!StringUtils.hasText(newCharacter.getBaseName())) {
             throw new IllegalArgumentException(INVALID_BASE_NAME);
         }
-        if (Objects.isNull(characterFigure.getGroup())) {
+        if (Objects.isNull(newCharacter.getGroup())) {
             throw new IllegalArgumentException(INVALID_GROUP);
         }
 
-        if (!StringUtils.hasText(characterFigure.getOriginalName())) {
-            characterFigure.setOriginalName(characterFigure.getBaseName());
+        if (!StringUtils.hasText(newCharacter.getOriginalName())) {
+            newCharacter.setOriginalName(newCharacter.getBaseName());
         }
 
-        if (Objects.isNull(characterFigure.getLineUp())) {
-            characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        if (Objects.isNull(newCharacter.getLineUp())) {
+            newCharacter.setLineUp(LineUp.MYTH_CLOTH_EX);
         }
 
-        if (Objects.isNull(characterFigure.getSeries())) {
-            characterFigure.setSeries(Series.SAINT_SEIYA);
+        if (Objects.isNull(newCharacter.getSeries())) {
+            newCharacter.setSeries(Series.SAINT_SEIYA);
         }
 
-        // the character is persisted.
-        CharacterFigure figureSaved = modelMapper.toModel(repository.save(modelMapper.toEntity(characterFigure)));
-        prepareCharacterFigure(figureSaved);
-        log.debug("A new character has been saved with id: {}", characterFigure.getId());
-        return figureSaved;
+        // check if the new figure is part of restocking, or it is a new one.
+        List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
+        log.debug("We found {} existing stored figures ...", existingFigures.size());
+
+        // @formatter:off
+        Optional<CharacterFigure> characterFound = existingFigures.stream()
+                .map($ -> modelMapper.toModel($))
+                .filter(newCharacter::equals)
+                .findFirst();
+        // @formatter:on
+
+        CharacterFigure cf;
+        if (characterFound.isPresent()) {
+            // the new character can be added as a restocking.
+            cf = characterFound.get();
+            addRestock(cf, newCharacter);
+            log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
+        } else {
+            // the new character is saved for the first time.
+            cf = modelMapper.toModel(repository.save(modelMapper.toEntity(newCharacter)));
+            log.debug("A new character has been saved with id: {}", newCharacter.getId());
+        }
+        calculatePriceAndDisplayableName(cf);
+        return cf;
+    }
+
+    private Sort getSorting() {
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
+        return Sort.by(orders);
     }
 
     private StringBuilder replacePattern(String name) {
@@ -304,6 +329,8 @@ public class CharacterFigureService {
     }
 
     private void addRestock(CharacterFigure current, CharacterFigure restock) {
+        log.debug("Found potential restock: [{}]", restock.getOriginalName());
+
         if (Objects.isNull(current.getRestocks())) {
             current.setRestocks(new ArrayList<>());
         }

@@ -272,6 +272,9 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setBaseName("Pegasus Seiya");
         characterFigure.setGroup(Group.V1);
+        Issuance issuanceJPY = new Issuance();
+        issuanceJPY.setReleaseDate(LocalDate.of(2023, 2, 3));
+        characterFigure.setIssuanceJPY(issuanceJPY);
 
         CharacterFigureEntity entity = new CharacterFigureEntity();
         entity.setBaseName("Pegasus Seiya");
@@ -410,6 +413,64 @@ public class CharacterFigureServiceTest {
         assertNull(characterFigureExpected.getIssuanceJPY().getPreorderConfirmationDay());
         assertEquals(LocalDate.of(2023, 9, 28), characterFigureExpected.getIssuanceJPY().getReleaseDate());
         assertTrue(characterFigureExpected.getIssuanceJPY().getReleaseConfirmationDay());
+        assertNull(characterFigureExpected.getIssuanceMXN());
+        assertFalse(characterFigureExpected.isFutureRelease());
+        assertNull(characterFigureExpected.getUrl());
+        assertNull(characterFigureExpected.getDistribution());
+        assertNull(characterFigureExpected.getRemarks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_create_new_character_with_multiple_restocks() {
+        CharacterFigure newCharacter = new CharacterFigure();
+        newCharacter.setBaseName("Virgo Shaka");
+        newCharacter.setGroup(Group.GOLD);
+        newCharacter.setRevival(true);
+
+        // no records exist in the DB yet
+        when(repository.findAll(any(Sort.class))).thenReturn(new ArrayList<>());
+
+        CharacterFigureEntity entity = createFigureEntity(null, "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(modelMapper.toEntity(any(CharacterFigure.class))).thenReturn(entity);
+
+        CharacterFigureEntity savedEntity = createFigureEntity("1", "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(repository.save(any(CharacterFigureEntity.class))).thenReturn(savedEntity);
+
+        CharacterFigure savedCharacter = new CharacterFigure();
+        savedCharacter.setId("1");
+        savedCharacter.setBaseName("Virgo Shaka");
+        savedCharacter.setGroup(Group.GOLD);
+        savedCharacter.setRevival(true);
+        savedCharacter.setLineUp(LineUp.MYTH_CLOTH_EX);
+        savedCharacter.setSeries(Series.SAINT_SEIYA);
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(savedCharacter);
+
+        CharacterFigure characterFigureExpected = service.createNewCharacter(newCharacter);
+        assertNotNull(characterFigureExpected);
+        assertEquals("1", characterFigureExpected.getId());
+        assertNull(characterFigureExpected.getOriginalName());
+        assertNull(characterFigureExpected.getBaseName());
+        assertEquals("Virgo Shaka", characterFigureExpected.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
+        assertEquals(Group.GOLD, characterFigureExpected.getGroup());
+        assertFalse(characterFigureExpected.isMetalBody());
+        assertFalse(characterFigureExpected.isOce());
+        assertTrue(characterFigureExpected.isRevival());
+        assertFalse(characterFigureExpected.isPlainCloth());
+        assertFalse(characterFigureExpected.isBrokenCloth());
+        assertFalse(characterFigureExpected.isBronzeToGold());
+        assertFalse(characterFigureExpected.isGold());
+        assertFalse(characterFigureExpected.isHongKongVersion());
+        assertFalse(characterFigureExpected.isManga());
+        assertFalse(characterFigureExpected.isSurplice());
+        assertFalse(characterFigureExpected.isSet());
+        assertNull(characterFigureExpected.getAnniversary());
+        assertNull(characterFigureExpected.getRestocks());
+        assertNull(characterFigureExpected.getIssuanceJPY());
         assertNull(characterFigureExpected.getIssuanceMXN());
         assertFalse(characterFigureExpected.isFutureRelease());
         assertNull(characterFigureExpected.getUrl());

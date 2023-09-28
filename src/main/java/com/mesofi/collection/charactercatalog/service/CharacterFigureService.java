@@ -30,6 +30,7 @@ import com.mesofi.collection.charactercatalog.exception.CharacterFigureException
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -118,7 +119,7 @@ public class CharacterFigureService {
                 if (effectiveCharacters.contains(curr)) {
                     // add the current character as re-stock.
                     CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
-                    addRestock(existing, curr);
+                    existing.setRestocks(addRestock(existing.getRestocks(), curr));
                 } else {
                     effectiveCharacters.add(curr);
                 }
@@ -263,7 +264,7 @@ public class CharacterFigureService {
      * @return The saved character.
      */
     public CharacterFigure createNewCharacter(final CharacterFigure newCharacter) {
-        log.debug("Creating a new character ...");
+        log.debug("Creating a brand new character ...");
         if (Objects.isNull(newCharacter)) {
             throw new IllegalArgumentException("Provide a valid character");
         }
@@ -286,6 +287,10 @@ public class CharacterFigureService {
             newCharacter.setSeries(Series.SAINT_SEIYA);
         }
 
+        if (Objects.nonNull(newCharacter.getIssuanceJPY())) {
+            newCharacter.setFutureRelease(Objects.isNull(newCharacter.getIssuanceJPY().getReleaseDate()));
+        }
+
         // check if the new figure is part of restocking, or it is a new one.
         List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
         log.debug("We found {} existing stored figures ...", existingFigures.size());
@@ -299,15 +304,22 @@ public class CharacterFigureService {
 
         CharacterFigure cf;
         if (characterFound.isPresent()) {
-            // the new character can be added as a restocking.
+            // the new character can be added as a re-stocking.
             cf = characterFound.get();
-            addRestock(cf, newCharacter);
-            log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
+            cf.setRestocks(addRestock(cf.getRestocks(), newCharacter));
+
+            // once it's added as re-stocking, then it's updated in our DB.
+            repository.findById(cf.getId()).ifPresentOrElse(entity -> {
+                entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
+                repository.save(entity); // updates with the new re-stocking
+                log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
+            }, () -> log.warn("No restock has been added"));
         } else {
             // the new character is saved for the first time.
             cf = modelMapper.toModel(repository.save(modelMapper.toEntity(newCharacter)));
-            log.debug("A new character has been saved with id: {}", newCharacter.getId());
+            log.debug("A new character has been saved with id: {}", cf.getId());
         }
+        // finally the price and name is calculated here ...
         calculatePriceAndDisplayableName(cf);
         return cf;
     }
@@ -328,19 +340,29 @@ public class CharacterFigureService {
         sb.append(attribute);
     }
 
-    private void addRestock(CharacterFigure current, CharacterFigure restock) {
-        log.debug("Found potential restock: [{}]", restock.getOriginalName());
-
-        if (Objects.isNull(current.getRestocks())) {
-            current.setRestocks(new ArrayList<>());
+    /**
+     * This method is used to add a figure as re-stock. If the existing list of
+     * re-stock is null, then it creates a new one and the figure is added into the
+     * list.
+     * 
+     * @param restocks   The list of re-stocks.
+     * @param newRestock The new figure to be added as re-stock.
+     * @return The new re-stocking list which includes the new item added.
+     */
+    private List<RestockFigure> addRestock(List<RestockFigure> restocks, final Figure newRestock) {
+        if (Objects.isNull(restocks)) {
+            restocks = new ArrayList<>();
         }
-        List<RestockFigure> restockList = current.getRestocks();
-        RestockFigure restockFigure = new RestockFigure();
-        restockFigure.setIssuanceJPY(restock.getIssuanceJPY());
-        restockFigure.setIssuanceMXN(restock.getIssuanceMXN());
-        restockFigure.setUrl(restock.getUrl());
-        restockFigure.setDistribution(restock.getDistribution());
-        restockFigure.setRemarks(restock.getRemarks());
-        restockList.add(restockFigure);
+
+        RestockFigure newRestockFigure = new RestockFigure();
+        newRestockFigure.setIssuanceJPY(newRestock.getIssuanceJPY());
+        newRestockFigure.setIssuanceMXN(newRestock.getIssuanceMXN());
+        newRestockFigure.setFutureRelease(newRestock.isFutureRelease());
+        newRestockFigure.setUrl(newRestock.getUrl());
+        newRestockFigure.setDistribution(newRestock.getDistribution());
+        newRestockFigure.setRemarks(newRestock.getRemarks());
+
+        restocks.add(newRestockFigure);
+        return restocks;
     }
 }

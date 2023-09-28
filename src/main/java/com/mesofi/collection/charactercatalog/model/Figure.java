@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Common properties.
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
 public abstract class Figure {
 
     @EqualsAndHashCode.Exclude

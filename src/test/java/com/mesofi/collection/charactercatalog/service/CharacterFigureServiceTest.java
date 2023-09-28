@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -448,6 +449,7 @@ public class CharacterFigureServiceTest {
         savedCharacter.setSeries(Series.SAINT_SEIYA);
         when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(savedCharacter);
 
+        // calls the creation of the character for the first time.
         CharacterFigure characterFigureExpected = service.createNewCharacter(newCharacter);
         assertNotNull(characterFigureExpected);
         assertEquals("1", characterFigureExpected.getId());
@@ -476,6 +478,61 @@ public class CharacterFigureServiceTest {
         assertNull(characterFigureExpected.getUrl());
         assertNull(characterFigureExpected.getDistribution());
         assertNull(characterFigureExpected.getRemarks());
+
+        // We found an existing record.
+        CharacterFigureEntity existingEntity = createFigureEntity("1", "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(repository.findAll(any(Sort.class))).thenReturn(List.of(existingEntity));
+
+        CharacterFigure mappedCharacter = new CharacterFigure();
+        mappedCharacter.setId("1");
+        mappedCharacter.setOriginalName("Virgo Shaka");
+        mappedCharacter.setBaseName("Virgo Shaka");
+        mappedCharacter.setGroup(Group.GOLD);
+        mappedCharacter.setRevival(true);
+        mappedCharacter.setLineUp(LineUp.MYTH_CLOTH_EX);
+        mappedCharacter.setSeries(Series.SAINT_SEIYA);
+        when(modelMapper.toModel(existingEntity)).thenReturn(mappedCharacter);
+
+        Optional<CharacterFigureEntity> entityFound = Optional
+                .of(createFigureEntity("1", "Virgo Shaka", "Virgo Shaka", Group.GOLD, true));
+        when(repository.findById("1")).thenReturn(entityFound);
+
+        // calls the creation of the character for the second time.
+        CharacterFigure characterFigureWithRestock = service.createNewCharacter(newCharacter);
+        assertNotNull(characterFigureWithRestock);
+        assertEquals("1", characterFigureWithRestock.getId());
+        assertNull(characterFigureWithRestock.getOriginalName());
+        assertNull(characterFigureWithRestock.getBaseName());
+        assertEquals("Virgo Shaka", characterFigureWithRestock.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureWithRestock.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characterFigureWithRestock.getSeries());
+        assertEquals(Group.GOLD, characterFigureWithRestock.getGroup());
+        assertFalse(characterFigureWithRestock.isMetalBody());
+        assertFalse(characterFigureWithRestock.isOce());
+        assertTrue(characterFigureWithRestock.isRevival());
+        assertFalse(characterFigureWithRestock.isPlainCloth());
+        assertFalse(characterFigureWithRestock.isBrokenCloth());
+        assertFalse(characterFigureWithRestock.isBronzeToGold());
+        assertFalse(characterFigureWithRestock.isGold());
+        assertFalse(characterFigureWithRestock.isHongKongVersion());
+        assertFalse(characterFigureWithRestock.isManga());
+        assertFalse(characterFigureWithRestock.isSurplice());
+        assertFalse(characterFigureWithRestock.isSet());
+        assertNull(characterFigureWithRestock.getAnniversary());
+        assertNotNull(characterFigureWithRestock.getRestocks());
+        assertEquals(1, characterFigureWithRestock.getRestocks().size());
+        assertFalse(characterFigureWithRestock.getRestocks().get(0).isFutureRelease());
+        assertNull(characterFigureWithRestock.getRestocks().get(0).getUrl());
+        assertNull(characterFigureWithRestock.getRestocks().get(0).getRemarks());
+        assertNull(characterFigureWithRestock.getRestocks().get(0).getDistribution());
+        assertNull(characterFigureWithRestock.getRestocks().get(0).getIssuanceMXN());
+        assertNull(characterFigureWithRestock.getRestocks().get(0).getIssuanceJPY());
+        assertNull(characterFigureWithRestock.getIssuanceJPY());
+        assertNull(characterFigureWithRestock.getIssuanceMXN());
+        assertFalse(characterFigureWithRestock.isFutureRelease());
+        assertNull(characterFigureWithRestock.getUrl());
+        assertNull(characterFigureWithRestock.getDistribution());
+        assertNull(characterFigureWithRestock.getRemarks());
     }
 
     private CharacterFigureEntity createFigureEntity(String id, String originalName, String baseName, Group group,

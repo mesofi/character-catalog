@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_BASE_NAME;
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_GROUP;
@@ -27,6 +28,7 @@ import static com.mesofi.collection.charactercatalog.service.CharacterFigureServ
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
 public class CharacterFigure extends Figure {
 
     @EqualsAndHashCode.Exclude

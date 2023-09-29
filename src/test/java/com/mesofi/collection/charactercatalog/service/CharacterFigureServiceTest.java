@@ -238,7 +238,7 @@ public class CharacterFigureServiceTest {
     public void should_fail_when_id_is_missing() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.retrieveCharactersById(null));
-        assertEquals("Provide a non empty id", exception.getMessage());
+        assertEquals("Provide a non empty id to find a character", exception.getMessage());
     }
 
     /**
@@ -488,7 +488,7 @@ public class CharacterFigureServiceTest {
         assertNull(characterFigureExpected.getIssuanceJPY().getFirstAnnouncementDate());
         assertNull(characterFigureExpected.getIssuanceJPY().getPreorderDate());
         assertNull(characterFigureExpected.getIssuanceJPY().getPreorderConfirmationDay());
-        assertEquals(LocalDate.of(2023, 9, 28), characterFigureExpected.getIssuanceJPY().getReleaseDate());
+        assertEquals(LocalDate.now(), characterFigureExpected.getIssuanceJPY().getReleaseDate());
         assertTrue(characterFigureExpected.getIssuanceJPY().getReleaseConfirmationDay());
         assertNull(characterFigureExpected.getIssuanceMXN());
         assertFalse(characterFigureExpected.isFutureRelease());

@@ -156,7 +156,7 @@ public class CharacterFigureService {
         log.debug("Finding a character by id: {}", id);
 
         if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("Provide a non empty id");
+            throw new IllegalArgumentException("Provide a non empty id to find a character");
         }
 
         // @formatter:off
@@ -287,31 +287,9 @@ public class CharacterFigureService {
      */
     public CharacterFigure createNewCharacter(final CharacterFigure newCharacter) {
         log.debug("Creating a brand new character ...");
-        if (Objects.isNull(newCharacter)) {
-            throw new IllegalArgumentException("Provide a valid character");
-        }
-        if (!StringUtils.hasText(newCharacter.getBaseName())) {
-            throw new IllegalArgumentException(INVALID_BASE_NAME);
-        }
-        if (Objects.isNull(newCharacter.getGroup())) {
-            throw new IllegalArgumentException(INVALID_GROUP);
-        }
 
-        if (!StringUtils.hasText(newCharacter.getOriginalName())) {
-            newCharacter.setOriginalName(newCharacter.getBaseName());
-        }
-
-        if (Objects.isNull(newCharacter.getLineUp())) {
-            newCharacter.setLineUp(LineUp.MYTH_CLOTH_EX);
-        }
-
-        if (Objects.isNull(newCharacter.getSeries())) {
-            newCharacter.setSeries(Series.SAINT_SEIYA);
-        }
-
-        if (Objects.nonNull(newCharacter.getIssuanceJPY())) {
-            newCharacter.setFutureRelease(Objects.isNull(newCharacter.getIssuanceJPY().getReleaseDate()));
-        }
+        // performs some validations.
+        validateCharacterFigure(newCharacter);
 
         // check if the new figure is part of restocking, or it is a new one.
         List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
@@ -344,6 +322,100 @@ public class CharacterFigureService {
         // finally the price and name is calculated here ...
         calculatePriceAndDisplayableName(cf);
         return cf;
+    }
+
+    /**
+     * This method is used to validate a character object.
+     * 
+     * @param character The character to be validated.
+     */
+    private void validateCharacterFigure(final CharacterFigure character) {
+
+        // make sure the required fields are there...
+        if (Objects.isNull(character)) {
+            throw new IllegalArgumentException("Provide a valid character");
+        }
+        if (!StringUtils.hasText(character.getBaseName())) {
+            throw new IllegalArgumentException(INVALID_BASE_NAME);
+        }
+        if (Objects.isNull(character.getGroup())) {
+            throw new IllegalArgumentException(INVALID_GROUP);
+        }
+
+        // now make sure some required fields are defaulted.
+        if (!StringUtils.hasText(character.getOriginalName())) {
+            character.setOriginalName(character.getBaseName());
+        }
+        if (Objects.isNull(character.getLineUp())) {
+            character.setLineUp(LineUp.MYTH_CLOTH_EX);
+        }
+        if (Objects.isNull(character.getSeries())) {
+            character.setSeries(Series.SAINT_SEIYA);
+        }
+        if (Objects.nonNull(character.getIssuanceJPY())) {
+            character.setFutureRelease(Objects.isNull(character.getIssuanceJPY().getReleaseDate()));
+        }
+    }
+
+    /**
+     * 
+     * @param id
+     * @param updatedCharacter
+     * @return
+     */
+    public CharacterFigure updateExistingCharacter(final String id, final CharacterFigure updatedCharacter) {
+        log.debug("Updating existing character with id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id to update the character");
+        }
+
+        // performs some validations.
+        validateCharacterFigure(updatedCharacter);
+        CharacterFigureEntity updatedCharacterEntity = modelMapper.toEntity(updatedCharacter);
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // update the entity ...
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setMetal(updatedCharacterEntity.isMetal());
+        characterFigureEntity.setGolden(updatedCharacterEntity.isGolden());
+        characterFigureEntity.setHk(updatedCharacterEntity.isHk());
+        characterFigureEntity.setIssuanceJPY(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceJPY()));
+        characterFigureEntity.setIssuanceMXN(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceMXN()));
+        characterFigureEntity.setFutureRelease(updatedCharacterEntity.isFutureRelease());
+        characterFigureEntity.setUrl(updatedCharacterEntity.getUrl());
+        characterFigureEntity.setDistribution(updatedCharacterEntity.getDistribution());
+        characterFigureEntity.setRemarks(updatedCharacterEntity.getRemarks());
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setBaseName(updatedCharacterEntity.getBaseName());
+        characterFigureEntity.setLineUp(updatedCharacterEntity.getLineUp());
+        characterFigureEntity.setSeries(updatedCharacterEntity.getSeries());
+        characterFigureEntity.setGroup(updatedCharacterEntity.getGroup());
+        characterFigureEntity.setOce(updatedCharacterEntity.isOce());
+        characterFigureEntity.setRevival(updatedCharacterEntity.isRevival());
+        characterFigureEntity.setPlainCloth(updatedCharacterEntity.isPlainCloth());
+        characterFigureEntity.setBrokenCloth(updatedCharacterEntity.isBrokenCloth());
+        characterFigureEntity.setGold(updatedCharacterEntity.isGold());
+        characterFigureEntity.setManga(updatedCharacterEntity.isManga());
+        characterFigureEntity.setSurplice(updatedCharacterEntity.isSurplice());
+        characterFigureEntity.setSet(updatedCharacterEntity.isSet());
+        characterFigureEntity.setAnniversary(updatedCharacterEntity.getAnniversary());
+        List<RestockFigure> list = updatedCharacterEntity.getRestocks();
+        if (list != null) {
+            characterFigureEntity.setRestocks(new ArrayList<>(list));
+        }
+
+        repository.save(characterFigureEntity);
+
+        // retrieves the entity directly from the DB.
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
     }
 
     private Sort getSorting() {

@@ -35,10 +35,17 @@ public class CommonUtils {
      * @return A BigDecimal reference or null if the input is null.
      */
     public static BigDecimal toPrice(final String value) {
-        if (StringUtils.hasText(value)) {
-            return new BigDecimal(value.substring(1).replace(',', '.'));
-        }
-        return null;
+        return StringUtils.hasText(value) ? new BigDecimal(value.substring(1).replace(',', '.')) : null;
+    }
+
+    /**
+     * Converts a BigDecimal into a valid String reference.
+     * 
+     * @param value The value to be converted.
+     * @return A BigDecimal string or null if the input is null.
+     */
+    public static String toPrice(final BigDecimal value) {
+        return Objects.nonNull(value) ? value.toString() : null;
     }
 
     /**
@@ -50,21 +57,34 @@ public class CommonUtils {
     public static LocalDate toDate(final String value) {
         if (StringUtils.hasText(value)) {
             boolean yearMonthDay = Boolean.TRUE.equals(isDayMonthYear(value));
-            // @formatter:off
-            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                    .appendPattern("M")
-                    .appendLiteral("/")
-                    .optionalStart()
-                    .appendPattern("d")
-                    .appendLiteral("/")
-                    .optionalEnd()
-                    .appendValue(ChronoField.YEAR, 4)
-                    .toFormatter();
-            // @formatter:on
-
+            DateTimeFormatter formatter = getDateTimeFormatter();
             return yearMonthDay ? LocalDate.parse(value, formatter) : YearMonth.parse(value, formatter).atDay(1);
         }
         return null;
+    }
+
+    /**
+     * Converts a LocalDate reference into a valid String.
+     * 
+     * @param value The value to be converted.
+     * @return A String or null if the input is null.
+     */
+    public static String toDate(final LocalDate value) {
+        return Objects.nonNull(value) ? value.format(getDateTimeFormatter()) : null;
+    }
+
+    private static DateTimeFormatter getDateTimeFormatter() {
+        // @formatter:off
+        return new DateTimeFormatterBuilder()
+                .appendPattern("M")
+                .appendLiteral("/")
+                .optionalStart()
+                .appendPattern("d")
+                .appendLiteral("/")
+                .optionalEnd()
+                .appendValue(ChronoField.YEAR, 4)
+                .toFormatter();
+        // @formatter:on
     }
 
     /**
@@ -74,10 +94,7 @@ public class CommonUtils {
      * @return true or false.
      */
     public static boolean toBoolean(final String value) {
-        if (StringUtils.hasText(value)) {
-            return "TRUE".equals(value);
-        }
-        return false;
+        return StringUtils.hasText(value) && "TRUE".equals(value);
     }
 
     /**
@@ -87,10 +104,7 @@ public class CommonUtils {
      * @return The integer.
      */
     public static Integer toInteger(final String value) {
-        if (StringUtils.hasText(value)) {
-            return Integer.parseInt(value);
-        }
-        return null;
+        return StringUtils.hasText(value) ? Integer.parseInt(value) : null;
     }
 
     /**
@@ -100,10 +114,7 @@ public class CommonUtils {
      * @return A null value if the input String is empty.
      */
     public static String toStringValue(final String value) {
-        if (StringUtils.hasText(value)) {
-            return value.trim();
-        }
-        return null;
+        return StringUtils.hasText(value) ? value.trim() : null;
     }
 
     /**

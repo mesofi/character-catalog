@@ -12,6 +12,8 @@ import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toStringValue;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -72,6 +74,13 @@ public class CharacterFigureFileMapper {
         }
 
         return characterFigure;
+    }
+
+    public Issuance createIssuance(Issuance issuance) {
+        return Objects.nonNull(issuance)
+                ? createIssuance(toPrice(issuance.getBasePrice()), toDate(issuance.getFirstAnnouncementDate()),
+                        toDate(issuance.getPreorderDate()), toDate(issuance.getReleaseDate()))
+                : null;
     }
 
     private Issuance createIssuance(String price, String announcement, String preorder, String release) {

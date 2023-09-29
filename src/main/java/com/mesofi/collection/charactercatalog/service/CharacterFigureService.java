@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -130,7 +131,7 @@ public class CharacterFigureService {
     }
 
     /**
-     * Retrieve all the characters.
+     * Retrieve all the characters ordered by release date.
      * 
      * @return The list of characters.
      */
@@ -143,6 +144,27 @@ public class CharacterFigureService {
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
         return figureList;
+    }
+
+    /**
+     * Retrieves a character using its identifier.
+     * 
+     * @param id The unique identifier.
+     * @return The character found or exception if it was not found.
+     */
+    public CharacterFigure retrieveCharactersById(final String id) {
+        log.debug("Finding a character by id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id");
+        }
+
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
     }
 
     /**

@@ -38,6 +38,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -228,6 +229,81 @@ public class CharacterFigureServiceTest {
         assertNotNull(list);
         assertFalse(list.isEmpty());
         assertEquals("Pegasus Seiya", list.get(0).getDisplayableName());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveCharactersById(String)}
+     */
+    @Test
+    public void should_fail_when_id_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.retrieveCharactersById(null));
+        assertEquals("Provide a non empty id", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveCharactersById(String)}
+     */
+    @Test
+    public void should_fail_when_id_does_not_exist() {
+        final String id = "unknownw";
+
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
+                () -> service.retrieveCharactersById(id));
+        assertEquals("Character not found with id: unknownw", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveCharactersById(String)}
+     */
+    @Test
+    public void should_retrieve_character_by_identifier() {
+        final String id = "65161253b30e8c1a61696f2c";
+
+        CharacterFigureEntity e1 = createFigureEntity("1", "Alraune Queen", "Alraune Queen", Group.SILVER, false);
+        Optional<CharacterFigureEntity> found = Optional.of(e1);
+        when(repository.findById(id)).thenReturn(found);
+
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setId(e1.getId());
+        characterFigure.setOriginalName(e1.getOriginalName());
+        characterFigure.setBaseName(e1.getBaseName());
+        characterFigure.setGroup(e1.getGroup());
+        characterFigure.setLineUp(e1.getLineUp());
+        characterFigure.setSeries(e1.getSeries());
+
+        when(modelMapper.toModel(e1)).thenReturn(characterFigure);
+
+        CharacterFigure characterFigureExpected = service.retrieveCharactersById(id);
+        assertNotNull(characterFigureExpected);
+        assertEquals("1", characterFigureExpected.getId());
+        assertNull(characterFigureExpected.getOriginalName());
+        assertNull(characterFigureExpected.getBaseName());
+        assertEquals("Alraune Queen", characterFigureExpected.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
+        assertEquals(Group.SILVER, characterFigureExpected.getGroup());
+        assertFalse(characterFigureExpected.isMetalBody());
+        assertFalse(characterFigureExpected.isOce());
+        assertFalse(characterFigureExpected.isRevival());
+        assertFalse(characterFigureExpected.isPlainCloth());
+        assertFalse(characterFigureExpected.isBrokenCloth());
+        assertFalse(characterFigureExpected.isBronzeToGold());
+        assertFalse(characterFigureExpected.isGold());
+        assertFalse(characterFigureExpected.isHongKongVersion());
+        assertFalse(characterFigureExpected.isManga());
+        assertFalse(characterFigureExpected.isSurplice());
+        assertFalse(characterFigureExpected.isSet());
+        assertNull(characterFigureExpected.getAnniversary());
+        assertNull(characterFigureExpected.getRestocks());
+        assertNull(characterFigureExpected.getIssuanceJPY());
+        assertNull(characterFigureExpected.getIssuanceMXN());
+        assertFalse(characterFigureExpected.isFutureRelease());
+        assertNull(characterFigureExpected.getUrl());
+        assertNull(characterFigureExpected.getDistribution());
+        assertNull(characterFigureExpected.getRemarks());
     }
 
     /**

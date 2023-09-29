@@ -3,6 +3,13 @@ logging:
     org.springframework: INFO
     com.mesofi: DEBUG
 
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+
 spring:
   data:
     mongodb:

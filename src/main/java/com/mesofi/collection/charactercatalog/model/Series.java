@@ -7,24 +7,30 @@ package com.mesofi.collection.charactercatalog.model;
 
 import lombok.Getter;
 
+/**
+ * The Series enum.
+ *
+ * @author armandorivasarzaluz
+ */
 @Getter
 public enum Series {
+
     // @formatter:off
     SAINT_SEIYA("Saint Seiya"),
     SAINTIA_SHO("Saintia Sho"),
     SOG("Soul of Gold"),
     LEGEND("Legend Of Sanctuary"),
     OMEGA("Omega"),
-    LL("Lost Canvas");
+    LOST_CANVAS("Lost Canvas");
     // @formatter:on
 
-    private final String friendlyName;
+    private final String stringValue;
 
     Series(String friendlyName) {
-        this.friendlyName = friendlyName;
+        this.stringValue = friendlyName;
     }
 
     public String toString() {
-        return this.friendlyName;
+        return this.stringValue;
     }
 }

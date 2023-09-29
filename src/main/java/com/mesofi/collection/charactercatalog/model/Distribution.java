@@ -7,6 +7,11 @@ package com.mesofi.collection.charactercatalog.model;
 
 import lombok.Getter;
 
+/**
+ * The Distribution enum.
+ *
+ * @author armandorivasarzaluz
+ */
 @Getter
 public enum Distribution {
 
@@ -19,13 +24,13 @@ public enum Distribution {
     OTHER("Other Limited Edition");
     // @formatter:on
 
-    private final String friendlyName;
+    private final String stringValue;
 
     Distribution(String friendlyName) {
-        this.friendlyName = friendlyName;
+        this.stringValue = friendlyName;
     }
 
     public String toString() {
-        return this.friendlyName;
+        return this.stringValue;
     }
 }

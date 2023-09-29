@@ -8,10 +8,13 @@ package com.mesofi.collection.charactercatalog.model;
 import lombok.Getter;
 
 /**
- * 
+ * The Group enum.
+ *
+ * @author armandorivasarzaluz
  */
 @Getter
 public enum Group {
+
     // @formatter:off
     V1("Bronze Saint V1"),
     V2("Bronze Saint V2"),
@@ -32,13 +35,13 @@ public enum Group {
     OTHER("-");
     // @formatter:on
 
-    private final String friendlyName;
+    private final String stringValue;
 
     Group(String friendlyName) {
-        this.friendlyName = friendlyName;
+        this.stringValue = friendlyName;
     }
 
     public String toString() {
-        return this.friendlyName;
+        return this.stringValue;
     }
 }

@@ -7,8 +7,13 @@ package com.mesofi.collection.charactercatalog.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 
-public interface CharacterRepository extends MongoRepository<CharacterFigure, String> {
-
+/**
+ * The repository.
+ * 
+ * @author armandorivasarzaluz
+ *
+ */
+public interface CharacterFigureRepository extends MongoRepository<CharacterFigureEntity, String> {
 }

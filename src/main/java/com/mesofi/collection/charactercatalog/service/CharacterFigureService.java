@@ -5,285 +5,212 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.reverseListElements;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mesofi.collection.charactercatalog.controllers.CarMapper;
+import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
+import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.model.CharacterFigureResponse;
-import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
 import com.mesofi.collection.charactercatalog.model.Series;
-import com.mesofi.collection.charactercatalog.repository.CharacterRepository;
+import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Handles the business logic of the service.
+ * 
+ * @author armandorivasarzaluz
+ *
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CharacterFigureService {
 
-    private final CharacterRepository characterRepository;
-    private final CarMapper carMapper;
+    public static final String INVALID_BASE_NAME = "Provide a non empty base name";
+    public static final String INVALID_GROUP = "Provide a valid group";
 
-    public void loadAllRecords(final MultipartFile file) {
+    private CharacterFigureRepository repository;
+    private CharacterFigureModelMapper modelMapper;
+    private CharacterFigureFileMapper fileMapper;
+
+    /**
+     * Loads all the characters.
+     * 
+     * @param file The reference to the file with all the records.
+     * @return The total of records loaded.
+     */
+    public long loadAllCharacters(final MultipartFile file) {
+        log.debug("Loading all the records ...");
+
+        if (Objects.isNull(file)) {
+            throw new IllegalArgumentException("The uploaded file is missing...");
+        }
         InputStream inputStream;
         try {
             inputStream = file.getInputStream();
         } catch (IOException e) {
-            throw new IllegalArgumentException("");
+            throw new CharacterFigureException("Unable to read characters from file");
         }
-        // removes all the records first.
-        characterRepository.deleteAll();
+        // first, removes all the records.
+        repository.deleteAll();
 
-        List<CharacterFigure> effectiveCharacters = new ArrayList<>();
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
-                .skip(1) // we skip the header.
-                .map(this::fromLineToCharacterFigure)
+                .skip(1) // we don't consider the header
+                .map($ -> fileMapper.fromLineToCharacterFigure($))
+                .collect(Collectors.toList());
+        // @formatter:on
+
+        // reverse the list so that we can add re-stocks easily ...
+        reverseListElements(allCharacters);
+
+        log.debug("Total of figures loaded: {}", allCharacters.size());
+        List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
+        log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
+
+        // performs a mapping and saves the records in the DB ...
+        // @formatter:off
+        long total = repository.saveAll(effectiveCharacters.stream()
+                        .map($ -> modelMapper.toEntity($))
+                        .collect(Collectors.toList())).size();
+        // @formatter:on
+        log.debug("Total of figures loaded: {}", total);
+        return total;
+    }
+
+    /**
+     * Gets the effective characters, this list contains the records to be saved in
+     * DB.
+     * 
+     * @param allCharacters All the characters.
+     * @return The effective characters.
+     */
+    public List<CharacterFigure> getEffectiveCharacters(final List<CharacterFigure> allCharacters) {
+        if (Objects.nonNull(allCharacters)) {
+            List<CharacterFigure> effectiveCharacters = new ArrayList<>();
+            for (CharacterFigure curr : allCharacters) {
+                if (effectiveCharacters.contains(curr)) {
+                    // add the current character as re-stock.
+                    CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
+                    existing.setRestocks(addRestock(existing.getRestocks(), curr));
+                } else {
+                    effectiveCharacters.add(curr);
+                }
+            }
+            return effectiveCharacters;
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retrieve all the characters ordered by release date.
+     * 
+     * @return The list of characters.
+     */
+    public List<CharacterFigure> retrieveAllCharacters() {
+        // @formatter:off
+        List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
+                .map($ -> modelMapper.toModel($))
+                .peek(this::calculatePriceAndDisplayableName)
                 .toList();
         // @formatter:on
-        for (CharacterFigure curr : allCharacters) {
-            if (!effectiveCharacters.contains(curr)) {
-                effectiveCharacters.add(curr);
+        log.debug("Total of characters found: {}", figureList.size());
+        return figureList;
+    }
+
+    /**
+     * Retrieves a character using its identifier.
+     * 
+     * @param id The unique identifier.
+     * @return The character found or exception if it was not found.
+     */
+    public CharacterFigure retrieveCharactersById(final String id) {
+        log.debug("Finding a character by id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id to find a character");
+        }
+
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    /**
+     * This method is used to prepare the figure to be displayed in the response.
+     * 
+     * @param figure The character figure to be shown.
+     */
+    private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
+        Issuance jpy = figure.getIssuanceJPY();
+        Issuance mxn = figure.getIssuanceMXN();
+
+        // the displayable name is calculated here
+        figure.setDisplayableName(calculateFigureDisplayableName(figure));
+        // the price is set here.
+        if (Objects.nonNull(jpy)) {
+            jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
+        }
+        if (Objects.nonNull(mxn)) {
+            mxn.setReleasePrice(mxn.getBasePrice());
+        }
+
+        figure.setOriginalName(null);
+        figure.setBaseName(null);
+    }
+
+    private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {
+        BigDecimal releasePrice;
+        if (Objects.nonNull(basePrice) && Objects.nonNull(releaseDate)) {
+            LocalDate october12019 = LocalDate.of(2019, 10, 1);
+            if (releaseDate.isBefore(october12019)) {
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".08")));
             } else {
-                // add this character as re-stock
-                CharacterFigure other = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
-                copyRestock(curr, other);
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".10")));
             }
-        }
-        // saves the records in the DB.
-        characterRepository.saveAll(effectiveCharacters);
-    }
-
-    private void copyRestock(CharacterFigure restock, CharacterFigure source) {
-        List<RestockFigure> restockList = source.getRestocks();
-        if (Objects.isNull(restockList)) {
-            source.setRestocks(new ArrayList<>());
-        }
-        // the source is added itself as re-stock.
-        List<RestockFigure> restocks = source.getRestocks();
-        RestockFigure restockFigure = new RestockFigure();
-        copyCommonInfo(source, restockFigure);
-        restocks.add(restockFigure);
-
-        // now the base info is updated.
-        copyCommonInfo(restock, source);
-        source.setOriginalName(restock.getOriginalName());
-        source.setBaseName(restock.getBaseName());
-        source.setLineUp(restock.getLineUp());
-        source.setSeries(restock.getSeries());
-        source.setGroup(restock.getGroup());
-        source.setMetalBody(restock.isMetalBody());
-        source.setOce(restock.isOce());
-        source.setRevival(restock.isRevival());
-        source.setPlainCloth(restock.isPlainCloth());
-        source.setBroken(restock.isBroken());
-        source.setGolden(restock.isGolden());
-        source.setGold(restock.isGold());
-        source.setHk(restock.isHk());
-        source.setManga(restock.isManga());
-        source.setSurplice(restock.isSurplice());
-        source.setSet(restock.isSet());
-        source.setAnniversary(restock.getAnniversary());
-    }
-
-    private void copyCommonInfo(Figure from, Figure target) {
-        target.setBasePrice(from.getBasePrice());
-        target.setOfficialPrice(from.getOfficialPrice());
-        target.setFirstAnnouncementDate(from.getFirstAnnouncementDate());
-        target.setPreOrderConfirmedDayDate(from.getPreOrderConfirmedDayDate());
-        target.setPreOrderDate(from.getPreOrderDate());
-        target.setReleaseConfirmedDayDate(from.getReleaseConfirmedDayDate());
-        target.setReleaseDate(from.getReleaseDate());
-        target.setDistribution(from.getDistribution());
-        target.setUrl(from.getUrl());
-        target.setRemarks(from.getRemarks());
-    }
-
-    private CharacterFigure fromLineToCharacterFigure(final String line) {
-        String[] columns = line.split("\t");
-
-        CharacterFigure characterFigure = new CharacterFigure();
-
-        characterFigure.setOriginalName(columns[0]);
-        characterFigure.setBaseName(columns[1]);
-        characterFigure.setBasePrice(getAmount(columns[2]));
-        characterFigure.setFirstAnnouncementDate(getDate(columns[4], true));
-
-        String preorderDate = columns[5];
-        Boolean preorderConfirmedDay = isConfirmedDay(preorderDate);
-        characterFigure.setPreOrderConfirmedDayDate(preorderConfirmedDay);
-        characterFigure.setPreOrderDate(getDate(preorderDate, preorderConfirmedDay));
-
-        String releaseDate = columns[6];
-        Boolean releaseConfirmedDay = isConfirmedDay(releaseDate);
-        characterFigure.setReleaseConfirmedDayDate(releaseConfirmedDay);
-        characterFigure.setReleaseDate(getDate(releaseDate, releaseConfirmedDay));
-
-        characterFigure.setDistribution(getDistribution(columns[7]));
-
-        characterFigure.setUrl(columns[8]);
-        characterFigure.setLineUp(getLineUp(columns[9]));
-        characterFigure.setSeries(getSeries(columns[10]));
-        characterFigure.setGroup(getGroup(columns[11]));
-        characterFigure.setMetalBody(getFlag(columns[12]));
-        characterFigure.setOce(getFlag(columns[13]));
-        characterFigure.setRevival(getFlag(columns[14]));
-        characterFigure.setPlainCloth(getFlag(columns[16]));
-        characterFigure.setBroken(getFlag(columns[17]));
-        characterFigure.setGolden(getFlag(columns[18]));
-        characterFigure.setGold(getFlag(columns[19]));
-        characterFigure.setHk(getFlag(columns[20]));
-        characterFigure.setManga(getFlag(columns[21]));
-        characterFigure.setSurplice(getFlag(columns[22]));
-        characterFigure.setSet(getFlag(columns[23]));
-
-        if (columns.length == 25) {
-            characterFigure.setAnniversary(getNumber(columns[24]));
-        }
-        if (columns.length == 26) {
-            characterFigure.setAnniversary(getNumber(columns[24]));
-            characterFigure.setRemarks(columns[25]);
-        }
-
-        return characterFigure;
-    }
-
-    private Boolean isConfirmedDay(String value) {
-        int count = 0;
-        for (int i = 0; i < value.length(); i++) {
-            if (value.charAt(i) == '/') {
-                count++;
-            }
-        }
-        if (count == 0) {
-            return null;
-        }
-        return count != 1;
-    }
-
-    private Date getDate(String value, Boolean dayMonthYear) {
-        if (StringUtils.hasText(value) && Objects.nonNull(dayMonthYear)) {
-
-            DateFormat sf = dayMonthYear ? new SimpleDateFormat("MM/dd/yyyy") : new SimpleDateFormat("MM/yyyy");
-            try {
-                return sf.parse(value);
-            } catch (ParseException e) {
-
-            }
-
-        }
-        return null;
-    }
-
-    private Integer getNumber(String value) {
-        if (StringUtils.hasText(value)) {
-
-            return Integer.parseInt(value);
-
-        }
-        return null;
-    }
-
-    private BigDecimal getAmount(String value) {
-        if (StringUtils.hasText(value)) {
-            return new BigDecimal(value.substring(1).replaceAll(",", ""));
-        }
-        return null;
-    }
-
-    private boolean getFlag(String value) {
-        return "TRUE".equals(value);
-    }
-
-    private Group getGroup(String value) {
-        for (int i = 0; i < Group.values().length; i++) {
-            Group d = Group.values()[i];
-            if (d.getFriendlyName().equals(value)) {
-                return d;
-            }
-        }
-        return null;
-    }
-
-    private LineUp getLineUp(String value) {
-        for (int i = 0; i < LineUp.values().length; i++) {
-            LineUp d = LineUp.values()[i];
-            if (d.getFriendlyName().equals(value)) {
-                return d;
-            }
-        }
-        return null;
-    }
-
-    private Series getSeries(String value) {
-        for (int i = 0; i < Series.values().length; i++) {
-            Series d = Series.values()[i];
-            if (d.getFriendlyName().equals(value)) {
-                return d;
-            }
-        }
-        return null;
-    }
-
-    private Distribution getDistribution(String value) {
-        for (int i = 0; i < Distribution.values().length; i++) {
-            Distribution d = Distribution.values()[i];
-            if (d.getFriendlyName().equals(value)) {
-                return d;
-            }
+            return releasePrice;
         }
         return null;
     }
 
     /**
-     * Creates a new character.
+     * Calculate the figure name.
      * 
-     * @param characterFigure The new character to be created.
-     * @return The character created.
+     * @param figure The figure name object.
+     * @return The displayable name.
      */
-    public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
-        log.debug("Creating a new character ...");
-        if (Objects.isNull(characterFigure)) {
-            throw new IllegalArgumentException("Unable to create a new character, provide a valid reference");
-        }
-        if (!StringUtils.hasText(characterFigure.getBaseName())) {
-            throw new IllegalArgumentException("Provide a base name for the character to be created");
-        }
-
-        if (Objects.isNull(characterFigure.getLineUp())) {
-            throw new IllegalArgumentException("Provide a valid LineUp for the character");
-        }
-
-        // saves the new record in the BD.
-        return characterRepository.save(characterFigure);
-    }
-
-    public void calculateFigureName(final CharacterFigure figure) {
+    public String calculateFigureDisplayableName(final CharacterFigure figure) {
         StringBuilder sb = new StringBuilder();
         sb.append(figure.getBaseName());
 
@@ -312,10 +239,10 @@ public class CharacterFigureService {
             appendAttr(sb, "(Plain Clothes)");
         }
 
-        if (figure.isGolden()) {
+        if (figure.isBronzeToGold()) {
             if (figure.getLineUp() == LineUp.MYTH_CLOTH) {
                 if (figure.getGroup() == Group.V1) {
-                    sb = replacePatter(sb.toString());
+                    sb = replacePattern(sb.toString());
                     appendAttr(sb, "~Limited Gold~");
                 }
                 if (figure.getGroup() == Group.V2) {
@@ -324,7 +251,7 @@ public class CharacterFigureService {
             }
             if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
                 if (figure.getGroup() == Group.V2 || figure.getGroup() == Group.V3) {
-                    sb = replacePatter(sb.toString());
+                    sb = replacePattern(sb.toString());
                     appendAttr(sb, "~Golden Limited Edition~");
                 }
             }
@@ -334,14 +261,14 @@ public class CharacterFigureService {
             appendAttr(sb, "~Comic Version~");
         }
         if (figure.isOce()) {
-            sb = replacePatter(sb.toString());
+            sb = replacePattern(sb.toString());
             appendAttr(sb, "~Original Color Edition~");
         }
         if (Objects.nonNull(figure.getAnniversary())) {
-            sb = replacePatter(sb.toString());
+            sb = replacePattern(sb.toString());
             appendAttr(sb, "~" + figure.getAnniversary() + "th Anniversary Ver.~");
         }
-        if (figure.isHk()) {
+        if (figure.isHongKongVersion()) {
             appendAttr(sb, "~HK Version~");
         }
 
@@ -349,11 +276,156 @@ public class CharacterFigureService {
             appendAttr(sb, "(Surplice)");
         }
 
-        // sets the displayed name ...
-        figure.setDisplayedName(sb.toString());
+        return sb.toString();
     }
 
-    private StringBuilder replacePatter(String name) {
+    /**
+     * Creates a new character.
+     * 
+     * @param newCharacter The character to be persisted.
+     * @return The saved character.
+     */
+    public CharacterFigure createNewCharacter(final CharacterFigure newCharacter) {
+        log.debug("Creating a brand new character ...");
+
+        // performs some validations.
+        validateCharacterFigure(newCharacter);
+
+        // check if the new figure is part of restocking, or it is a new one.
+        List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
+        log.debug("We found {} existing stored figures ...", existingFigures.size());
+
+        // @formatter:off
+        Optional<CharacterFigure> characterFound = existingFigures.stream()
+                .map($ -> modelMapper.toModel($))
+                .filter(newCharacter::equals)
+                .findFirst();
+        // @formatter:on
+
+        CharacterFigure cf;
+        if (characterFound.isPresent()) {
+            // the new character can be added as a re-stocking.
+            cf = characterFound.get();
+            cf.setRestocks(addRestock(cf.getRestocks(), newCharacter));
+
+            // once it's added as re-stocking, then it's updated in our DB.
+            repository.findById(cf.getId()).ifPresentOrElse(entity -> {
+                entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
+                repository.save(entity); // updates with the new re-stocking
+                log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
+            }, () -> log.warn("No restock has been added"));
+        } else {
+            // the new character is saved for the first time.
+            cf = modelMapper.toModel(repository.save(modelMapper.toEntity(newCharacter)));
+            log.debug("A new character has been saved with id: {}", cf.getId());
+        }
+        // finally the price and name is calculated here ...
+        calculatePriceAndDisplayableName(cf);
+        return cf;
+    }
+
+    /**
+     * This method is used to validate a character object.
+     * 
+     * @param character The character to be validated.
+     */
+    private void validateCharacterFigure(final CharacterFigure character) {
+
+        // make sure the required fields are there...
+        if (Objects.isNull(character)) {
+            throw new IllegalArgumentException("Provide a valid character");
+        }
+        if (!StringUtils.hasText(character.getBaseName())) {
+            throw new IllegalArgumentException(INVALID_BASE_NAME);
+        }
+        if (Objects.isNull(character.getGroup())) {
+            throw new IllegalArgumentException(INVALID_GROUP);
+        }
+
+        // now make sure some required fields are defaulted.
+        if (!StringUtils.hasText(character.getOriginalName())) {
+            character.setOriginalName(character.getBaseName());
+        }
+        if (Objects.isNull(character.getLineUp())) {
+            character.setLineUp(LineUp.MYTH_CLOTH_EX);
+        }
+        if (Objects.isNull(character.getSeries())) {
+            character.setSeries(Series.SAINT_SEIYA);
+        }
+        if (Objects.nonNull(character.getIssuanceJPY())) {
+            character.setFutureRelease(Objects.isNull(character.getIssuanceJPY().getReleaseDate()));
+        }
+    }
+
+    /**
+     * 
+     * @param id
+     * @param updatedCharacter
+     * @return
+     */
+    public CharacterFigure updateExistingCharacter(final String id, final CharacterFigure updatedCharacter) {
+        log.debug("Updating existing character with id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id to update the character");
+        }
+
+        // performs some validations.
+        validateCharacterFigure(updatedCharacter);
+        CharacterFigureEntity updatedCharacterEntity = modelMapper.toEntity(updatedCharacter);
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // update the entity ...
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setMetal(updatedCharacterEntity.isMetal());
+        characterFigureEntity.setGolden(updatedCharacterEntity.isGolden());
+        characterFigureEntity.setHk(updatedCharacterEntity.isHk());
+        characterFigureEntity.setIssuanceJPY(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceJPY()));
+        characterFigureEntity.setIssuanceMXN(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceMXN()));
+        characterFigureEntity.setFutureRelease(updatedCharacterEntity.isFutureRelease());
+        characterFigureEntity.setUrl(updatedCharacterEntity.getUrl());
+        characterFigureEntity.setDistribution(updatedCharacterEntity.getDistribution());
+        characterFigureEntity.setRemarks(updatedCharacterEntity.getRemarks());
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setBaseName(updatedCharacterEntity.getBaseName());
+        characterFigureEntity.setLineUp(updatedCharacterEntity.getLineUp());
+        characterFigureEntity.setSeries(updatedCharacterEntity.getSeries());
+        characterFigureEntity.setGroup(updatedCharacterEntity.getGroup());
+        characterFigureEntity.setOce(updatedCharacterEntity.isOce());
+        characterFigureEntity.setRevival(updatedCharacterEntity.isRevival());
+        characterFigureEntity.setPlainCloth(updatedCharacterEntity.isPlainCloth());
+        characterFigureEntity.setBrokenCloth(updatedCharacterEntity.isBrokenCloth());
+        characterFigureEntity.setGold(updatedCharacterEntity.isGold());
+        characterFigureEntity.setManga(updatedCharacterEntity.isManga());
+        characterFigureEntity.setSurplice(updatedCharacterEntity.isSurplice());
+        characterFigureEntity.setSet(updatedCharacterEntity.isSet());
+        characterFigureEntity.setAnniversary(updatedCharacterEntity.getAnniversary());
+        List<RestockFigure> list = updatedCharacterEntity.getRestocks();
+        if (list != null) {
+            characterFigureEntity.setRestocks(new ArrayList<>(list));
+        }
+
+        repository.save(characterFigureEntity);
+
+        // retrieves the entity directly from the DB.
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    private Sort getSorting() {
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
+        return Sort.by(orders);
+    }
+
+    private StringBuilder replacePattern(String name) {
         return new StringBuilder(name.replaceFirst("~", "(").replaceFirst("~", ")"));
     }
 
@@ -362,20 +434,29 @@ public class CharacterFigureService {
         sb.append(attribute);
     }
 
-    public List<CharacterFigureResponse> getAll() {
-        return characterRepository.findAll().stream().map(this::ddss).collect(Collectors.toList());
-    }
-
-    private CharacterFigureResponse ddss(CharacterFigure d) {
-
-        return carMapper.toDto(d);
-
-    }
-
-    private LocalDate aa(Date firstAnnouncementDate) {
-        if (Objects.nonNull(firstAnnouncementDate)) {
-            return firstAnnouncementDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    /**
+     * This method is used to add a figure as re-stock. If the existing list of
+     * re-stock is null, then it creates a new one and the figure is added into the
+     * list.
+     * 
+     * @param restocks   The list of re-stocks.
+     * @param newRestock The new figure to be added as re-stock.
+     * @return The new re-stocking list which includes the new item added.
+     */
+    private List<RestockFigure> addRestock(List<RestockFigure> restocks, final Figure newRestock) {
+        if (Objects.isNull(restocks)) {
+            restocks = new ArrayList<>();
         }
-        return null;
+
+        RestockFigure newRestockFigure = new RestockFigure();
+        newRestockFigure.setIssuanceJPY(newRestock.getIssuanceJPY());
+        newRestockFigure.setIssuanceMXN(newRestock.getIssuanceMXN());
+        newRestockFigure.setFutureRelease(newRestock.isFutureRelease());
+        newRestockFigure.setUrl(newRestock.getUrl());
+        newRestockFigure.setDistribution(newRestock.getDistribution());
+        newRestockFigure.setRemarks(newRestock.getRemarks());
+
+        restocks.add(newRestockFigure);
+        return restocks;
     }
 }

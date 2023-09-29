@@ -8,10 +8,13 @@ package com.mesofi.collection.charactercatalog.model;
 import lombok.Getter;
 
 /**
- * 
+ * The LineUp enum.
+ *
+ * @author armandorivasarzaluz
  */
 @Getter
 public enum LineUp {
+
     // @formatter:off
     MYTH_CLOTH("Myth Cloth"),
     MYTH_CLOTH_EX("Myth Cloth EX"),
@@ -22,13 +25,13 @@ public enum LineUp {
     FIGUARTS("Figuarts");
     // @formatter:on
 
-    private final String friendlyName;
+    private final String stringValue;
 
     LineUp(String friendlyName) {
-        this.friendlyName = friendlyName;
+        this.stringValue = friendlyName;
     }
 
     public String toString() {
-        return this.friendlyName;
+        return this.stringValue;
     }
 }

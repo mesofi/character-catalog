@@ -5,41 +5,40 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Common properties.
+ *
+ * @author armandorivasarzaluz
+ */
 @Getter
 @Setter
 @EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ToString
-public class Figure {
+public abstract class Figure {
 
     @EqualsAndHashCode.Exclude
-    private BigDecimal basePrice; // Base price without taxes.
-    @EqualsAndHashCode.Exclude
-    private BigDecimal officialPrice; // Price with taxes.
+    private Issuance issuanceJPY;
 
     @EqualsAndHashCode.Exclude
-    private Date firstAnnouncementDate; // Date when the figure was first announced.
-    @EqualsAndHashCode.Exclude
-    private Boolean preOrderConfirmedDayDate;
-    @EqualsAndHashCode.Exclude
-    private Date preOrderDate; // The preOrder date.
-    @EqualsAndHashCode.Exclude
-    private Boolean releaseConfirmedDayDate;
-    @EqualsAndHashCode.Exclude
-    private Date releaseDate; // The release date in Japan
+    private Issuance issuanceMXN;
 
     @EqualsAndHashCode.Exclude
-    private Distribution distribution; // how this figure was
+    private boolean futureRelease; // <== Calculated == Used to determine if the figure is in the future or not.
+
     @EqualsAndHashCode.Exclude
     private String url; // URL for the Tamashii website.
 
     @EqualsAndHashCode.Exclude
-    private String remarks;
+    private Distribution distribution; // how this figure was distributed.
+
+    @EqualsAndHashCode.Exclude
+    private String remarks; // remarks or comments.
 }

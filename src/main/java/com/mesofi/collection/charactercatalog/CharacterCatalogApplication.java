@@ -8,8 +8,13 @@ package com.mesofi.collection.charactercatalog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Just loads the Application Context.
+ * 
+ * @author armandorivasarzaluz
+ *
+ */
 @SpringBootApplication
-// @EnableConfigurationProperties(CharacterConfig.class)
 public class CharacterCatalogApplication {
 
     public static void main(String[] args) {

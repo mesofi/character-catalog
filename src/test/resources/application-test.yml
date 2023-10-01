@@ -1,0 +1,16 @@
+logging:
+  level:
+    org.springframework.boot.autoconfigure.mongo.embedded: DEBUG
+    org.mongodb: DEBUG
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      database: saintseiyauniverse-test
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2

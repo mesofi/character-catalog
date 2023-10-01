@@ -10,7 +10,3 @@ logging:
             core:
               MongoTemplate: DEBUG
 
-spring:
-  data:
-    mongodb:
-      database: saintseiyauniverse

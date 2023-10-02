@@ -12,15 +12,13 @@
     <artifactId>character-catalog</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>character-catalog</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Character Catalog for Spring Boot</description>
     <properties>
         <java.version>17</java.version>
         <commons-text.version>1.10.0</commons-text.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.28</lombok.version>
         <de.flapdoodle.embed.mongo.spring30x>4.9.3</de.flapdoodle.embed.mongo.spring30x>
-
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -48,12 +46,6 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
-            <version>${de.flapdoodle.embed.mongo.spring30x}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -85,6 +77,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
+            <version>${de.flapdoodle.embed.mongo.spring30x}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,7 +102,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>

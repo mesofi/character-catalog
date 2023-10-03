@@ -17,12 +17,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
@@ -32,6 +35,7 @@ import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
+import com.mesofi.collection.charactercatalog.model.Series;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 import lombok.AllArgsConstructor;
@@ -251,6 +255,84 @@ public class CharacterFigureService {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Creates a new character.
+     *
+     * @param newCharacter The character to be persisted.
+     * @return The saved character.
+     */
+    public CharacterFigure createNewCharacter(final CharacterFigure newCharacter) {
+        log.debug("Creating a brand new character ...");
+
+        // performs some validations.
+        validateCharacterFigure(newCharacter);
+
+        // check if the new figure is part of restocking, or it is a new one.
+        List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
+        log.debug("We found {} existing stored figures ...", existingFigures.size());
+
+        // @formatter:off
+        Optional<CharacterFigure> characterFound = existingFigures.stream()
+                .map($ -> modelMapper.toModel($))
+                .filter(newCharacter::equals)
+                .findFirst();
+        // @formatter:on
+
+        CharacterFigure cf;
+        if (characterFound.isPresent()) {
+            // the new character can be added as a re-stocking.
+            cf = characterFound.get();
+            cf.setRestocks(addRestock(cf.getRestocks(), newCharacter));
+
+            // once it's added as re-stocking, then it's updated in our DB.
+            repository.findById(cf.getId()).ifPresentOrElse(entity -> {
+                entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
+                repository.save(entity); // updates with the new re-stocking
+                log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
+            }, () -> log.warn("No restock has been added"));
+        } else {
+            // the new character is saved for the first time.
+            cf = modelMapper.toModel(repository.save(modelMapper.toEntity(newCharacter)));
+            log.debug("A new character has been saved with id: {}", cf.getId());
+        }
+        // finally the price and name is calculated here ...
+        calculatePriceAndDisplayableName(cf);
+        return cf;
+    }
+
+    /**
+     * This method is used to validate a character object.
+     *
+     * @param character The character to be validated.
+     */
+    private void validateCharacterFigure(final CharacterFigure character) {
+
+        // make sure the required fields are there...
+        if (Objects.isNull(character)) {
+            throw new IllegalArgumentException("Provide a valid character");
+        }
+        if (!StringUtils.hasText(character.getBaseName())) {
+            throw new IllegalArgumentException(INVALID_BASE_NAME);
+        }
+        if (Objects.isNull(character.getGroup())) {
+            throw new IllegalArgumentException(INVALID_GROUP);
+        }
+
+        // now make sure some required fields are defaulted.
+        if (!StringUtils.hasText(character.getOriginalName())) {
+            character.setOriginalName(character.getBaseName());
+        }
+        if (Objects.isNull(character.getLineUp())) {
+            character.setLineUp(LineUp.MYTH_CLOTH_EX);
+        }
+        if (Objects.isNull(character.getSeries())) {
+            character.setSeries(Series.SAINT_SEIYA);
+        }
+        if (Objects.nonNull(character.getIssuanceJPY())) {
+            character.setFutureRelease(Objects.isNull(character.getIssuanceJPY().getReleaseDate()));
+        }
     }
 
     private Sort getSorting() {

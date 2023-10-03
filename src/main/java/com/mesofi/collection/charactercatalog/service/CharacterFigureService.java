@@ -11,12 +11,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +28,9 @@ import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Figure;
+import com.mesofi.collection.charactercatalog.model.Group;
+import com.mesofi.collection.charactercatalog.model.Issuance;
+import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
@@ -117,6 +123,150 @@ public class CharacterFigureService {
             return effectiveCharacters;
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * Retrieve all the characters ordered by release date.
+     * 
+     * @return The list of characters.
+     */
+    public List<CharacterFigure> retrieveAllCharacters() {
+        // @formatter:off
+        List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
+                .map($ -> modelMapper.toModel($))
+                .peek(this::calculatePriceAndDisplayableName)
+                .toList();
+        // @formatter:on
+        log.debug("Total of characters found: {}", figureList.size());
+        return figureList;
+    }
+
+    /**
+     * This method is used to prepare the figure to be displayed in the response.
+     *
+     * @param figure The character figure to be shown.
+     */
+    private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
+        Issuance jpy = figure.getIssuanceJPY();
+        Issuance mxn = figure.getIssuanceMXN();
+
+        // the displayable name is calculated here
+        figure.setDisplayableName(calculateFigureDisplayableName(figure));
+        // the price is set here.
+        if (Objects.nonNull(jpy)) {
+            jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
+        }
+        if (Objects.nonNull(mxn)) {
+            mxn.setReleasePrice(mxn.getBasePrice());
+        }
+
+        figure.setOriginalName(null);
+        figure.setBaseName(null);
+    }
+
+    private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {
+        BigDecimal releasePrice;
+        if (Objects.nonNull(basePrice) && Objects.nonNull(releaseDate)) {
+            LocalDate october12019 = LocalDate.of(2019, 10, 1);
+            if (releaseDate.isBefore(october12019)) {
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".08")));
+            } else {
+                releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".10")));
+            }
+            return releasePrice;
+        }
+        return null;
+    }
+
+    /**
+     * Calculate the figure name.
+     *
+     * @param figure The figure name object.
+     * @return The displayable name.
+     */
+    public String calculateFigureDisplayableName(final CharacterFigure figure) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(figure.getBaseName());
+
+        switch (figure.getGroup()) {
+        case V1:
+            appendAttr(sb, "~Initial Bronze Cloth~");
+            break;
+        case V2:
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+                appendAttr(sb, "~New Bronze Cloth~");
+            }
+            break;
+        case V3:
+            appendAttr(sb, "~Final Bronze Cloth~");
+            break;
+        case V4:
+            appendAttr(sb, "(God Cloth)");
+            break;
+        case V5:
+            appendAttr(sb, "(Heaven Chapter)");
+            break;
+        default:
+            break;
+        }
+        if (figure.isPlainCloth()) {
+            appendAttr(sb, "(Plain Clothes)");
+        }
+
+        if (figure.isBronzeToGold()) {
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH) {
+                if (figure.getGroup() == Group.V1) {
+                    sb = replacePattern(sb.toString());
+                    appendAttr(sb, "~Limited Gold~");
+                }
+                if (figure.getGroup() == Group.V2) {
+                    appendAttr(sb, "~Power of Gold~");
+                }
+            }
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+                if (figure.getGroup() == Group.V2 || figure.getGroup() == Group.V3) {
+                    sb = replacePattern(sb.toString());
+                    appendAttr(sb, "~Golden Limited Edition~");
+                }
+            }
+        }
+
+        if (figure.isManga()) {
+            appendAttr(sb, "~Comic Version~");
+        }
+        if (figure.isOce()) {
+            sb = replacePattern(sb.toString());
+            appendAttr(sb, "~Original Color Edition~");
+        }
+        if (Objects.nonNull(figure.getAnniversary())) {
+            sb = replacePattern(sb.toString());
+            appendAttr(sb, "~" + figure.getAnniversary() + "th Anniversary Ver.~");
+        }
+        if (figure.isHongKongVersion()) {
+            appendAttr(sb, "~HK Version~");
+        }
+
+        if (figure.isSurplice()) {
+            appendAttr(sb, "(Surplice)");
+        }
+
+        return sb.toString();
+    }
+
+    private Sort getSorting() {
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
+        return Sort.by(orders);
+    }
+
+    private StringBuilder replacePattern(String name) {
+        return new StringBuilder(name.replaceFirst("~", "(").replaceFirst("~", ")"));
+    }
+
+    private void appendAttr(StringBuilder sb, String attribute) {
+        sb.append(" ");
+        sb.append(attribute);
     }
 
     /**

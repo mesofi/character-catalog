@@ -159,6 +159,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.anniversary").doesNotExist()
                 .jsonPath("$.restocks").exists()
                 .jsonPath("$.restocks").isArray()
+                .jsonPath("$.restocks.length()").isEqualTo(1)
                 .jsonPath("$.restocks[0].issuanceJPY.basePrice").doesNotExist()
                 .jsonPath("$.restocks[0].issuanceJPY.releasePrice").doesNotExist()
                 .jsonPath("$.restocks[0].issuanceJPY.firstAnnouncementDate").doesNotExist()
@@ -265,8 +266,5 @@ public class CharacterFigureCreateIT {
         ;
         // @formatter:on
         log.debug("The character have been created correctly! ...");
-
-        // We delete all existing records.
-        repository.deleteAll();
     }
 }

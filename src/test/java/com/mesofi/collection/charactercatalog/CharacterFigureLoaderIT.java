@@ -5,6 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog;
 
+import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ public class CharacterFigureLoaderIT {
     @Autowired
     private WebTestClient webTestClient;
 
+    @Autowired
+    private CharacterFigureRepository repository;
+
     final String BASE_URL = "";
     final String CONTEXT = "/characters";
 
@@ -47,6 +51,9 @@ public class CharacterFigureLoaderIT {
     @Order(1)
     void should_load_all_characters() {
         log.debug("Loading all the characters for the first time ...");
+
+        // We start by deleting all the existing characters.
+        repository.deleteAll();
 
         final String data = "characters/MythCloth Catalog - CatalogMyth-min.tsv";
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
@@ -81,6 +88,7 @@ public class CharacterFigureLoaderIT {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$").isArray()
+                .jsonPath("$.length()").isEqualTo(6)
                 .jsonPath("$[0].futureRelease").isEqualTo(true)
                 .jsonPath("$[0].remarks").isEqualTo("20th anniversary")
                 .jsonPath("$[0].displayableName").isEqualTo("Andromeda Shun (Initial Bronze Cloth) ~20th Anniversary Ver.~")
@@ -186,6 +194,7 @@ public class CharacterFigureLoaderIT {
                 .jsonPath("$[4].surplice").isEqualTo(false)
                 .jsonPath("$[4].set").isEqualTo(false)
                 .jsonPath("$[4].restocks").isArray()
+                .jsonPath("$[4].restocks.length()").isEqualTo(1)
                 .jsonPath("$[4].restocks[0].issuanceJPY.basePrice").isEqualTo(0)
                 .jsonPath("$[4].restocks[0].issuanceJPY.firstAnnouncementDate").isEqualTo("2023-09-15")
                 .jsonPath("$[4].restocks[0].issuanceJPY.preorderDate").isEqualTo("2023-11-01")

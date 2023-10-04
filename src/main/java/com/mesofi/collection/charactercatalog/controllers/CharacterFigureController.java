@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,5 +75,16 @@ public class CharacterFigureController {
     public List<CharacterFigure> getAllCharacters() {
         log.debug("Getting all existing characters ...");
         return service.retrieveAllCharacters();
+    }
+
+    /**
+     * Get all existing characters.
+     *
+     * @return The list of characters.
+     */
+    @GetMapping("/{id}")
+    public CharacterFigure retrieveCharactersById(@PathVariable String id) {
+        log.debug("Getting the character based on id: {}", id);
+        return service.retrieveCharactersById(id);
     }
 }

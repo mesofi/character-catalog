@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -143,6 +144,27 @@ public class CharacterFigureService {
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
         return figureList;
+    }
+
+    /**
+     * Retrieves a character using its identifier.
+     *
+     * @param id The unique identifier.
+     * @return The character found or exception if it was not found.
+     */
+    public CharacterFigure retrieveCharactersById(final String id) {
+        log.debug("Finding a character by id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id to find a character");
+        }
+
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
     }
 
     /**
@@ -318,6 +340,10 @@ public class CharacterFigureService {
         }
         if (Objects.isNull(character.getGroup())) {
             throw new IllegalArgumentException(INVALID_GROUP);
+        }
+        // make sure the character does not have a 're-stock' structure
+        if (Objects.nonNull(character.getRestocks())) {
+            throw new IllegalArgumentException("Remove restock reference");
         }
 
         // now make sure some required fields are defaulted.

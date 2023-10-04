@@ -364,6 +364,67 @@ public class CharacterFigureService {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param updatedCharacter
+     * @return
+     */
+    public CharacterFigure updateExistingCharacter(final String id, final CharacterFigure updatedCharacter) {
+        log.debug("Updating existing character with id: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Provide a non empty id to update the character");
+        }
+
+        // performs some validations.
+        validateCharacterFigure(updatedCharacter);
+        CharacterFigureEntity updatedCharacterEntity = modelMapper.toEntity(updatedCharacter);
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // update the entity ...
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setMetal(updatedCharacterEntity.isMetal());
+        characterFigureEntity.setGolden(updatedCharacterEntity.isGolden());
+        characterFigureEntity.setHk(updatedCharacterEntity.isHk());
+        characterFigureEntity.setIssuanceJPY(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceJPY()));
+        characterFigureEntity.setIssuanceMXN(fileMapper.createIssuance(updatedCharacterEntity.getIssuanceMXN()));
+        characterFigureEntity.setFutureRelease(updatedCharacterEntity.isFutureRelease());
+        characterFigureEntity.setUrl(updatedCharacterEntity.getUrl());
+        characterFigureEntity.setDistribution(updatedCharacterEntity.getDistribution());
+        characterFigureEntity.setRemarks(updatedCharacterEntity.getRemarks());
+        characterFigureEntity.setOriginalName(updatedCharacterEntity.getOriginalName());
+        characterFigureEntity.setBaseName(updatedCharacterEntity.getBaseName());
+        characterFigureEntity.setLineUp(updatedCharacterEntity.getLineUp());
+        characterFigureEntity.setSeries(updatedCharacterEntity.getSeries());
+        characterFigureEntity.setGroup(updatedCharacterEntity.getGroup());
+        characterFigureEntity.setOce(updatedCharacterEntity.isOce());
+        characterFigureEntity.setRevival(updatedCharacterEntity.isRevival());
+        characterFigureEntity.setPlainCloth(updatedCharacterEntity.isPlainCloth());
+        characterFigureEntity.setBrokenCloth(updatedCharacterEntity.isBrokenCloth());
+        characterFigureEntity.setGold(updatedCharacterEntity.isGold());
+        characterFigureEntity.setManga(updatedCharacterEntity.isManga());
+        characterFigureEntity.setSurplice(updatedCharacterEntity.isSurplice());
+        characterFigureEntity.setSet(updatedCharacterEntity.isSet());
+        characterFigureEntity.setAnniversary(updatedCharacterEntity.getAnniversary());
+        List<RestockFigure> list = updatedCharacterEntity.getRestocks();
+        if (list != null) {
+            characterFigureEntity.setRestocks(new ArrayList<>(list));
+        }
+
+        repository.save(characterFigureEntity);
+
+        // retrieves the entity directly from the DB.
+        // @formatter:off
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
     private Sort getSorting() {
         List<Sort.Order> orders = new ArrayList<>();
         orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));

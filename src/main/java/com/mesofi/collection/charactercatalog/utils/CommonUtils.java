@@ -35,7 +35,14 @@ public class CommonUtils {
      * @return A BigDecimal reference or null if the input is null.
      */
     public static BigDecimal toPrice(final String value) {
-        return StringUtils.hasText(value) ? new BigDecimal(value.substring(1).replace(',', '.')) : null;
+        if (StringUtils.hasText(value)) {
+            if (value.contains("$") || value.contains("¥")) {
+                return new BigDecimal(value.substring(1).replace(',', '.'));
+            } else {
+                return new BigDecimal(value.replace(',', '.'));
+            }
+        }
+        return null;
     }
 
     /**

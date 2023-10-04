@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,5 +87,19 @@ public class CharacterFigureController {
     public CharacterFigure retrieveCharactersById(@PathVariable String id) {
         log.debug("Getting the character based on id: {}", id);
         return service.retrieveCharactersById(id);
+    }
+
+    /**
+     * Update an existing character.
+     * 
+     * @param id              The unique identifier.
+     * @param characterFigure The new character to be updated.
+     * @return The updated character.
+     */
+    @PutMapping("/{id}")
+    public CharacterFigure updateExistingCharacter(@PathVariable String id,
+            @Valid @RequestBody CharacterFigure characterFigure) {
+        log.debug("Updating existing character with: {}", id);
+        return service.updateExistingCharacter(id, characterFigure);
     }
 }

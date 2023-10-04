@@ -330,7 +330,10 @@ public class CharacterFigureService {
         if (Objects.isNull(character.getSeries())) {
             character.setSeries(Series.SAINT_SEIYA);
         }
-        if (Objects.nonNull(character.getIssuanceJPY())) {
+
+        if (Objects.isNull(character.getIssuanceJPY())) {
+            character.setFutureRelease(true);
+        } else {
             character.setFutureRelease(Objects.isNull(character.getIssuanceJPY().getReleaseDate()));
         }
     }

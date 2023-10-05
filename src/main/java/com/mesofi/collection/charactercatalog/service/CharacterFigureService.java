@@ -365,10 +365,12 @@ public class CharacterFigureService {
     }
 
     /**
-     *
-     * @param id
-     * @param updatedCharacter
-     * @return
+     * Updates the existing character with new data, the character found will be
+     * replaced by the new one as long as it exists in the DB.
+     * 
+     * @param id               Unique identifier of the character.
+     * @param updatedCharacter The character that will replace the existing one.
+     * @return The updated character.
      */
     public CharacterFigure updateExistingCharacter(final String id, final CharacterFigure updatedCharacter) {
         log.debug("Updating existing character with id: {}", id);
@@ -414,9 +416,11 @@ public class CharacterFigureService {
             characterFigureEntity.setRestocks(new ArrayList<>(list));
         }
 
+        // the character is updated here.
         repository.save(characterFigureEntity);
 
-        // retrieves the entity directly from the DB.
+        // retrieves the entity directly from the DB so that we can sent to to the
+        // response..
         // @formatter:off
         CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));

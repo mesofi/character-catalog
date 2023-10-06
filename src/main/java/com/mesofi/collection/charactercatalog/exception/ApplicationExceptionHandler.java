@@ -3,8 +3,8 @@ package com.mesofi.collection.charactercatalog.exception;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,6 +29,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
             @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        log.debug("Handle http message not readable exception ...");
+
         ApiErrorResponse body = new ApiErrorResponse();
         body.setMessage(ex.getMessage());
         return createResponseEntity(body, headers, status, request);
@@ -40,11 +41,40 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        log.debug("Handle method argument not valid exception ...");
+
         ApiErrorResponse body = new ApiErrorResponse();
         body.setMessage(ex.getMessage());
         body.setErrors(getErrors(ex));
         return createResponseEntity(body, headers, status, request);
+    }
+
+    @ExceptionHandler(value = { CharacterFigureNotFoundException.class })
+    protected ResponseEntity<Object> handleNotFound(CharacterFigureNotFoundException ex, final WebRequest request) {
+        log.debug("Handle character not found exception ...");
+
+        ApiErrorResponse body = new ApiErrorResponse();
+        body.setMessage(ex.getMessage());
+        return createResponseEntity(body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(value = { IllegalArgumentException.class })
+    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, final WebRequest request) {
+        log.debug("Handle invalid request exception ...");
+
+        ApiErrorResponse body = new ApiErrorResponse();
+        body.setMessage(ex.getMessage());
+        return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = { RuntimeException.class })
+    protected ResponseEntity<Object> handleNotFoundc(RuntimeException ex, final WebRequest request) {
+        log.debug("Unhandle exception ...");
+
+        ApiErrorResponse body = new ApiErrorResponse();
+        body.setMessage(ex.getMessage());
+        return createResponseEntity(body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     private Set<String> getErrors(MethodArgumentNotValidException ex) {
@@ -58,15 +88,6 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         }
 
         return errors;
-    }
-
-    @ExceptionHandler(value = { NotFoundException.class })
-    protected ResponseEntity<?> handleNotFound(RuntimeException ex, final HttpServletRequest request) {
-
-        ApiErrorResponse response = new ApiErrorResponse();
-
-        HttpStatusCode d = HttpStatusCode.valueOf(200);
-        return new ResponseEntity<>(response, d);
     }
 
 }

@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +39,18 @@ public class CommonUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "¥12,500", "¥0" })
+    @ValueSource(strings = { "¥12,500", "¥0", "$11.9", "3.4" })
     public void should_return_valid_price(String input) {
         assertNotNull(CommonUtils.toPrice(input));
+    }
+
+    @Test
+    public void should_return_convert_price_to_string() {
+        BigDecimal decimal = null;
+        assertNull(CommonUtils.toPrice(decimal));
+
+        decimal = new BigDecimal("34");
+        assertEquals("34", CommonUtils.toPrice(decimal));
     }
 
     @ParameterizedTest
@@ -52,6 +63,15 @@ public class CommonUtilsTest {
     @ValueSource(strings = { "9/15/2023", "10/30/2020", "7/3/2020", "11/2022", "5/2021" })
     public void should_return_valid_local_date(String input) {
         assertNotNull(CommonUtils.toDate(input));
+    }
+
+    @Test
+    public void should_return_convert_date_to_string() {
+        LocalDate localDate = null;
+        assertNull(CommonUtils.toDate(localDate));
+
+        localDate = LocalDate.of(2022, 2, 3);
+        assertEquals("2/3/2022", CommonUtils.toDate(localDate));
     }
 
     @Test

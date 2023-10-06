@@ -57,7 +57,7 @@ public class CharacterFigureController {
 
     /**
      * Creates a new character.
-     * 
+     *
      * @param characterFigure The character to be created.
      * @return The created character.
      */
@@ -80,17 +80,24 @@ public class CharacterFigureController {
 
     /**
      * Get all existing characters.
-     * 
+     *
      * @return The list of characters.
      */
     @GetMapping("/{id}")
-    public CharacterFigure getAllCharacters(@PathVariable String id) {
+    public CharacterFigure retrieveCharactersById(@PathVariable String id) {
         log.debug("Getting the character based on id: {}", id);
         return service.retrieveCharactersById(id);
     }
 
+    /**
+     * Update an existing character.
+     * 
+     * @param id              The unique identifier.
+     * @param characterFigure The new character to be updated.
+     * @return The updated character.
+     */
     @PutMapping("/{id}")
-    public CharacterFigure updateExstingCharacter(@PathVariable String id,
+    public CharacterFigure updateExistingCharacter(@PathVariable String id,
             @Valid @RequestBody CharacterFigure characterFigure) {
         log.debug("Updating existing character with: {}", id);
         return service.updateExistingCharacter(id, characterFigure);

@@ -92,7 +92,7 @@ public class CharacterFigureService {
         // reverse the list so that we can add re-stocks easily ...
         reverseListElements(allCharacters);
 
-        log.debug("Total of figures loaded: {}", allCharacters.size());
+        log.debug("Total of figures to be loaded: {}", allCharacters.size());
         List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
         log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
 
@@ -102,14 +102,14 @@ public class CharacterFigureService {
                         .map($ -> modelMapper.toEntity($))
                         .collect(Collectors.toList())).size();
         // @formatter:on
-        log.debug("Total of figures loaded: {}", total);
+        log.debug("Total of figures loaded correctly: {}", total);
         return total;
     }
 
     /**
      * Gets the effective characters, this list contains the records to be saved in
      * DB.
-     * 
+     *
      * @param allCharacters All the characters.
      * @return The effective characters.
      */
@@ -148,7 +148,7 @@ public class CharacterFigureService {
 
     /**
      * Retrieves a character using its identifier.
-     * 
+     *
      * @param id The unique identifier.
      * @return The character found or exception if it was not found.
      */
@@ -169,7 +169,7 @@ public class CharacterFigureService {
 
     /**
      * This method is used to prepare the figure to be displayed in the response.
-     * 
+     *
      * @param figure The character figure to be shown.
      */
     private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
@@ -206,7 +206,7 @@ public class CharacterFigureService {
 
     /**
      * Calculate the figure name.
-     * 
+     *
      * @param figure The figure name object.
      * @return The displayable name.
      */
@@ -281,7 +281,7 @@ public class CharacterFigureService {
 
     /**
      * Creates a new character.
-     * 
+     *
      * @param newCharacter The character to be persisted.
      * @return The saved character.
      */
@@ -326,7 +326,7 @@ public class CharacterFigureService {
 
     /**
      * This method is used to validate a character object.
-     * 
+     *
      * @param character The character to be validated.
      */
     private void validateCharacterFigure(final CharacterFigure character) {
@@ -341,6 +341,10 @@ public class CharacterFigureService {
         if (Objects.isNull(character.getGroup())) {
             throw new IllegalArgumentException(INVALID_GROUP);
         }
+        // make sure the character does not have a 're-stock' structure
+        if (Objects.nonNull(character.getRestocks())) {
+            throw new IllegalArgumentException("Remove restock reference");
+        }
 
         // now make sure some required fields are defaulted.
         if (!StringUtils.hasText(character.getOriginalName())) {
@@ -352,16 +356,21 @@ public class CharacterFigureService {
         if (Objects.isNull(character.getSeries())) {
             character.setSeries(Series.SAINT_SEIYA);
         }
-        if (Objects.nonNull(character.getIssuanceJPY())) {
+
+        if (Objects.isNull(character.getIssuanceJPY())) {
+            character.setFutureRelease(true);
+        } else {
             character.setFutureRelease(Objects.isNull(character.getIssuanceJPY().getReleaseDate()));
         }
     }
 
     /**
+     * Updates the existing character with new data, the character found will be
+     * replaced by the new one as long as it exists in the DB.
      * 
-     * @param id
-     * @param updatedCharacter
-     * @return
+     * @param id               Unique identifier of the character.
+     * @param updatedCharacter The character that will replace the existing one.
+     * @return The updated character.
      */
     public CharacterFigure updateExistingCharacter(final String id, final CharacterFigure updatedCharacter) {
         log.debug("Updating existing character with id: {}", id);
@@ -407,9 +416,11 @@ public class CharacterFigureService {
             characterFigureEntity.setRestocks(new ArrayList<>(list));
         }
 
+        // the character is updated here.
         repository.save(characterFigureEntity);
 
-        // retrieves the entity directly from the DB.
+        // retrieves the entity directly from the DB so that we can sent to to the
+        // response..
         // @formatter:off
         CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
@@ -438,7 +449,7 @@ public class CharacterFigureService {
      * This method is used to add a figure as re-stock. If the existing list of
      * re-stock is null, then it creates a new one and the figure is added into the
      * list.
-     * 
+     *
      * @param restocks   The list of re-stocks.
      * @param newRestock The new figure to be added as re-stock.
      * @return The new re-stocking list which includes the new item added.

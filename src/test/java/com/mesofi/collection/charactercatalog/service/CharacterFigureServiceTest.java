@@ -34,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,7 +96,7 @@ public class CharacterFigureServiceTest {
         final String folder = "characters/";
         final String name = "MythCloth Catalog - CatalogMyth-min.tsv";
         final byte[] bytes = Files.readAllBytes(getPathFromClassPath(folder + name));
-        MultipartFile result = new MockMultipartFile(name, name, "text/plain", bytes);
+        MultipartFile result = new MockMultipartFile(name, name, MediaType.TEXT_PLAIN_VALUE, bytes);
 
         assertEquals(0, service.loadAllCharacters(result));
     }
@@ -131,84 +132,6 @@ public class CharacterFigureServiceTest {
         assertEquals(1, list.get(0).getRestocks().size());
         assertEquals("Seiya", list.get(1).getOriginalName());
         assertNull(list.get(1).getRestocks());
-    }
-
-    /**
-     * Test for
-     * {@link CharacterFigureService#calculateFigureDisplayableName(CharacterFigure)}
-     */
-    @Test
-    public void should_get_figure_displayable_name() {
-        CharacterFigure characterFigure = new CharacterFigure();
-        characterFigure.setBaseName("Pegasus Seiya");
-        characterFigure.setGroup(Group.V1);
-        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V2);
-        assertEquals("Pegasus Seiya", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
-        assertEquals("Pegasus Seiya ~New Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V3);
-        assertEquals("Pegasus Seiya ~Final Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V4);
-        assertEquals("Pegasus Seiya (God Cloth)", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V5);
-        assertEquals("Pegasus Seiya (Heaven Chapter)", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.GOLD);
-        assertEquals("Pegasus Seiya", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setPlainCloth(true);
-        assertEquals("Pegasus Seiya (Plain Clothes)", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setPlainCloth(false);
-        characterFigure.setBronzeToGold(true);
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
-        characterFigure.setGroup(Group.V1);
-        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Limited Gold~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V2);
-        assertEquals("Pegasus Seiya ~Power of Gold~", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
-        assertEquals("Pegasus Seiya ~Power of Gold~", service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
-        assertEquals("Pegasus Seiya (New Bronze Cloth) ~Golden Limited Edition~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V3);
-        assertEquals("Pegasus Seiya (Final Bronze Cloth) ~Golden Limited Edition~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setGroup(Group.V1);
-        characterFigure.setManga(true);
-        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ ~Comic Version~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setOce(true);
-        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Comic Version~ ~Original Color Edition~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setAnniversary(20);
-        assertEquals(
-                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setHongKongVersion(true);
-        assertEquals(
-                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~ ~HK Version~",
-                service.calculateFigureDisplayableName(characterFigure));
-
-        characterFigure.setSurplice(true);
-        assertEquals(
-                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~ ~HK Version~ (Surplice)",
-                service.calculateFigureDisplayableName(characterFigure));
     }
 
     /**
@@ -307,6 +230,84 @@ public class CharacterFigureServiceTest {
     }
 
     /**
+     * Test for
+     * {@link CharacterFigureService#calculateFigureDisplayableName(CharacterFigure)}
+     */
+    @Test
+    public void should_get_figure_displayable_name() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V2);
+        assertEquals("Pegasus Seiya", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        assertEquals("Pegasus Seiya ~New Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V3);
+        assertEquals("Pegasus Seiya ~Final Bronze Cloth~", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V4);
+        assertEquals("Pegasus Seiya (God Cloth)", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V5);
+        assertEquals("Pegasus Seiya (Heaven Chapter)", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.GOLD);
+        assertEquals("Pegasus Seiya", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setPlainCloth(true);
+        assertEquals("Pegasus Seiya (Plain Clothes)", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setPlainCloth(false);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+        characterFigure.setGroup(Group.V1);
+        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Limited Gold~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V2);
+        assertEquals("Pegasus Seiya ~Power of Gold~", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+        assertEquals("Pegasus Seiya ~Power of Gold~", service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        assertEquals("Pegasus Seiya (New Bronze Cloth) ~Golden Limited Edition~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V3);
+        assertEquals("Pegasus Seiya (Final Bronze Cloth) ~Golden Limited Edition~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setManga(true);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ ~Comic Version~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setOce(true);
+        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Comic Version~ ~Original Color Edition~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setAnniversary(20);
+        assertEquals(
+                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setHongKongVersion(true);
+        assertEquals(
+                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~ ~HK Version~",
+                service.calculateFigureDisplayableName(characterFigure));
+
+        characterFigure.setSurplice(true);
+        assertEquals(
+                "Pegasus Seiya (Initial Bronze Cloth) (Comic Version) ~Original Color Edition~ ~20th Anniversary Ver.~ ~HK Version~ (Surplice)",
+                service.calculateFigureDisplayableName(characterFigure));
+    }
+
+    /**
      * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
      */
     @Test
@@ -339,6 +340,21 @@ public class CharacterFigureServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.createNewCharacter(characterFigure));
         assertEquals("Provide a valid group", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)}
+     */
+    @Test
+    public void should_fail_when_new_character_contains_restocks() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setRestocks(new ArrayList<>());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.createNewCharacter(characterFigure));
+        assertEquals("Remove restock reference", exception.getMessage());
     }
 
     /**
@@ -478,7 +494,7 @@ public class CharacterFigureServiceTest {
         assertEquals(1, characterFigureExpected.getRestocks().size());
         assertNull(characterFigureExpected.getRestocks().get(0).getIssuanceJPY());
         assertNull(characterFigureExpected.getRestocks().get(0).getIssuanceMXN());
-        assertFalse(characterFigureExpected.getRestocks().get(0).isFutureRelease());
+        assertTrue(characterFigureExpected.getRestocks().get(0).isFutureRelease());
         assertNull(characterFigureExpected.getRestocks().get(0).getUrl());
         assertNull(characterFigureExpected.getRestocks().get(0).getDistribution());
         assertNull(characterFigureExpected.getRestocks().get(0).getRemarks());
@@ -597,7 +613,7 @@ public class CharacterFigureServiceTest {
         assertNull(characterFigureWithRestock.getAnniversary());
         assertNotNull(characterFigureWithRestock.getRestocks());
         assertEquals(1, characterFigureWithRestock.getRestocks().size());
-        assertFalse(characterFigureWithRestock.getRestocks().get(0).isFutureRelease());
+        assertTrue(characterFigureWithRestock.getRestocks().get(0).isFutureRelease());
         assertNull(characterFigureWithRestock.getRestocks().get(0).getUrl());
         assertNull(characterFigureWithRestock.getRestocks().get(0).getRemarks());
         assertNull(characterFigureWithRestock.getRestocks().get(0).getDistribution());
@@ -609,6 +625,107 @@ public class CharacterFigureServiceTest {
         assertNull(characterFigureWithRestock.getUrl());
         assertNull(characterFigureWithRestock.getDistribution());
         assertNull(characterFigureWithRestock.getRemarks());
+    }
+
+    /**
+     * Test for
+     * {@link CharacterFigureService#updateExistingCharacter(String, CharacterFigure)}
+     */
+    @Test
+    public void should_fail_update_character_when_id_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.updateExistingCharacter(null, null));
+        assertEquals("Provide a non empty id to update the character", exception.getMessage());
+    }
+
+    /**
+     * Test for
+     * {@link CharacterFigureService#updateExistingCharacter(String, CharacterFigure)}
+     */
+    @Test
+    public void should_fail_update_character_when_updated_character_is_missing() {
+        String id = "122kk3j4h5hdn";
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.updateExistingCharacter(id, null));
+        assertEquals("Provide a valid character", exception.getMessage());
+    }
+
+    /**
+     * Test for
+     * {@link CharacterFigureService#updateExistingCharacter(String, CharacterFigure)}
+     */
+    @Test
+    public void should_fail_update_character_when_id_is_not_found() {
+        String id = "122kk3j4h5hdn";
+        CharacterFigure updatedCharacter = new CharacterFigure();
+        updatedCharacter.setBaseName("Scorpio Milo");
+        updatedCharacter.setGroup(Group.GOLD);
+
+        CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
+                () -> service.updateExistingCharacter(id, updatedCharacter));
+        assertEquals("Character not found with id: 122kk3j4h5hdn", exception.getMessage());
+    }
+
+    /**
+     * Test for
+     * {@link CharacterFigureService#updateExistingCharacter(String, CharacterFigure)}
+     */
+    @Test
+    public void should_update_character_successfully() {
+        String id = "122kk3j4h5hdn";
+        CharacterFigure updatedCharacter = new CharacterFigure();
+        updatedCharacter.setOriginalName("Scorpio Ecarlet");
+        updatedCharacter.setBaseName("Scorpio Ecarlet");
+        updatedCharacter.setGroup(Group.GOLD);
+        updatedCharacter.setRevival(true);
+
+        CharacterFigureEntity updatedCharacterEntity = createFigureEntity(null, "Scorpio Ecarlet", "Scorpio Ecarlet",
+                Group.GOLD, true);
+        when(modelMapper.toEntity(updatedCharacter)).thenReturn(updatedCharacterEntity);
+
+        CharacterFigureEntity entity = createFigureEntity(id, "Scorpio Milo", "Scorpio Milo", Group.GOLD, false);
+        entity.setId(id);
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+
+        CharacterFigure figure = new CharacterFigure();
+        figure.setId(id);
+        figure.setOriginalName("Scorpio Ecarlet");
+        figure.setBaseName("Scorpio Ecarlet");
+        figure.setGroup(Group.GOLD);
+        figure.setRevival(true);
+        figure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        figure.setSeries(Series.SAINT_SEIYA);
+        when(modelMapper.toModel(any())).thenReturn(figure);
+
+        CharacterFigure actual = service.updateExistingCharacter(id, updatedCharacter);
+        assertNotNull(actual);
+        assertNotNull(actual);
+        assertEquals("122kk3j4h5hdn", actual.getId());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Scorpio Ecarlet", actual.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, actual.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
     }
 
     private CharacterFigureEntity createFigureEntity(String id, String originalName, String baseName, Group group,

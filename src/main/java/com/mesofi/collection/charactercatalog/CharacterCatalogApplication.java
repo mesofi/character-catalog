@@ -9,7 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Just loads the Application Context.
+ * Entry point of the application.
  * 
  * @author armandorivasarzaluz
  *

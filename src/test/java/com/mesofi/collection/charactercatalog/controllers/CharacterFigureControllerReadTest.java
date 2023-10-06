@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -130,6 +132,63 @@ public class CharacterFigureControllerReadTest {
                 .andExpect(jsonPath("$.set").value(false))
                 .andExpect(jsonPath("$.anniversary").doesNotExist())
                 .andExpect(jsonPath("$.restocks").doesNotExist())
+                ;
+        // @formatter:on
+    }
+
+    @Test
+    public void should_return_all_characters() throws Exception {
+
+        CharacterFigure actual = new CharacterFigure();
+        final String id = "651e9f3bb850c2238f2dfac2";
+
+        actual.setId(id);
+        actual.setBaseName("Scorpio Milo");
+        actual.setOriginalName("Scorpio Milo");
+        actual.setGroup(Group.V1);
+        actual.setLineUp(LineUp.MYTH_CLOTH_EX);
+        actual.setSeries(Series.SAINT_SEIYA);
+
+        when(characterFigureService.retrieveAllCharacters()).thenReturn(List.of(actual));
+
+        // @formatter:off
+        mockMvc.perform(get(BASE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].issuanceJPY.basePrice").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.releasePrice").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
+                .andExpect(jsonPath("$[0].issuanceMXN").doesNotExist())
+                .andExpect(jsonPath("$[0].futureRelease").value(false))
+                .andExpect(jsonPath("$[0].url").doesNotExist())
+                .andExpect(jsonPath("$[0].distribution").doesNotExist())
+                .andExpect(jsonPath("$[0].id").value("651e9f3bb850c2238f2dfac2"))
+                .andExpect(jsonPath("$[0].originalName").value("Scorpio Milo"))
+                .andExpect(jsonPath("$[0].baseName").value("Scorpio Milo"))
+                .andExpect(jsonPath("$[0].displayableName").doesNotExist())
+                .andExpect(jsonPath("$[0].lineUp").value("MYTH_CLOTH_EX"))
+                .andExpect(jsonPath("$[0].series").value("SAINT_SEIYA"))
+                .andExpect(jsonPath("$[0].group").value("V1"))
+                .andExpect(jsonPath("$[0].metalBody").value(false))
+                .andExpect(jsonPath("$[0].oce").value(false))
+                .andExpect(jsonPath("$[0].revival").value(false))
+                .andExpect(jsonPath("$[0].plainCloth").value(false))
+                .andExpect(jsonPath("$[0].brokenCloth").value(false))
+                .andExpect(jsonPath("$[0].bronzeToGold").value(false))
+                .andExpect(jsonPath("$[0].gold").value(false))
+                .andExpect(jsonPath("$[0].hongKongVersion").value(false))
+                .andExpect(jsonPath("$[0].manga").value(false))
+                .andExpect(jsonPath("$[0].surplice").value(false))
+                .andExpect(jsonPath("$[0].set").value(false))
+                .andExpect(jsonPath("$[0].anniversary").doesNotExist())
+                .andExpect(jsonPath("$[0].restocks").doesNotExist())
                 ;
         // @formatter:on
     }

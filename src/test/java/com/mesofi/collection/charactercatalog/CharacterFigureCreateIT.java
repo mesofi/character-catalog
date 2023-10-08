@@ -7,6 +7,7 @@ package com.mesofi.collection.charactercatalog;
 
 import java.time.LocalDate;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.MethodOrderer;
@@ -81,6 +82,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").doesNotExist()
                 .jsonPath("$.distribution").doesNotExist()
                 .jsonPath("$.remarks").doesNotExist()
+                .jsonPath("$.tags").doesNotExist()
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()
@@ -138,6 +140,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").doesNotExist()
                 .jsonPath("$.distribution").doesNotExist()
                 .jsonPath("$.remarks").doesNotExist()
+                .jsonPath("$.tags").doesNotExist()
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()
@@ -172,6 +175,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.restocks[0].url").doesNotExist()
                 .jsonPath("$.restocks[0].distribution").doesNotExist()
                 .jsonPath("$.restocks[0].remarks").doesNotExist()
+                .jsonPath("$.restocks[0].tags").doesNotExist()
         ;
         // @formatter:on
         log.debug("The character have been created correctly! ...");
@@ -196,6 +200,11 @@ public class CharacterFigureCreateIT {
         issuanceJPY.put("releaseDate", LocalDate.of(2024, 2, 1));
         issuanceJPY.put("releaseConfirmationDay", false);
 
+        JSONArray tags = new JSONArray();
+        tags.put(0, "ex");
+        tags.put(1, "gold");
+        tags.put(2, "dragon");
+
         // @formatter:off
         String postRequestBody = new JSONObject()
                 .put("originalName", "Dragon Shiryu ~Initial Bronze Cloth 20th Anniversary Ver.~")
@@ -219,6 +228,7 @@ public class CharacterFigureCreateIT {
                 .put("set", "false")
                 .put("anniversary", "20")
                 .put("remarks", "20th anniversary")
+                .put("tags", tags)
                 .toString();
         // @formatter:on
 
@@ -243,6 +253,9 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").isEqualTo("https://tamashiiweb.com/item/14642")
                 .jsonPath("$.distribution").isEqualTo("TAMASHII_WEB_SHOP")
                 .jsonPath("$.remarks").isEqualTo("20th anniversary")
+                .jsonPath("$.tags").exists()
+                .jsonPath("$.tags").isArray()
+                .jsonPath("$.tags.length()").isEqualTo(3)
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()

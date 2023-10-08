@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -129,6 +130,109 @@ public class CharacterFigureServiceTest {
         assertEquals(2, list.size());
         assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
         assertNotNull(list.get(0).getRestocks());
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_new_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c3.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(3, list.get(0).getTags().size());
+        assertEquals(Set.of("god", "gold", "ex"), list.get(0).getTags());
+
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_existing_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c1.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(3, list.get(0).getTags().size());
+        assertEquals(Set.of("god", "gold", "ex"), list.get(0).getTags());
+
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_new_existing_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c1.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c3.setTags(Set.of("god", "gold", "libra", "ex", "revival")); // adds new tags
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(5, list.get(0).getTags().size());
+        assertEquals(Set.of("gold", "ex", "libra", "revival", "god"), list.get(0).getTags());
+
         assertEquals(1, list.get(0).getRestocks().size());
         assertEquals("Seiya", list.get(1).getOriginalName());
         assertNull(list.get(1).getRestocks());

@@ -5,7 +5,6 @@
  */
 package com.mesofi.collection.charactercatalog;
 
-import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import com.mesofi.collection.charactercatalog.controllers.CharacterFigureController;
+import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,8 +49,8 @@ public class CharacterFigureLoaderIT {
      */
     @Test
     @Order(1)
-    void should_load_all_characters() {
-        log.debug("Loading all the characters for the first time ...");
+    void should_load_all_characters_partial_file() {
+        log.debug("Loading all the characters for the first time (partial records) ...");
 
         // We start by deleting all the existing characters.
         repository.deleteAll();
@@ -231,5 +231,32 @@ public class CharacterFigureLoaderIT {
         ;
         // @formatter:on
         log.debug("The characters has been validated ...");
+    }
+
+    /**
+     * {@link CharacterFigureController#handleFileUpload(org.springframework.web.multipart.MultipartFile)}
+     */
+    @Test
+    @Order(3)
+    void should_load_all_characters_complete_file() {
+        log.debug("Loading all the characters ...");
+
+        // We start by deleting all the existing characters.
+        repository.deleteAll();
+
+        final String data = "characters/MythCloth Catalog - CatalogMyth.tsv";
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", new ClassPathResource(data)).contentType(MediaType.MULTIPART_FORM_DATA);
+
+        // @formatter:off
+        webTestClient.post()
+                .uri(BASE_URL + CONTEXT + "/loader")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus().isAccepted();
+        // @formatter:on
+        log.debug("The characters have been loaded correctly! ...");
     }
 }

@@ -15,9 +15,11 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -118,10 +120,12 @@ public class CharacterFigureService {
             List<CharacterFigure> effectiveCharacters = new ArrayList<>();
             for (CharacterFigure curr : allCharacters) {
                 if (effectiveCharacters.contains(curr)) {
-                    // add the current character as re-stock.
+                    // add the current character as re-stock in the final list.
                     CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
                     existing.setRestocks(addRestock(existing.getRestocks(), curr));
+                    existing.setTags(addTags(existing.getTags(), curr.getTags()));
                 } else {
+                    // we add the current character to the final list.
                     effectiveCharacters.add(curr);
                 }
             }
@@ -469,5 +473,23 @@ public class CharacterFigureService {
 
         restocks.add(newRestockFigure);
         return restocks;
+    }
+
+    private Set<String> addTags(Set<String> existingTags, Set<String> newTags) {
+        if (Objects.isNull(existingTags) & Objects.isNull(newTags)) {
+            return null;
+        }
+        if (Objects.isNull(existingTags)) {
+            return newTags;
+        }
+
+        if (Objects.isNull(newTags)) {
+            return existingTags;
+        }
+
+        Set<String> data = new HashSet<>();
+        data.addAll(existingTags);
+        data.addAll(newTags);
+        return data;
     }
 }

@@ -9,6 +9,7 @@ import static com.mesofi.collection.charactercatalog.service.CharacterFigureServ
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_GROUP;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -78,5 +79,8 @@ public class CharacterFigure extends Figure {
     private Integer anniversary; // Is it part of an anniversary?.
 
     @EqualsAndHashCode.Exclude
-    private List<RestockFigure> restocks;
+    private List<RestockFigure> restocks; // used to stored the restocks.
+
+    @EqualsAndHashCode.Exclude
+    private Set<String> tags; // the list of tags associated to a character.
 }

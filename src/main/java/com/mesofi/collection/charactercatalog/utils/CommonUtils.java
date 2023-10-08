@@ -11,8 +11,12 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.util.StringUtils;
 
@@ -122,6 +126,18 @@ public class CommonUtils {
      */
     public static String toStringValue(final String value) {
         return StringUtils.hasText(value) ? value.trim() : null;
+    }
+
+    /**
+     * Gets a list of elements based on a comma separated string.
+     * 
+     * @param value String value to be parsed to list.
+     * @return A null value if the input String is empty.
+     */
+    public static Set<String> toSetValue(final String value) {
+        return StringUtils.hasText(value)
+                ? new HashSet<>(Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toList()))
+                : null;
     }
 
     /**

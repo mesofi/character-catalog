@@ -10,6 +10,7 @@ import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toBoolean
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toDate;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
+import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toSetValue;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toStringValue;
 
 import java.util.Objects;
@@ -71,6 +72,9 @@ public class CharacterFigureFileMapper {
         }
         if (columns.length >= 29) {
             characterFigure.setRemarks(toStringValue(columns[28]));
+        }
+        if (columns.length >= 30) {
+            characterFigure.setTags(toSetValue(columns[29]));
         }
 
         return characterFigure;

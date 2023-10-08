@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.MethodOrderer;
@@ -149,11 +150,16 @@ public class CharacterFigureUpdateIT {
             issuanceJPY.put("releaseDate", LocalDate.of(2024, 9, 16));
             issuanceJPY.put("releaseConfirmationDay", true);
 
+            JSONArray tags = new JSONArray();
+            tags.put(0, "ex");
+            tags.put(1, "gold");
+
             // @formatter:off
             String postRequestBody = new JSONObject()
                     .put("baseName", "Scorpio")
                     .put("group", "GOLD")
                     .put("issuanceJPY", issuanceJPY)
+                    .put("tags", tags)
                     .toString();
             // @formatter:on
 
@@ -180,7 +186,9 @@ public class CharacterFigureUpdateIT {
                     .jsonPath("$.url").doesNotExist()
                     .jsonPath("$.distribution").doesNotExist()
                     .jsonPath("$.remarks").doesNotExist()
-                    .jsonPath("$.tags").doesNotExist()
+                    .jsonPath("$.tags").exists()
+                    .jsonPath("$.tags").isArray()
+                    .jsonPath("$.tags.length()").isEqualTo(2)
                     .jsonPath("$.id").exists()
                     .jsonPath("$.originalName").doesNotExist()
                     .jsonPath("$.baseName").doesNotExist()

@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -311,10 +312,12 @@ public class CharacterFigureService {
             // the new character can be added as a re-stocking.
             cf = characterFound.get();
             cf.setRestocks(addRestock(cf.getRestocks(), newCharacter));
+            cf.setTags(addTags(cf.getTags(), newCharacter.getTags()));
 
             // once it's added as re-stocking, then it's updated in our DB.
             repository.findById(cf.getId()).ifPresentOrElse(entity -> {
                 entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
+                entity.setTags(addTags(entity.getTags(), newCharacter.getTags()));
                 repository.save(entity); // updates with the new re-stocking
                 log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
             }, () -> log.warn("No restock has been added"));
@@ -419,12 +422,16 @@ public class CharacterFigureService {
         if (list != null) {
             characterFigureEntity.setRestocks(new ArrayList<>(list));
         }
+        Set<String> set = updatedCharacterEntity.getTags();
+        if (set != null) {
+            characterFigureEntity.setTags(new LinkedHashSet<>(set));
+        }
 
         // the character is updated here.
         repository.save(characterFigureEntity);
 
-        // retrieves the entity directly from the DB so that we can sent to to the
-        // response..
+        // retrieves the entity directly from the DB so that we can send to the
+        // response...
         // @formatter:off
         CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));

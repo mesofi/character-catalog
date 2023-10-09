@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,6 +59,7 @@ public class CharacterFigureService {
 
     public static final String INVALID_BASE_NAME = "Provide a non empty base name";
     public static final String INVALID_GROUP = "Provide a valid group";
+    public static final String INVALID_ID = "Provide a non empty character id";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
@@ -383,7 +385,7 @@ public class CharacterFigureService {
         log.debug("Updating existing character with id: {}", id);
 
         if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("Provide a non empty id to update the character");
+            throw new IllegalArgumentException(INVALID_ID);
         }
 
         // performs some validations.
@@ -438,6 +440,68 @@ public class CharacterFigureService {
         // @formatter:on
         calculatePriceAndDisplayableName(figure);
         return figure;
+    }
+
+    /**
+     * Update the tags in an existing character.
+     * 
+     * @param id   The unique identifier for the character.
+     * @param tags The list of tags to be added.
+     * @return The character updated with new tags.
+     */
+    public CharacterFigure updateTagsInCharacter(final String id, @Nullable final Set<String> tags) {
+        log.debug("Updating tags: {} from this character: {}", tags, id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        if (Objects.nonNull(characterFigureEntity.getTags()) & Objects.nonNull(tags)) {
+            Set<String> hashSet = new HashSet<>();
+            hashSet.addAll(characterFigureEntity.getTags());
+            hashSet.addAll(tags);
+            characterFigureEntity.setTags(hashSet);
+        }
+
+        if (Objects.isNull(characterFigureEntity.getTags()) & Objects.nonNull(tags)) {
+            characterFigureEntity.setTags(new HashSet<>(tags));
+        }
+
+        if (Objects.isNull(characterFigureEntity.getTags()) & Objects.isNull(tags)) {
+            // it's not necessary to update anything in the DB since the tags do not exist.
+            return modelMapper.toModel(characterFigureEntity);
+        }
+
+        // update the tags.
+        repository.save(characterFigureEntity);
+
+        // gets the character updated.
+        return modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+    }
+
+    public CharacterFigure deleteAllTagsInCharacter(String id) {
+        log.debug("Updated character {} to delete all the existing tags", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // deletes all the tags
+        characterFigureEntity.setTags(null);
+
+        // updates the tags.
+        repository.save(characterFigureEntity);
+
+        // gets the character updated.
+        return modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
     }
 
     private Sort getSorting() {

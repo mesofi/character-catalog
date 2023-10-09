@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -449,7 +450,7 @@ public class CharacterFigureService {
      * @param tags The list of tags to be added.
      * @return The character updated with new tags.
      */
-    public CharacterFigure updateTagsInCharacter(final String id, @Nullable final Set<String> tags) {
+    public CharacterFigure updateTagsInCharacter(@NonNull final String id, @Nullable final Set<String> tags) {
         log.debug("Updating tags: {} from this character: {}", tags, id);
 
         if (!StringUtils.hasText(id)) {
@@ -483,8 +484,14 @@ public class CharacterFigureService {
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
     }
 
-    public CharacterFigure deleteAllTagsInCharacter(String id) {
-        log.debug("Updated character {} to delete all the existing tags", id);
+    /**
+     * Deletes all the tags from an existing character.
+     * 
+     * @param id The unique identifier for the character.
+     * @return The updated character.
+     */
+    public CharacterFigure deleteAllTagsInCharacter(@NonNull final String id) {
+        log.debug("Update character {} to delete all the existing tags", id);
 
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException(INVALID_ID);

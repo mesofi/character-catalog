@@ -1052,6 +1052,97 @@ public class CharacterFigureServiceTest {
         assertEquals(Set.of("ex", "virgo", "shaka"), actual.getTags());
     }
 
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_fail_character_delete_tags_when_id_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.deleteAllTagsInCharacter(null));
+        assertEquals("Provide a non empty character id", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_fail_character_delete_tags_when_id_not_found() {
+        final String id = "223"; // not found
+        CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
+                () -> service.deleteAllTagsInCharacter(id));
+        assertEquals("Character not found with id: 223", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_delete_tags_when_character_id_is_found() {
+        final String id = "65215079a5d1a04590202d6f";
+
+        doAnswer((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            CharacterFigureEntity e = (CharacterFigureEntity) args[0];
+            assertEquals(id, e.getId());
+            assertEquals("Virgo Shaka", e.getBaseName());
+            assertEquals("Virgo Shaka", e.getOriginalName());
+            assertEquals(Group.GOLD, e.getGroup());
+            assertTrue(e.isRevival());
+            assertNull(e.getTags()); // the tags are null
+
+            return null;
+        }).when(repository).save(any(CharacterFigureEntity.class));
+
+        CharacterFigureEntity e = new CharacterFigureEntity();
+        e.setId(id);
+        e.setBaseName("Virgo Shaka");
+        e.setOriginalName("Virgo Shaka");
+        e.setGroup(Group.GOLD);
+        e.setRevival(true);
+        e.setTags(Set.of("ex", "virgo"));
+        when(repository.findById(id)).thenReturn(Optional.of(e));
+
+        CharacterFigure cf = new CharacterFigure();
+        cf.setId(id);
+        cf.setBaseName("Virgo Shaka");
+        cf.setOriginalName("Virgo Shaka");
+        cf.setGroup(Group.GOLD);
+        cf.setRevival(true);
+        cf.setTags(null);
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(cf);
+
+        // the tags are deleted.
+        CharacterFigure actual = service.deleteAllTagsInCharacter(id);
+        assertNotNull(actual);
+        assertEquals("65215079a5d1a04590202d6f", actual.getId());
+        assertEquals("Virgo Shaka", actual.getOriginalName());
+        assertEquals("Virgo Shaka", actual.getBaseName());
+        assertNull(actual.getDisplayableName());
+        assertNull(actual.getLineUp());
+        assertNull(actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
+        assertNull(actual.getTags());
+    }
+
     private CharacterFigureEntity createFigureEntity(String id, String originalName, String baseName, Group group,
             boolean revival) {
         CharacterFigureEntity characterFigure = new CharacterFigureEntity();

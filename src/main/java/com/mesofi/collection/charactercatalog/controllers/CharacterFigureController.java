@@ -114,7 +114,8 @@ public class CharacterFigureController {
      * @return The updated character.
      */
     @PatchMapping("/{id}/tags")
-    public CharacterFigure updateTagsInCharacter(@PathVariable String id, @RequestParam Set<String> tags) {
+    public CharacterFigure updateTagsInCharacter(@PathVariable String id,
+            @RequestParam(required = false) Set<String> tags) {
         log.debug("Updating existing character with: {}, and tags: {}", id, tags);
         return service.updateTagsInCharacter(id, tags);
     }

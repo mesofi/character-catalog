@@ -86,6 +86,7 @@ public class CharacterFigureService {
         }
         // first, removes all the records.
         repository.deleteAll();
+        log.debug("All the records were deleted correctly!");
 
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
@@ -432,6 +433,7 @@ public class CharacterFigureService {
 
         // the character is updated here.
         repository.save(characterFigureEntity);
+        log.debug("Character has been updated correctly!");
 
         // retrieves the entity directly from the DB so that we can send to the
         // response...
@@ -478,10 +480,13 @@ public class CharacterFigureService {
 
         // update the tags.
         repository.save(characterFigureEntity);
+        log.debug("Tags updated correctly!!!");
 
         // gets the character updated.
-        return modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        calculatePriceAndDisplayableName(figure);
+        return figure;
     }
 
     /**
@@ -503,12 +508,15 @@ public class CharacterFigureService {
         // deletes all the tags
         characterFigureEntity.setTags(null);
 
-        // updates the tags.
+        // deletes the tags.
         repository.save(characterFigureEntity);
+        log.debug("Tags deleted correctly!!!");
 
         // gets the character updated.
-        return modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        calculatePriceAndDisplayableName(figure);
+        return figure;
     }
 
     private Sort getSorting() {

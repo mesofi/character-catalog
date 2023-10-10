@@ -6,6 +6,7 @@
 package com.mesofi.collection.charactercatalog;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -211,6 +212,9 @@ public class CharacterFigureUpdateIT {
                     .jsonPath("$.restocks").doesNotExist()
                     ;
             // @formatter:on
+        } else {
+            // the flow should not end up here.
+            fail("Unexpected flow ...");
         }
     }
 }

@@ -950,9 +950,9 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertEquals("Virgo Shaka", actual.getOriginalName());
-        assertEquals("Virgo Shaka", actual.getBaseName());
-        assertNull(actual.getDisplayableName());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());
         assertEquals(Group.GOLD, actual.getGroup());
@@ -1023,9 +1023,9 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertEquals("Virgo Shaka", actual.getOriginalName());
-        assertEquals("Virgo Shaka", actual.getBaseName());
-        assertNull(actual.getDisplayableName());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());
         assertEquals(Group.GOLD, actual.getGroup());
@@ -1115,9 +1115,9 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.deleteAllTagsInCharacter(id);
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertEquals("Virgo Shaka", actual.getOriginalName());
-        assertEquals("Virgo Shaka", actual.getBaseName());
-        assertNull(actual.getDisplayableName());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());
         assertEquals(Group.GOLD, actual.getGroup());

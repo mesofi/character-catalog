@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.stubbing.Answer;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -135,6 +138,109 @@ public class CharacterFigureServiceTest {
     }
 
     /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_new_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c3.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(3, list.get(0).getTags().size());
+        assertEquals(Set.of("god", "gold", "ex"), list.get(0).getTags());
+
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_existing_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c1.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(3, list.get(0).getTags().size());
+        assertEquals(Set.of("god", "gold", "ex"), list.get(0).getTags());
+
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#getEffectiveCharacters(List)}
+     */
+    @Test
+    public void should_get_effective_characters_with_restocks_and_new_existing_tags() {
+        List<CharacterFigure> allCharacters = new ArrayList<>();
+        CharacterFigure c1 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c1.setTags(Set.of("god", "gold", "ex")); // adds new tags
+
+        CharacterFigure c2 = createFigure(null, "Seiya", LocalDate.of(2019, 2, 1), LineUp.MYTH_CLOTH,
+                Series.SAINT_SEIYA, Group.V2, true, true);
+
+        CharacterFigure c3 = createFigure(null, "Libra Dohko (God Cloth)", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SOG, Group.GOLD, false, false);
+        c3.setTags(Set.of("god", "gold", "libra", "ex", "revival")); // adds new tags
+
+        allCharacters.add(c1);
+        allCharacters.add(c2);
+        allCharacters.add(c3);
+
+        List<CharacterFigure> list = service.getEffectiveCharacters(allCharacters);
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        assertEquals("Libra Dohko (God Cloth)", list.get(0).getOriginalName());
+        assertNotNull(list.get(0).getRestocks());
+        assertNotNull(list.get(0).getTags());
+        assertEquals(5, list.get(0).getTags().size());
+        assertEquals(Set.of("gold", "ex", "libra", "revival", "god"), list.get(0).getTags());
+
+        assertEquals(1, list.get(0).getRestocks().size());
+        assertEquals("Seiya", list.get(1).getOriginalName());
+        assertNull(list.get(1).getRestocks());
+    }
+
+    /**
      * Test for {@link CharacterFigureService#retrieveAllCharacters()}
      */
     @Test
@@ -169,13 +275,13 @@ public class CharacterFigureServiceTest {
      */
     @Test
     public void should_fail_when_id_does_not_exist() {
-        final String id = "unknownw";
+        final String id = "unknown";
 
         when(repository.findById(id)).thenReturn(Optional.empty());
 
         CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
                 () -> service.retrieveCharactersById(id));
-        assertEquals("Character not found with id: unknownw", exception.getMessage());
+        assertEquals("Character not found with id: unknown", exception.getMessage());
     }
 
     /**
@@ -635,7 +741,7 @@ public class CharacterFigureServiceTest {
     public void should_fail_update_character_when_id_is_missing() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> service.updateExistingCharacter(null, null));
-        assertEquals("Provide a non empty id to update the character", exception.getMessage());
+        assertEquals("Provide a non empty character id", exception.getMessage());
     }
 
     /**
@@ -726,6 +832,315 @@ public class CharacterFigureServiceTest {
         assertNull(actual.getUrl());
         assertNull(actual.getDistribution());
         assertNull(actual.getRemarks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#updateTagsInCharacter(String, Set)}
+     */
+    @Test
+    public void should_fail_character_update_tags_when_id_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.updateTagsInCharacter(null, null));
+        assertEquals("Provide a non empty character id", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#updateTagsInCharacter(String, Set)}
+     */
+    @Test
+    public void should_fail_character_update_tags_when_id_not_found() {
+        final String id = "223"; // not found
+        CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
+                () -> service.updateTagsInCharacter(id, null));
+        assertEquals("Character not found with id: 223", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#updateTagsInCharacter(String, Set)}
+     */
+    @Test
+    public void should_avoid_update_character_tags_when_no_tags_available() {
+        final String id = "65215079a5d1a04590202d6f";
+
+        CharacterFigureEntity entity = createFigureEntity("1", "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setId(id);
+        characterFigure.setBaseName("Virgo Shaka");
+        characterFigure.setGroup(Group.GOLD);
+        characterFigure.setRevival(true);
+        characterFigure.setSeries(Series.SAINT_SEIYA);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        when(modelMapper.toModel(any())).thenReturn(characterFigure);
+
+        // the tags do not exist
+        CharacterFigure actual = service.updateTagsInCharacter(id, null);
+        assertNotNull(actual);
+        assertEquals("65215079a5d1a04590202d6f", actual.getId());
+        assertNull(actual.getOriginalName());
+        assertEquals("Virgo Shaka", actual.getBaseName());
+        assertNull(actual.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, actual.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
+        assertNull(actual.getTags());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#updateTagsInCharacter(String, Set)}
+     */
+    @Test
+    public void should_update_tags_when_existing_tags_are_empty_and_new_tags_are_provided() {
+        final String id = "65215079a5d1a04590202d6f";
+
+        CharacterFigureEntity entity = createFigureEntity(id, "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+
+        doAnswer((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            CharacterFigureEntity e = (CharacterFigureEntity) args[0];
+            assertEquals(id, e.getId());
+            assertEquals("Virgo Shaka", e.getBaseName());
+            assertEquals("Virgo Shaka", e.getOriginalName());
+            assertEquals(Group.GOLD, e.getGroup());
+            assertTrue(e.isRevival());
+
+            return null;
+        }).when(repository).save(any(CharacterFigureEntity.class));
+
+        CharacterFigureEntity e = new CharacterFigureEntity();
+        e.setId(id);
+        e.setBaseName("Virgo Shaka");
+        e.setOriginalName("Virgo Shaka");
+        e.setGroup(Group.GOLD);
+        e.setRevival(true);
+        when(repository.findById(id)).thenReturn(Optional.of(e));
+
+        CharacterFigure cf = new CharacterFigure();
+        cf.setId(id);
+        cf.setBaseName("Virgo Shaka");
+        cf.setOriginalName("Virgo Shaka");
+        cf.setGroup(Group.GOLD);
+        cf.setRevival(true);
+        cf.setTags(Set.of("ex", "virgo"));
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(cf);
+
+        // the tags are provided.
+        CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
+        assertNotNull(actual);
+        assertEquals("65215079a5d1a04590202d6f", actual.getId());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
+        assertNull(actual.getLineUp());
+        assertNull(actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
+        assertNotNull(actual.getTags());
+        assertEquals(Set.of("ex", "virgo"), actual.getTags());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#updateTagsInCharacter(String, Set)}
+     */
+    @Test
+    public void should_update_tags_when_existing_tags_and_new_tags_are_provided() {
+        final String id = "65215079a5d1a04590202d6f";
+
+        CharacterFigureEntity entity = createFigureEntity(id, "Virgo Shaka", "Virgo Shaka", Group.GOLD, true);
+        when(repository.findById(id)).thenReturn(Optional.of(entity));
+
+        doAnswer((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            CharacterFigureEntity e = (CharacterFigureEntity) args[0];
+            assertEquals(id, e.getId());
+            assertEquals("Virgo Shaka", e.getBaseName());
+            assertEquals("Virgo Shaka", e.getOriginalName());
+            assertEquals(Group.GOLD, e.getGroup());
+            assertTrue(e.isRevival());
+
+            return null;
+        }).when(repository).save(any(CharacterFigureEntity.class));
+
+        CharacterFigureEntity e = new CharacterFigureEntity();
+        e.setId(id);
+        e.setBaseName("Virgo Shaka");
+        e.setOriginalName("Virgo Shaka");
+        e.setGroup(Group.GOLD);
+        e.setRevival(true);
+        e.setTags(Set.of("shaka")); // existing tags provided.
+        when(repository.findById(id)).thenReturn(Optional.of(e));
+
+        CharacterFigure cf = new CharacterFigure();
+        cf.setId(id);
+        cf.setBaseName("Virgo Shaka");
+        cf.setOriginalName("Virgo Shaka");
+        cf.setGroup(Group.GOLD);
+        cf.setRevival(true);
+        cf.setTags(Set.of("ex", "virgo", "shaka"));
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(cf);
+
+        // the tags are provided.
+        CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
+        assertNotNull(actual);
+        assertEquals("65215079a5d1a04590202d6f", actual.getId());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
+        assertNull(actual.getLineUp());
+        assertNull(actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
+        assertNotNull(actual.getTags());
+        assertEquals(Set.of("ex", "virgo", "shaka"), actual.getTags());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_fail_character_delete_tags_when_id_is_missing() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.deleteAllTagsInCharacter(null));
+        assertEquals("Provide a non empty character id", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_fail_character_delete_tags_when_id_not_found() {
+        final String id = "223"; // not found
+        CharacterFigureNotFoundException exception = assertThrows(CharacterFigureNotFoundException.class,
+                () -> service.deleteAllTagsInCharacter(id));
+        assertEquals("Character not found with id: 223", exception.getMessage());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#deleteAllTagsInCharacter(String)}
+     */
+    @Test
+    public void should_delete_tags_when_character_id_is_found() {
+        final String id = "65215079a5d1a04590202d6f";
+
+        doAnswer((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            CharacterFigureEntity e = (CharacterFigureEntity) args[0];
+            assertEquals(id, e.getId());
+            assertEquals("Virgo Shaka", e.getBaseName());
+            assertEquals("Virgo Shaka", e.getOriginalName());
+            assertEquals(Group.GOLD, e.getGroup());
+            assertTrue(e.isRevival());
+            assertNull(e.getTags()); // the tags are null
+
+            return null;
+        }).when(repository).save(any(CharacterFigureEntity.class));
+
+        CharacterFigureEntity e = new CharacterFigureEntity();
+        e.setId(id);
+        e.setBaseName("Virgo Shaka");
+        e.setOriginalName("Virgo Shaka");
+        e.setGroup(Group.GOLD);
+        e.setRevival(true);
+        e.setTags(Set.of("ex", "virgo"));
+        when(repository.findById(id)).thenReturn(Optional.of(e));
+
+        CharacterFigure cf = new CharacterFigure();
+        cf.setId(id);
+        cf.setBaseName("Virgo Shaka");
+        cf.setOriginalName("Virgo Shaka");
+        cf.setGroup(Group.GOLD);
+        cf.setRevival(true);
+        cf.setTags(null);
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(cf);
+
+        // the tags are deleted.
+        CharacterFigure actual = service.deleteAllTagsInCharacter(id);
+        assertNotNull(actual);
+        assertEquals("65215079a5d1a04590202d6f", actual.getId());
+        assertNull(actual.getOriginalName());
+        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getDisplayableName());
+        assertNull(actual.getLineUp());
+        assertNull(actual.getSeries());
+        assertEquals(Group.GOLD, actual.getGroup());
+        assertFalse(actual.isMetalBody());
+        assertFalse(actual.isOce());
+        assertTrue(actual.isRevival());
+        assertFalse(actual.isPlainCloth());
+        assertFalse(actual.isBrokenCloth());
+        assertFalse(actual.isBronzeToGold());
+        assertFalse(actual.isGold());
+        assertFalse(actual.isHongKongVersion());
+        assertFalse(actual.isManga());
+        assertFalse(actual.isSurplice());
+        assertFalse(actual.isSet());
+        assertNull(actual.getAnniversary());
+        assertNull(actual.getRestocks());
+        assertNull(actual.getIssuanceJPY());
+        assertNull(actual.getIssuanceMXN());
+        assertFalse(actual.isFutureRelease());
+        assertNull(actual.getUrl());
+        assertNull(actual.getDistribution());
+        assertNull(actual.getRemarks());
+        assertNull(actual.getTags());
     }
 
     private CharacterFigureEntity createFigureEntity(String id, String originalName, String baseName, Group group,

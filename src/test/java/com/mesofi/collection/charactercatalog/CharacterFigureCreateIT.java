@@ -5,10 +5,13 @@
  */
 package com.mesofi.collection.charactercatalog;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -46,6 +49,11 @@ public class CharacterFigureCreateIT {
     final String BASE_URL = "";
     final String CONTEXT = "/characters";
 
+    @BeforeEach
+    public void beforeEach() {
+        webTestClient = webTestClient.mutate().responseTimeout(Duration.ofMinutes(5)).build();
+    }
+
     /**
      * {@link CharacterFigureController#createNewCharacter(com.mesofi.collection.charactercatalog.model.CharacterFigure)}
      * 
@@ -81,6 +89,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").doesNotExist()
                 .jsonPath("$.distribution").doesNotExist()
                 .jsonPath("$.remarks").doesNotExist()
+                .jsonPath("$.tags").doesNotExist()
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()
@@ -138,6 +147,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").doesNotExist()
                 .jsonPath("$.distribution").doesNotExist()
                 .jsonPath("$.remarks").doesNotExist()
+                .jsonPath("$.tags").doesNotExist()
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()
@@ -172,6 +182,7 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.restocks[0].url").doesNotExist()
                 .jsonPath("$.restocks[0].distribution").doesNotExist()
                 .jsonPath("$.restocks[0].remarks").doesNotExist()
+                .jsonPath("$.restocks[0].tags").doesNotExist()
         ;
         // @formatter:on
         log.debug("The character have been created correctly! ...");
@@ -184,8 +195,88 @@ public class CharacterFigureCreateIT {
      */
     @Test
     @Order(3)
+    void should_create_basic_character_with_restock_and_tags() throws JSONException {
+        log.debug("Creating a basic character with restock and tags ...");
+
+        JSONArray tags = new JSONArray();
+        tags.put(0, "ex");
+        tags.put(1, "gold");
+
+        // @formatter:off
+        String postRequestBody = new JSONObject()
+                .put("baseName", "Scorpio")
+                .put("group", "GOLD")
+                .put("tags", tags)
+                .toString();
+        // @formatter:on
+
+        // @formatter:off
+        webTestClient.post()
+                .uri(BASE_URL + CONTEXT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(postRequestBody))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.issuanceJPY").doesNotExist()
+                .jsonPath("$.issuanceMXN").doesNotExist()
+                .jsonPath("$.futureRelease").isEqualTo(true)
+                .jsonPath("$.url").doesNotExist()
+                .jsonPath("$.distribution").doesNotExist()
+                .jsonPath("$.remarks").doesNotExist()
+                .jsonPath("$.tags").exists()
+                .jsonPath("$.tags").isArray()
+                .jsonPath("$.tags.length()").isEqualTo(2)
+                .jsonPath("$.id").exists()
+                .jsonPath("$.originalName").doesNotExist()
+                .jsonPath("$.baseName").doesNotExist()
+                .jsonPath("$.displayableName").isEqualTo("Scorpio")
+                .jsonPath("$.lineUp").isEqualTo("MYTH_CLOTH_EX")
+                .jsonPath("$.series").isEqualTo("SAINT_SEIYA")
+                .jsonPath("$.group").isEqualTo("GOLD")
+                .jsonPath("$.metalBody").isEqualTo(false)
+                .jsonPath("$.oce").isEqualTo(false)
+                .jsonPath("$.revival").isEqualTo(false)
+                .jsonPath("$.plainCloth").isEqualTo(false)
+                .jsonPath("$.brokenCloth").isEqualTo(false)
+                .jsonPath("$.bronzeToGold").isEqualTo(false)
+                .jsonPath("$.gold").isEqualTo(false)
+                .jsonPath("$.hongKongVersion").isEqualTo(false)
+                .jsonPath("$.manga").isEqualTo(false)
+                .jsonPath("$.surplice").isEqualTo(false)
+                .jsonPath("$.set").isEqualTo(false)
+                .jsonPath("$.anniversary").doesNotExist()
+                .jsonPath("$.restocks").exists()
+                .jsonPath("$.restocks").isArray()
+                .jsonPath("$.restocks.length()").isEqualTo(2)
+                .jsonPath("$.restocks[0].issuanceJPY.basePrice").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.releasePrice").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.firstAnnouncementDate").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.preorderDate").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.preorderConfirmationDay").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.releaseDate").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceJPY.releaseConfirmationDay").doesNotExist()
+                .jsonPath("$.restocks[0].issuanceMX").doesNotExist()
+                .jsonPath("$.restocks[0].futureRelease").isEqualTo(true)
+                .jsonPath("$.restocks[0].url").doesNotExist()
+                .jsonPath("$.restocks[0].distribution").doesNotExist()
+                .jsonPath("$.restocks[0].remarks").doesNotExist()
+                .jsonPath("$.restocks[0].tags").doesNotExist()
+        ;
+        // @formatter:on
+        log.debug("The character have been created correctly! ...");
+    }
+
+    /**
+     * {@link CharacterFigureController#createNewCharacter(com.mesofi.collection.charactercatalog.model.CharacterFigure)}
+     * 
+     * @throws JSONException If there's an exception creating the request body.
+     */
+    @Test
+    @Order(4)
     void should_create_complete_character() throws JSONException {
-        log.debug("Creating a basic character with restock ...");
+        log.debug("Creating complete character...");
 
         JSONObject issuanceJPY = new JSONObject();
         issuanceJPY.put("basePrice", "12.500");
@@ -195,6 +286,11 @@ public class CharacterFigureCreateIT {
         issuanceJPY.put("preorderConfirmationDay", true);
         issuanceJPY.put("releaseDate", LocalDate.of(2024, 2, 1));
         issuanceJPY.put("releaseConfirmationDay", false);
+
+        JSONArray tags = new JSONArray();
+        tags.put(0, "ex");
+        tags.put(1, "gold");
+        tags.put(2, "dragon");
 
         // @formatter:off
         String postRequestBody = new JSONObject()
@@ -219,6 +315,7 @@ public class CharacterFigureCreateIT {
                 .put("set", "false")
                 .put("anniversary", "20")
                 .put("remarks", "20th anniversary")
+                .put("tags", tags)
                 .toString();
         // @formatter:on
 
@@ -243,6 +340,9 @@ public class CharacterFigureCreateIT {
                 .jsonPath("$.url").isEqualTo("https://tamashiiweb.com/item/14642")
                 .jsonPath("$.distribution").isEqualTo("TAMASHII_WEB_SHOP")
                 .jsonPath("$.remarks").isEqualTo("20th anniversary")
+                .jsonPath("$.tags").exists()
+                .jsonPath("$.tags").isArray()
+                .jsonPath("$.tags.length()").isEqualTo(3)
                 .jsonPath("$.id").exists()
                 .jsonPath("$.originalName").doesNotExist()
                 .jsonPath("$.baseName").doesNotExist()

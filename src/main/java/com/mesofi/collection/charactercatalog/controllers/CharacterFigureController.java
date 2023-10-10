@@ -6,11 +6,14 @@
 package com.mesofi.collection.charactercatalog.controllers;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -101,5 +104,31 @@ public class CharacterFigureController {
             @Valid @RequestBody CharacterFigure characterFigure) {
         log.debug("Updating existing character with: {}", id);
         return service.updateExistingCharacter(id, characterFigure);
+    }
+
+    /**
+     * Update the tags in a existing character.
+     * 
+     * @param id   The unique identifier.
+     * @param tags List of tags to be updated.
+     * @return The updated character.
+     */
+    @PatchMapping("/{id}/tags")
+    public CharacterFigure updateTagsInCharacter(@PathVariable String id,
+            @RequestParam(required = false) Set<String> tags) {
+        log.debug("Updating existing character with: {}, and tags: {}", id, tags);
+        return service.updateTagsInCharacter(id, tags);
+    }
+
+    /**
+     * Deletes all the existing characters.
+     * 
+     * @param id The unique identifier.
+     * @return The character updated without tags.
+     */
+    @DeleteMapping("/{id}/tags")
+    public CharacterFigure deleteAllTagsInCharacter(@PathVariable String id) {
+        log.debug("Deleting all the existing tags for character: {}", id);
+        return service.deleteAllTagsInCharacter(id);
     }
 }

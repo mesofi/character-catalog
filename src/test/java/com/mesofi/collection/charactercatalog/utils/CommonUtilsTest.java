@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -95,6 +96,25 @@ public class CommonUtilsTest {
         assertNull(CommonUtils.toStringValue(null));
         assertNull(CommonUtils.toStringValue(""));
         assertEquals("5", CommonUtils.toStringValue("5"));
+    }
+
+    @Test
+    public void should_return_valid_list_value() {
+        assertNull(CommonUtils.toSetValue(null));
+        assertNull(CommonUtils.toSetValue(""));
+
+        Set<String> list = CommonUtils.toSetValue("3");
+        assertNotNull(list);
+        assertEquals(1, list.size());
+        assertTrue(list.contains("3"));
+
+        list = CommonUtils.toSetValue("ikki, ex, gold,seiya");
+        assertNotNull(list);
+        assertEquals(4, list.size());
+        assertTrue(list.contains("ikki"));
+        assertTrue(list.contains("ex"));
+        assertTrue(list.contains("gold"));
+        assertTrue(list.contains("seiya"));
     }
 
     @Test

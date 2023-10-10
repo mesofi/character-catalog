@@ -15,12 +15,17 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +60,7 @@ public class CharacterFigureService {
 
     public static final String INVALID_BASE_NAME = "Provide a non empty base name";
     public static final String INVALID_GROUP = "Provide a valid group";
+    public static final String INVALID_ID = "Provide a non empty character id";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
@@ -80,6 +86,7 @@ public class CharacterFigureService {
         }
         // first, removes all the records.
         repository.deleteAll();
+        log.debug("All the records were deleted correctly!");
 
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
@@ -118,10 +125,12 @@ public class CharacterFigureService {
             List<CharacterFigure> effectiveCharacters = new ArrayList<>();
             for (CharacterFigure curr : allCharacters) {
                 if (effectiveCharacters.contains(curr)) {
-                    // add the current character as re-stock.
+                    // add the current character as re-stock in the final list.
                     CharacterFigure existing = effectiveCharacters.get(effectiveCharacters.indexOf(curr));
                     existing.setRestocks(addRestock(existing.getRestocks(), curr));
+                    existing.setTags(addTags(existing.getTags(), curr.getTags()));
                 } else {
+                    // we add the current character to the final list.
                     effectiveCharacters.add(curr);
                 }
             }
@@ -307,10 +316,12 @@ public class CharacterFigureService {
             // the new character can be added as a re-stocking.
             cf = characterFound.get();
             cf.setRestocks(addRestock(cf.getRestocks(), newCharacter));
+            cf.setTags(addTags(cf.getTags(), newCharacter.getTags()));
 
             // once it's added as re-stocking, then it's updated in our DB.
             repository.findById(cf.getId()).ifPresentOrElse(entity -> {
                 entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
+                entity.setTags(addTags(entity.getTags(), newCharacter.getTags()));
                 repository.save(entity); // updates with the new re-stocking
                 log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
             }, () -> log.warn("No restock has been added"));
@@ -376,7 +387,7 @@ public class CharacterFigureService {
         log.debug("Updating existing character with id: {}", id);
 
         if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("Provide a non empty id to update the character");
+            throw new IllegalArgumentException(INVALID_ID);
         }
 
         // performs some validations.
@@ -415,16 +426,95 @@ public class CharacterFigureService {
         if (list != null) {
             characterFigureEntity.setRestocks(new ArrayList<>(list));
         }
+        Set<String> set = updatedCharacterEntity.getTags();
+        if (set != null) {
+            characterFigureEntity.setTags(new LinkedHashSet<>(set));
+        }
 
         // the character is updated here.
         repository.save(characterFigureEntity);
+        log.debug("Character has been updated correctly!");
 
-        // retrieves the entity directly from the DB so that we can sent to to the
-        // response..
+        // retrieves the entity directly from the DB so that we can send to the
+        // response...
         // @formatter:off
         CharacterFigure figure = modelMapper.toModel(repository.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         // @formatter:on
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    /**
+     * Update the tags in an existing character.
+     * 
+     * @param id   The unique identifier for the character.
+     * @param tags The list of tags to be added.
+     * @return The character updated with new tags.
+     */
+    public CharacterFigure updateTagsInCharacter(@NonNull final String id, @Nullable final Set<String> tags) {
+        log.debug("Updating tags: {} from this character: {}", tags, id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        if (Objects.nonNull(characterFigureEntity.getTags()) & Objects.nonNull(tags)) {
+            Set<String> hashSet = new HashSet<>();
+            hashSet.addAll(characterFigureEntity.getTags());
+            hashSet.addAll(tags);
+            characterFigureEntity.setTags(hashSet);
+        }
+
+        if (Objects.isNull(characterFigureEntity.getTags()) & Objects.nonNull(tags)) {
+            characterFigureEntity.setTags(new HashSet<>(tags));
+        }
+
+        if (Objects.isNull(characterFigureEntity.getTags()) & Objects.isNull(tags)) {
+            // it's not necessary to update anything in the DB since the tags do not exist.
+            return modelMapper.toModel(characterFigureEntity);
+        }
+
+        // update the tags.
+        repository.save(characterFigureEntity);
+        log.debug("Tags updated correctly!!!");
+
+        // gets the character updated.
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    /**
+     * Deletes all the tags from an existing character.
+     * 
+     * @param id The unique identifier for the character.
+     * @return The updated character.
+     */
+    public CharacterFigure deleteAllTagsInCharacter(@NonNull final String id) {
+        log.debug("Update character {} to delete all the existing tags", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // deletes all the tags
+        characterFigureEntity.setTags(null);
+
+        // deletes the tags.
+        repository.save(characterFigureEntity);
+        log.debug("Tags deleted correctly!!!");
+
+        // gets the character updated.
+        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         calculatePriceAndDisplayableName(figure);
         return figure;
     }
@@ -469,5 +559,23 @@ public class CharacterFigureService {
 
         restocks.add(newRestockFigure);
         return restocks;
+    }
+
+    private Set<String> addTags(Set<String> existingTags, Set<String> newTags) {
+        if (Objects.isNull(existingTags) & Objects.isNull(newTags)) {
+            return null;
+        }
+        if (Objects.isNull(existingTags)) {
+            return newTags;
+        }
+
+        if (Objects.isNull(newTags)) {
+            return existingTags;
+        }
+
+        Set<String> data = new HashSet<>();
+        data.addAll(existingTags);
+        data.addAll(newTags);
+        return data;
     }
 }

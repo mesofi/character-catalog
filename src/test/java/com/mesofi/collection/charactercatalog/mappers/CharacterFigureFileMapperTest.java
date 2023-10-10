@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,6 +173,43 @@ public class CharacterFigureFileMapperTest {
     }
 
     /**
+     * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
+     */
+    @Test
+    public void should_map_character_complete_3() {
+        String line = "Phoenix Ikki ~Initial Bronze Cloth 20th Anniversary Ver.~\tPhoenix Ikki\t\t\t\t\t\t\t\t\t\t\tMyth Cloth\tSaint Seiya\tBronze Saint V1\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t20\t20th anniversary\tmilo,gold,revival";
+        CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
+        assertNull(figure.getIssuanceJPY());
+        assertNull(figure.getIssuanceMXN());
+        assertTrue(figure.isFutureRelease());
+        assertNull(figure.getUrl());
+        assertNull(figure.getDistribution());
+        assertEquals("20th anniversary", figure.getRemarks());
+        assertNull(figure.getId());
+        assertEquals("Phoenix Ikki ~Initial Bronze Cloth 20th Anniversary Ver.~", figure.getOriginalName());
+        assertEquals("Phoenix Ikki", figure.getBaseName());
+        assertNull(figure.getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH, figure.getLineUp());
+        assertEquals(Series.SAINT_SEIYA, figure.getSeries());
+        assertEquals(Group.V1, figure.getGroup());
+        assertFalse(figure.isMetalBody());
+        assertFalse(figure.isOce());
+        assertFalse(figure.isRevival());
+        assertFalse(figure.isPlainCloth());
+        assertFalse(figure.isBrokenCloth());
+        assertFalse(figure.isBronzeToGold());
+        assertFalse(figure.isGold());
+        assertFalse(figure.isHongKongVersion());
+        assertFalse(figure.isManga());
+        assertFalse(figure.isSurplice());
+        assertFalse(figure.isSet());
+        assertEquals(20, figure.getAnniversary());
+        assertNull(figure.getRestocks());
+        assertNotNull(figure.getTags());
+        assertEquals(List.of("gold", "revival", "milo"), new ArrayList<>(figure.getTags()));
+    }
+
+    /**
      * {@link CharacterFigureFileMapper#createIssuance(com.mesofi.collection.charactercatalog.model.Issuance)}
      */
     @Test
@@ -209,7 +248,7 @@ public class CharacterFigureFileMapperTest {
         actual = characterFigureFileMapper.createIssuance(issuance);
         assertNotNull(actual);
         assertEquals(LocalDate.of(2023, 10, 10), actual.getPreorderDate());
-        
+
         issuance = new Issuance();
         issuance.setReleaseDate(LocalDate.of(2023, 10, 10));
         actual = characterFigureFileMapper.createIssuance(issuance);

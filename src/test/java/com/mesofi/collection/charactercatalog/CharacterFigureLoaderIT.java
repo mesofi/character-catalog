@@ -72,7 +72,7 @@ public class CharacterFigureLoaderIT {
     }
 
     /**
-     * {@link CharacterFigureController#getAllCharacters()}
+     * {@link CharacterFigureController#getAllCharactersByName(String)}
      */
     @Test
     @Order(2)

@@ -121,7 +121,7 @@ public class CharacterFigureUpdateAndDeleteTagsIT {
     }
 
     /**
-     * {@link CharacterFigureController#getAllCharacters()}
+     * {@link CharacterFigureController#getAllCharactersByName(String)}
      * {@link CharacterFigureController#updateTagsInCharacter(String, java.util.Set)}
      * {@link CharacterFigureController#deleteAllTagsInCharacter(String)}
      * 

@@ -5,7 +5,10 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
@@ -26,7 +29,12 @@ public class CharacterFinderService {
 
     private CharacterFigureRepository repository;
 
-    public CharacterFigure findCharacterByName(final String name) {
+    public List<CharacterFigure> findCharacterByName(final String name) {
+        log.debug("Finding a character with name: {}", name);
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("Provide a non empty figure name.");
+        } 
+
         return null;
     }
 }

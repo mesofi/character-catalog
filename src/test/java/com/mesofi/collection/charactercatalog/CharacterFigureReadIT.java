@@ -112,7 +112,7 @@ public class CharacterFigureReadIT {
     }
 
     /**
-     * {@link CharacterFigureController#getAllCharacters()}
+     * {@link CharacterFigureController#getAllCharactersByName(String)}
      * {@link CharacterFigureController#retrieveCharactersById(String)}
      * 
      */

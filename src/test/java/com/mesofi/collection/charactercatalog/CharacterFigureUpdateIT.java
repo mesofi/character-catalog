@@ -115,7 +115,7 @@ public class CharacterFigureUpdateIT {
     }
 
     /**
-     * {@link CharacterFigureController#getAllCharacters()}
+     * {@link CharacterFigureController#getAllCharactersByName(String)}
      * {@link CharacterFigureController#updateExistingCharacter(String, CharacterFigure)}
      * 
      * @throws JSONException If there's an exception creating the request body.

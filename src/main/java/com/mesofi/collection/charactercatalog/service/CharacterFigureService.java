@@ -147,12 +147,25 @@ public class CharacterFigureService {
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
         List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
-                .map($ -> modelMapper.toModel($))
-                .peek(this::calculatePriceAndDisplayableName)
+                .map(this::fromEntityToDisplayableFigure)
                 .toList();
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
         return figureList;
+    }
+
+    /**
+     * This method converts an entity object to the corresponding model, after that,
+     * the price and final name are calculated to be displayed. This is a convenient
+     * method to be called from other services.
+     * 
+     * @param entity The raw entity.
+     * @return The figure model with the name and price calculated.
+     */
+    public CharacterFigure fromEntityToDisplayableFigure(CharacterFigureEntity entity) {
+        CharacterFigure cf = modelMapper.toModel(entity);
+        calculatePriceAndDisplayableName(cf);
+        return cf;
     }
 
     /**
@@ -182,11 +195,14 @@ public class CharacterFigureService {
      * @param figure The character figure to be shown.
      */
     private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
+        calculateReleasePricing(figure);
+        calculateDisplayableName(figure);
+    }
+
+    private void calculateReleasePricing(final Figure figure) {
         Issuance jpy = figure.getIssuanceJPY();
         Issuance mxn = figure.getIssuanceMXN();
 
-        // the displayable name is calculated here
-        figure.setDisplayableName(calculateFigureDisplayableName(figure));
         // the price is set here.
         if (Objects.nonNull(jpy)) {
             jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
@@ -194,7 +210,11 @@ public class CharacterFigureService {
         if (Objects.nonNull(mxn)) {
             mxn.setReleasePrice(mxn.getBasePrice());
         }
+    }
 
+    private void calculateDisplayableName(final CharacterFigure figure) {
+        // the displayable name is calculated here
+        figure.setDisplayableName(calculateFigureDisplayableName(figure));
         figure.setOriginalName(null);
         figure.setBaseName(null);
     }
@@ -556,6 +576,7 @@ public class CharacterFigureService {
         newRestockFigure.setUrl(newRestock.getUrl());
         newRestockFigure.setDistribution(newRestock.getDistribution());
         newRestockFigure.setRemarks(newRestock.getRemarks());
+        calculateReleasePricing(newRestockFigure); // the release price is set here.
 
         restocks.add(newRestockFigure);
         return restocks;

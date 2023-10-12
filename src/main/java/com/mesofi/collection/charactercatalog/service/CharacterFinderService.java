@@ -49,34 +49,32 @@ public class CharacterFinderService {
                 .toList();
         // @formatter:on
 
-        List<CharacterFigureEntity> list = repository.findAll();
-
         // @formatter:off
-        Set<String> res = Arrays.stream(name.split("\\s+"))
+        Set<String> simpleNameKeywords = Arrays.stream(name.split("\\s+"))
                 .map(String::toLowerCase)
-                //.peek($->System.out.println($))
-                .filter($->!exclusions.contains($))
+                .filter($ -> !exclusions.contains($))
                 .map(this::removeSpecialCharacters)
-                .filter($->!exclusions.contains($))
+                .filter($ -> !exclusions.contains($))
                 .collect(Collectors.toSet());
         // @formatter:on
 
-        System.out.println(res);
-        System.out.println("==========================");
-        String a = "gemini";
-
-
-
-        for (String sdss : res) {
+        List<CharacterFigureEntity> list = repository.findAll();
+        for (String nameKeyword : simpleNameKeywords) {
+            // @formatter:off
             list = list.stream()
                     .filter($ -> Objects.nonNull($.getTags()))
-                    .filter($ -> $.getTags().contains(sdss))
+                    .filter($ -> $.getTags().contains(nameKeyword))
                     .toList();
+            // @formatter:on
+            log.debug("[{}] matches found so far", list.size());
+            if (list.size() == 1) {
+                // we found at least one match
+                break;
+            }
         }
-        
-        return list.stream().map($->characterFigureService.fromEntityToDisplayableFigure($)).collect(Collectors.toList());
 
-        
+        return list.stream().map($ -> characterFigureService.fromEntityToDisplayableFigure($))
+                .collect(Collectors.toList());
     }
 
     private String removeSpecialCharacters(String word) {

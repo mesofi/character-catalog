@@ -84,10 +84,28 @@ public class CharacterFigureService {
         } catch (IOException e) {
             throw new CharacterFigureException("Unable to read characters from file");
         }
+
+        // the records are read and processed now.
+        List<CharacterFigureEntity> listEntities = convertStreamToEntityList(inputStream);
+
         // first, removes all the records.
         repository.deleteAll();
-        log.debug("All the records were deleted correctly!");
 
+        // performs a mapping and saves the records in the DB ...
+        long total = repository.saveAll(listEntities).size();
+
+        log.debug("Total of figures loaded correctly: {}", total);
+        return total;
+    }
+
+    /**
+     * Converts and process the incoming records and return a list with the
+     * characters ready to be saved in a persistence storage.
+     * 
+     * @param inputStream Reference to the records read from a source.
+     * @return The list or records.
+     */
+    public List<CharacterFigureEntity> convertStreamToEntityList(InputStream inputStream) {
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
@@ -99,18 +117,15 @@ public class CharacterFigureService {
         // reverse the list so that we can add re-stocks easily ...
         reverseListElements(allCharacters);
 
+        // gets the new characters with restocks
         log.debug("Total of figures to be loaded: {}", allCharacters.size());
         List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
         log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
-
-        // performs a mapping and saves the records in the DB ...
         // @formatter:off
-        long total = repository.saveAll(effectiveCharacters.stream()
-                        .map($ -> modelMapper.toEntity($))
-                        .collect(Collectors.toList())).size();
+        return effectiveCharacters.stream()
+                .map($ -> modelMapper.toEntity($))
+                .collect(Collectors.toList());
         // @formatter:on
-        log.debug("Total of figures loaded correctly: {}", total);
-        return total;
     }
 
     /**

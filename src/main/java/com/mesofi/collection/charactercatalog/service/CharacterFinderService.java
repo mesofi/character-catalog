@@ -44,7 +44,7 @@ public class CharacterFinderService {
         // @formatter:off
         List<String> exclusions = Stream.of("Bandai", "Saint", "Seiya", "Myth", "Cloth",
                         "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version",
-                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation")
+                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used")
                 .map(String::toLowerCase)
                 .toList();
         // @formatter:on
@@ -87,6 +87,6 @@ public class CharacterFinderService {
 
     private String removeSpecialCharacters(String word) {
         // removes characters for example: [], (), - etc ...
-        return word.replaceAll("[\\[\\]()-]", "");
+        return word.replaceAll("[\\[\\]\"()-]", "");
     }
 }

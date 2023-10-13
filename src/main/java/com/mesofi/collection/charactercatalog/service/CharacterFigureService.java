@@ -150,7 +150,12 @@ public class CharacterFigureService {
         // We add some more tags depending on the name of the character.
         for (CharacterFigure figure : effectiveCharacters) {
             String[] nameArr = figure.getBaseName().toLowerCase().split("\\s+");
-            figure.setTags(new HashSet<>(Arrays.asList(nameArr)));
+            if (Objects.isNull(figure.getTags())) {
+                figure.setTags(new HashSet<>());
+            }
+            Set<String> existingTags = figure.getTags();
+            existingTags.addAll(Arrays.asList(nameArr));
+            figure.setTags(existingTags);
         }
 
         // Now, the standard tags

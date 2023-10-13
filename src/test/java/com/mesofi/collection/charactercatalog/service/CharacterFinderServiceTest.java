@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,6 +56,7 @@ import com.mesofi.collection.charactercatalog.repository.CharacterFigureReposito
         CharacterFigureModelMapperImpl.class,
         CharacterFigureFileMapper.class })
 // @formatter:on
+// @DisplayName("Testing different ways to unify character names")
 public class CharacterFinderServiceTest {
 
     @Mock
@@ -65,6 +67,13 @@ public class CharacterFinderServiceTest {
     private CharacterFinderService service;
 
     private static List<CharacterFigureEntity> entities = new ArrayList<>();
+
+    private final String CSV = ".csv";
+    private final String PREFIX = "should_find: ";
+    private final String EX_LOCATION = "/lineup/myth_cloth_ex/";
+
+    private final String GEMINI_SAGA_24K = "Gemini Saga Gold 24K EX";
+    private final String GEMINI_SAGA_EX_SET = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
 
     @BeforeAll
     public static void initAll(@Autowired CharacterFigureService characterFigureRealService) throws IOException {
@@ -93,14 +102,24 @@ public class CharacterFinderServiceTest {
         assertEquals("Provide a non empty figure name.", exception.getMessage());
     }
 
+    @ParameterizedTest
+    @DisplayName(PREFIX + GEMINI_SAGA_EX_SET)
+    @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_EX_SET + CSV, numLinesToSkip = 1)
+    public void should_match_gemini_saga_ex_set(final String input) {
+        shouldMatchCharacterFigure(input, GEMINI_SAGA_EX_SET);
+    }
+
+    @ParameterizedTest
+    @DisplayName(PREFIX + GEMINI_SAGA_24K)
+    @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_24K + CSV, numLinesToSkip = 1)
+    public void should_match_gemini_saga_24k_ex(final String input) {
+        shouldMatchCharacterFigure(input, GEMINI_SAGA_24K);
+    }
+
     /**
      * Test for {@link CharacterFinderService#findCharacterByName(String)}
      */
-    @ParameterizedTest
-    @CsvFileSource(resources = "/lineup/myth_cloth_ex/Gemini Saga (God Cloth) Saga Saga Premium Set.csv", numLinesToSkip = 1)
-    public void should_fail_finding_figure_when_input_name_is_missing_(final String input) {
-
-        final String originalName = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
+    private void shouldMatchCharacterFigure(final String input, final String originalName) {
 
         entities.stream().filter($ -> originalName.equals($.getOriginalName())).findFirst().ifPresentOrElse((ddd) -> {
             CharacterFigure cf = new CharacterFigure();

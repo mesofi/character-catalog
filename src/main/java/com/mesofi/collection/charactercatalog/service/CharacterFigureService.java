@@ -15,12 +15,14 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -61,6 +63,13 @@ public class CharacterFigureService {
     public static final String INVALID_BASE_NAME = "Provide a non empty base name";
     public static final String INVALID_GROUP = "Provide a valid group";
     public static final String INVALID_ID = "Provide a non empty character id";
+
+    public static final String TAG_EX = "ex";
+    public static final String TAG_REVIVAL = "revival";
+    public static final String TAG_SET = "set";
+    public static final String TAG_BROKEN = "broken";
+    public static final String TAG_METAL = "metal";
+    public static final String TAG_OCE = "oce";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
@@ -121,11 +130,54 @@ public class CharacterFigureService {
         log.debug("Total of figures to be loaded: {}", allCharacters.size());
         List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
         log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
+
+        // add some tags
+        addStandardTags(effectiveCharacters);
+
         // @formatter:off
         return effectiveCharacters.stream()
                 .map($ -> modelMapper.toEntity($))
                 .collect(Collectors.toList());
         // @formatter:on
+    }
+
+    /**
+     * Add some standard tags to the figures.
+     * 
+     * @param effectiveCharacters The list of characters.
+     */
+    private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
+        // We add some more tags depending on the name of the character.
+        for (CharacterFigure figure : effectiveCharacters) {
+            String[] nameArr = figure.getBaseName().toLowerCase().split("\\s+");
+            figure.setTags(new HashSet<>(Arrays.asList(nameArr)));
+        }
+
+        // Now, the standard tags
+        addStandardTagToFigure(effectiveCharacters, $ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX, TAG_EX);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isRevival, TAG_REVIVAL);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isSet, TAG_SET);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBrokenCloth, TAG_BROKEN);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isMetalBody, TAG_METAL);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isOce, TAG_OCE);
+    }
+
+    /**
+     * Add some standard tags to the figure.
+     * 
+     * @param characters The list of characters.
+     * @param predicate  The actual predicate.
+     * @param tagName    The tag name.
+     */
+    private void addStandardTagToFigure(List<CharacterFigure> characters, Predicate<CharacterFigure> predicate,
+            String tagName) {
+        long total = characters.stream().filter(predicate).peek($ -> {
+            if (Objects.isNull($.getTags())) {
+                $.setTags(new HashSet<>());
+            }
+            $.getTags().add(tagName);
+        }).count();
+        log.debug("{} figures have been updated with new tag: [{}]", total, tagName);
     }
 
     /**

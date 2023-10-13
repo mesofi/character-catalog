@@ -44,7 +44,7 @@ public class CharacterFinderService {
         // @formatter:off
         List<String> exclusions = Stream.of("Bandai", "Saint", "Seiya", "Myth", "Cloth",
                         "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version",
-                        "OF", "-", "/")
+                        "OF", "-", "/", "gold")
                 .map(String::toLowerCase)
                 .toList();
         // @formatter:on
@@ -57,6 +57,7 @@ public class CharacterFinderService {
                 .filter($ -> !exclusions.contains($))
                 .collect(Collectors.toSet());
         // @formatter:on
+        log.debug("Simplified figure name: {}", simpleNameKeywords);
 
         List<CharacterFigureEntity> list = repository.findAll();
         for (String nameKeyword : simpleNameKeywords) {
@@ -67,11 +68,17 @@ public class CharacterFinderService {
                     .toList();
             // @formatter:on
             log.debug("[{}] matches found so far", list.size());
+            if (list.isEmpty()) {
+                // no matches were found
+                break;
+            }
             if (list.size() == 1) {
                 // we found at least one match
                 break;
             }
         }
+        log.debug("Character matches: {}",
+                list.stream().map(CharacterFigureEntity::getBaseName).collect(Collectors.toList()));
 
         return list.stream().map($ -> characterFigureService.fromEntityToDisplayableFigure($))
                 .collect(Collectors.toList());

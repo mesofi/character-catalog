@@ -6,8 +6,11 @@
 package com.mesofi.collection.charactercatalog.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -97,13 +100,20 @@ public class CharacterFinderServiceTest {
     @CsvFileSource(resources = "/lineup/myth_cloth_ex/Gemini Saga (God Cloth) Saga Saga Premium Set.csv", numLinesToSkip = 1)
     public void should_fail_finding_figure_when_input_name_is_missing_(final String input) {
 
-        when(repository.findAll()).thenReturn(entities);
-        //when(characterFigureService.fromEntityToDisplayableFigure(null))
+        final String originalName = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
 
-        List<CharacterFigure> characterFigureList=  service.findCharacterByName(input);
-        assertNotNull(characterFigureList);
-        //assertFalse(characterFigureList.isEmpty());
-        //assertEquals(1, characterFigureList.size());
-        //assertEquals("fds", characterFigureList.get(0).getDisplayableName());
+        entities.stream().filter($ -> originalName.equals($.getOriginalName())).findFirst().ifPresentOrElse((ddd) -> {
+            CharacterFigure cf = new CharacterFigure();
+            cf.setOriginalName(originalName);
+
+            when(repository.findAll()).thenReturn(entities);
+            when(characterFigureService.fromEntityToDisplayableFigure(any(CharacterFigureEntity.class))).thenReturn(cf);
+
+            List<CharacterFigure> characterFigureList = service.findCharacterByName(input);
+            assertNotNull(characterFigureList);
+            assertFalse(characterFigureList.isEmpty());
+            assertEquals(1, characterFigureList.size());
+            assertEquals(originalName, characterFigureList.get(0).getOriginalName());
+        }, () -> fail("No character found with original name: " + originalName));
     }
 }

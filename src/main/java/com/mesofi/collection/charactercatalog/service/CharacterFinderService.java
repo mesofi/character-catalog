@@ -43,8 +43,9 @@ public class CharacterFinderService {
         }
         // @formatter:off
         List<String> exclusions = Stream.of("Bandai", "Saint", "Seiya", "Myth", "Cloth",
-                        "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version",
-                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used", "web")
+                        "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version", "ver.",
+                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used", "web", "Zodiac",
+                        "copyright", "sticker", "from", "figure", "action")
                 .map(String::toLowerCase)
                 .toList();
         // @formatter:on
@@ -65,7 +66,7 @@ public class CharacterFinderService {
             // @formatter:off
             tmpList = list.stream()
                     .filter($ -> Objects.nonNull($.getTags()))
-                    .filter($ -> $.getTags().contains(nameKeyword))
+                    .filter($ -> $.getTags().stream().anyMatch(nameKeyword::equalsIgnoreCase))
                     .toList();
             // @formatter:on
             if (tmpList.isEmpty()) {

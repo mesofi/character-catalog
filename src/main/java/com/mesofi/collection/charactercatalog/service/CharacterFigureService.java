@@ -69,7 +69,7 @@ public class CharacterFigureService {
     public static final String TAG_SET = "set";
     public static final String TAG_BROKEN = "broken";
     public static final String TAG_METAL = "metal";
-    public static final String TAG_OCE = "oce,original,color,edition";
+    public static final String TAG_OCE = "oce,original,color";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;

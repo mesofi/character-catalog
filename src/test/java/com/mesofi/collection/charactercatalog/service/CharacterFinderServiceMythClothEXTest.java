@@ -70,8 +70,10 @@ public class CharacterFinderServiceMythClothEXTest {
     private final String PREFIX = "should_find: ";
     private final String EX_LOCATION = "/lineup/myth_cloth_ex/";
 
-    private final String GEMINI_SAGA_24K = "Gemini Saga Gold 24K EX";
+    private final String AQUARIUS_CAMUS_SURPLICE_EX = "Aquarius Camus (Surplice) EX";
     private final String GEMINI_SAGA_EX_SET = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
+    private final String GEMINI_SAGA_EX_REVIVAL = "Gemini Saga EX <Revival>";
+    private final String GEMINI_SAGA_24K = "Gemini Saga Gold 24K EX";
     private final String THIRD_GOLDEN_EX_OCE = "The Third Golden Saint Warrior EX OCE";
 
     @BeforeAll
@@ -92,10 +94,24 @@ public class CharacterFinderServiceMythClothEXTest {
     }
 
     @ParameterizedTest
+    @DisplayName(PREFIX + AQUARIUS_CAMUS_SURPLICE_EX)
+    @CsvFileSource(resources = EX_LOCATION + AQUARIUS_CAMUS_SURPLICE_EX + CSV, numLinesToSkip = 1)
+    public void should_match_aquarius_camus_surplice_ex(final String input) {
+        shouldMatchCharacterFigure(input, AQUARIUS_CAMUS_SURPLICE_EX);
+    }
+
+    @ParameterizedTest
     @DisplayName(PREFIX + GEMINI_SAGA_EX_SET)
     @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_EX_SET + CSV, numLinesToSkip = 1)
     public void should_match_gemini_saga_ex_set(final String input) {
         shouldMatchCharacterFigure(input, GEMINI_SAGA_EX_SET);
+    }
+
+    @ParameterizedTest
+    @DisplayName(PREFIX + GEMINI_SAGA_EX_REVIVAL)
+    @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_EX_REVIVAL + CSV, numLinesToSkip = 1)
+    public void should_match_gemini_saga_ex_revival(final String input) {
+        shouldMatchCharacterFigure(input, GEMINI_SAGA_EX_REVIVAL);
     }
 
     @ParameterizedTest

@@ -69,7 +69,7 @@ public class CharacterFigureService {
     public static final String TAG_SET = "set";
     public static final String TAG_BROKEN = "broken";
     public static final String TAG_METAL = "metal";
-    public static final String TAG_OCE = "oce";
+    public static final String TAG_OCE = "oce,original,color,edition";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
@@ -172,17 +172,19 @@ public class CharacterFigureService {
      * 
      * @param characters The list of characters.
      * @param predicate  The actual predicate.
-     * @param tagName    The tag name.
+     * @param tagNames   The tag names.
      */
     private void addStandardTagToFigure(List<CharacterFigure> characters, Predicate<CharacterFigure> predicate,
-            String tagName) {
+            String tagNames) {
         long total = characters.stream().filter(predicate).peek($ -> {
             if (Objects.isNull($.getTags())) {
                 $.setTags(new HashSet<>());
             }
-            $.getTags().add(tagName);
+            for (String tag : tagNames.split(",")) {
+                $.getTags().add(tag);
+            }
         }).count();
-        log.debug("{} figures have been updated with new tag: [{}]", total, tagName);
+        log.debug("{} figures have been updated with new tag: [{}]", total, tagNames);
     }
 
     /**

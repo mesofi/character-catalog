@@ -44,7 +44,7 @@ public class CharacterFinderService {
         // @formatter:off
         List<String> exclusions = Stream.of("Bandai", "Saint", "Seiya", "Myth", "Cloth",
                         "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version",
-                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used")
+                        "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used", "web")
                 .map(String::toLowerCase)
                 .toList();
         // @formatter:on

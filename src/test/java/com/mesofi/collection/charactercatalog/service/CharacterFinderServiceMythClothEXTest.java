@@ -72,6 +72,7 @@ public class CharacterFinderServiceMythClothEXTest {
 
     private final String GEMINI_SAGA_24K = "Gemini Saga Gold 24K EX";
     private final String GEMINI_SAGA_EX_SET = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
+    private final String THIRD_GOLDEN_EX_OCE = "The Third Golden Saint Warrior EX OCE";
 
     @BeforeAll
     public static void initAll(@Autowired CharacterFigureService characterFigureRealService) throws IOException {
@@ -102,6 +103,13 @@ public class CharacterFinderServiceMythClothEXTest {
     @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_24K + CSV, numLinesToSkip = 1)
     public void should_match_gemini_saga_24k_ex(final String input) {
         shouldMatchCharacterFigure(input, GEMINI_SAGA_24K);
+    }
+
+    @ParameterizedTest
+    @DisplayName(PREFIX + THIRD_GOLDEN_EX_OCE)
+    @CsvFileSource(resources = EX_LOCATION + THIRD_GOLDEN_EX_OCE + CSV, numLinesToSkip = 1)
+    public void should_match_third_golden_ex_oce(final String input) {
+        shouldMatchCharacterFigure(input, THIRD_GOLDEN_EX_OCE);
     }
 
     /**

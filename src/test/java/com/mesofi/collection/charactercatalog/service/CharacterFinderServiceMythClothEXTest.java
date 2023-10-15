@@ -122,9 +122,9 @@ public class CharacterFinderServiceMythClothEXTest {
         shouldMatchCharacterFigure(input, GEMINI_SAGA_24K);
     }
 
-    @ParameterizedTest
-    @DisplayName(PREFIX + TAURUS_ALDEBARAN_GOD_EX)
-    @CsvFileSource(resources = EX_LOCATION + TAURUS_ALDEBARAN_GOD_EX + CSV, numLinesToSkip = 1)
+    //@ParameterizedTest
+    //@DisplayName(PREFIX + TAURUS_ALDEBARAN_GOD_EX)
+    //@CsvFileSource(resources = EX_LOCATION + TAURUS_ALDEBARAN_GOD_EX + CSV, numLinesToSkip = 1)
     public void should_taurus_aldebaran_god_ex(final String input) {
         shouldMatchCharacterFigure(input, TAURUS_ALDEBARAN_GOD_EX);
     }

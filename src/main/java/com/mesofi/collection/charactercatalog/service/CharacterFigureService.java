@@ -65,6 +65,7 @@ public class CharacterFigureService {
     public static final String INVALID_ID = "Provide a non empty character id";
 
     public static final String TAG_EX = "ex";
+    public static final String TAG_SOG = "soul,gold,god";
     public static final String TAG_REVIVAL = "revival";
     public static final String TAG_SET = "set";
     public static final String TAG_BROKEN = "broken";
@@ -160,6 +161,7 @@ public class CharacterFigureService {
 
         // Now, the standard tags
         addStandardTagToFigure(effectiveCharacters, $ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX, TAG_EX);
+        addStandardTagToFigure(effectiveCharacters, $ -> $.getSeries() == Series.SOG, TAG_SOG);
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isRevival, TAG_REVIVAL);
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isSet, TAG_SET);
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBrokenCloth, TAG_BROKEN);

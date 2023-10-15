@@ -38,6 +38,9 @@ import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper
 import com.mesofi.collection.charactercatalog.mock.CharacterFigureCustomRepositoryImpl;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
+import com.mesofi.collection.charactercatalog.test.LoggingUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Test for {@link CharacterFinderService}
@@ -45,6 +48,7 @@ import com.mesofi.collection.charactercatalog.repository.CharacterFigureReposito
  * @author armandorivasarzaluz
  *
  */
+@Slf4j
 @ExtendWith({ SpringExtension.class, MockitoExtension.class })
 // @formatter:off
 @ContextConfiguration(classes = {
@@ -79,6 +83,9 @@ public class CharacterFinderServiceMythClothEXTest {
 
     @BeforeAll
     public static void initAll(@Autowired CharacterFigureService characterFigureRealService) throws IOException {
+        LoggingUtils.enableLog(log); // enabled DEBUG
+        log.debug("Loading the whole DB so that we can test the names.");
+
         Resource resource = new ClassPathResource("characters/MythCloth Catalog - CatalogMyth.tsv");
 
         // We assign a fake id to the records just loaded.
@@ -122,9 +129,9 @@ public class CharacterFinderServiceMythClothEXTest {
         shouldMatchCharacterFigure(input, GEMINI_SAGA_24K);
     }
 
-    //@ParameterizedTest
-    //@DisplayName(PREFIX + TAURUS_ALDEBARAN_GOD_EX)
-    //@CsvFileSource(resources = EX_LOCATION + TAURUS_ALDEBARAN_GOD_EX + CSV, numLinesToSkip = 1)
+    @ParameterizedTest
+    @DisplayName(PREFIX + TAURUS_ALDEBARAN_GOD_EX)
+    @CsvFileSource(resources = EX_LOCATION + TAURUS_ALDEBARAN_GOD_EX + CSV, numLinesToSkip = 1)
     public void should_taurus_aldebaran_god_ex(final String input) {
         shouldMatchCharacterFigure(input, TAURUS_ALDEBARAN_GOD_EX);
     }
@@ -140,6 +147,7 @@ public class CharacterFinderServiceMythClothEXTest {
      * Test for {@link CharacterFinderService#findCharacterByName(String)}
      */
     private void shouldMatchCharacterFigure(final String input, final String originalName) {
+        log.debug("==> Find: [{}] and expect: [{}] <==", input, originalName);
 
         entities.stream().filter($ -> originalName.equals($.getOriginalName())).findFirst().ifPresentOrElse((ddd) -> {
             CharacterFigure cf = new CharacterFigure();
@@ -148,6 +156,7 @@ public class CharacterFinderServiceMythClothEXTest {
             when(repository.findAll()).thenReturn(entities);
             when(characterFigureService.fromEntityToDisplayableFigure(any(CharacterFigureEntity.class))).thenReturn(cf);
 
+            // call the service ...
             List<CharacterFigure> characterFigureList = service.findCharacterByName(input);
             assertNotNull(characterFigureList);
             assertFalse(characterFigureList.isEmpty());

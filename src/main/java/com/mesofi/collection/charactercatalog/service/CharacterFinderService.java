@@ -37,7 +37,7 @@ public class CharacterFinderService {
     private CharacterFigureService characterFigureService;
 
     public List<CharacterFigure> findCharacterByName(final String name) {
-        log.debug("Finding a character with name: '{}'", name);
+        log.info("Finding a character with name: '{}'", name);
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("Provide a non empty figure name.");
         }
@@ -45,7 +45,7 @@ public class CharacterFinderService {
         List<String> exclusions = Stream.of("Bandai", "Saint", "Seiya", "Myth", "Cloth",
                         "Masami", "Kurumada", "Cross", "Correction", "BOX", "Modification", "No", "Japan", "version", "ver.",
                         "OF", "-", "/", "gold", "Tamashi","Tamashii", "Spirits", "Nation", "used", "web", "Zodiac",
-                        "copyright", "sticker", "from", "figure", "action")
+                        "copyright", "sticker", "from", "figure", "action", "with", "item", "first", "bonus")
                 .map(String::toLowerCase)
                 .toList();
         // @formatter:on
@@ -58,7 +58,7 @@ public class CharacterFinderService {
                 .filter($ -> !exclusions.contains($))
                 .collect(Collectors.toSet());
         // @formatter:on
-        log.debug("Simplified figure name: {}", simpleNameKeywords);
+        log.info("Simplified figure name: {}", simpleNameKeywords);
 
         List<CharacterFigureEntity> list = repository.findAll();
         List<CharacterFigureEntity> tmpList;
@@ -79,7 +79,7 @@ public class CharacterFinderService {
                 break;
             }
         }
-        log.debug("Character matches: {}",
+        log.info("Character matches: {}",
                 list.stream().map(CharacterFigureEntity::getBaseName).collect(Collectors.toList()));
 
         return list.stream().map($ -> characterFigureService.fromEntityToDisplayableFigure($))

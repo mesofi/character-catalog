@@ -74,6 +74,7 @@ public class CharacterFinderServiceMythClothEXTest {
     private final String GEMINI_SAGA_EX_SET = "Gemini Saga (God Cloth) Saga Saga Premium Set EX";
     private final String GEMINI_SAGA_EX_REVIVAL = "Gemini Saga EX <Revival>";
     private final String GEMINI_SAGA_24K = "Gemini Saga Gold 24K EX";
+    private final String TAURUS_ALDEBARAN_GOD_EX = "Taurus Aldebaran (God Cloth) EX";
     private final String THIRD_GOLDEN_EX_OCE = "The Third Golden Saint Warrior EX OCE";
 
     @BeforeAll
@@ -119,6 +120,13 @@ public class CharacterFinderServiceMythClothEXTest {
     @CsvFileSource(resources = EX_LOCATION + GEMINI_SAGA_24K + CSV, numLinesToSkip = 1)
     public void should_match_gemini_saga_24k_ex(final String input) {
         shouldMatchCharacterFigure(input, GEMINI_SAGA_24K);
+    }
+
+    @ParameterizedTest
+    @DisplayName(PREFIX + TAURUS_ALDEBARAN_GOD_EX)
+    @CsvFileSource(resources = EX_LOCATION + TAURUS_ALDEBARAN_GOD_EX + CSV, numLinesToSkip = 1)
+    public void should_taurus_aldebaran_god_ex(final String input) {
+        shouldMatchCharacterFigure(input, TAURUS_ALDEBARAN_GOD_EX);
     }
 
     @ParameterizedTest

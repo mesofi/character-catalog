@@ -71,6 +71,8 @@ public class CharacterFigureService {
     public static final String TAG_BROKEN = "broken";
     public static final String TAG_METAL = "metal";
     public static final String TAG_OCE = "oce,original,color";
+    public static final String TAG_HK = "asia";
+    public static final String TAG_BRONZE_TO_GOLD = "golden";
 
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
@@ -143,7 +145,9 @@ public class CharacterFigureService {
     }
 
     /**
-     * Add some standard tags to the figures.
+     * Add some standard tags to the figures. Normally this method should be called
+     * if we want to apply certain tags to a specific set of characters, as opposite
+     * to set them directly in the catalog (tags very specific).
      * 
      * @param effectiveCharacters The list of characters.
      */
@@ -167,6 +171,8 @@ public class CharacterFigureService {
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBrokenCloth, TAG_BROKEN);
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isMetalBody, TAG_METAL);
         addStandardTagToFigure(effectiveCharacters, CharacterFigure::isOce, TAG_OCE);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isHongKongVersion, TAG_HK);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBronzeToGold, TAG_BRONZE_TO_GOLD);
     }
 
     /**

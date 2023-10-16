@@ -15,12 +15,14 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -62,6 +64,16 @@ public class CharacterFigureService {
     public static final String INVALID_GROUP = "Provide a valid group";
     public static final String INVALID_ID = "Provide a non empty character id";
 
+    public static final String TAG_EX = "ex";
+    public static final String TAG_SOG = "soul,gold,god";
+    public static final String TAG_REVIVAL = "revival";
+    public static final String TAG_SET = "set";
+    public static final String TAG_BROKEN = "broken";
+    public static final String TAG_METAL = "metal";
+    public static final String TAG_OCE = "oce,original,color";
+    public static final String TAG_HK = "asia";
+    public static final String TAG_BRONZE_TO_GOLD = "golden";
+
     private CharacterFigureRepository repository;
     private CharacterFigureModelMapper modelMapper;
     private CharacterFigureFileMapper fileMapper;
@@ -84,10 +96,28 @@ public class CharacterFigureService {
         } catch (IOException e) {
             throw new CharacterFigureException("Unable to read characters from file");
         }
+
+        // the records are read and processed now.
+        List<CharacterFigureEntity> listEntities = convertStreamToEntityList(inputStream);
+
         // first, removes all the records.
         repository.deleteAll();
-        log.debug("All the records were deleted correctly!");
 
+        // performs a mapping and saves the records in the DB ...
+        long total = repository.saveAll(listEntities).size();
+
+        log.debug("Total of figures loaded correctly: {}", total);
+        return total;
+    }
+
+    /**
+     * Converts and process the incoming records and return a list with the
+     * characters ready to be saved in a persistence storage.
+     * 
+     * @param inputStream Reference to the records read from a source.
+     * @return The list or records.
+     */
+    public List<CharacterFigureEntity> convertStreamToEntityList(InputStream inputStream) {
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
@@ -99,18 +129,70 @@ public class CharacterFigureService {
         // reverse the list so that we can add re-stocks easily ...
         reverseListElements(allCharacters);
 
+        // gets the new characters with restocks
         log.debug("Total of figures to be loaded: {}", allCharacters.size());
         List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
         log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
 
-        // performs a mapping and saves the records in the DB ...
+        // add some tags
+        addStandardTags(effectiveCharacters);
+
         // @formatter:off
-        long total = repository.saveAll(effectiveCharacters.stream()
-                        .map($ -> modelMapper.toEntity($))
-                        .collect(Collectors.toList())).size();
+        return effectiveCharacters.stream()
+                .map($ -> modelMapper.toEntity($))
+                .collect(Collectors.toList());
         // @formatter:on
-        log.debug("Total of figures loaded correctly: {}", total);
-        return total;
+    }
+
+    /**
+     * Add some standard tags to the figures. Normally this method should be called
+     * if we want to apply certain tags to a specific set of characters, as opposite
+     * to set them directly in the catalog (tags very specific).
+     * 
+     * @param effectiveCharacters The list of characters.
+     */
+    private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
+        // We add some more tags depending on the name of the character.
+        for (CharacterFigure figure : effectiveCharacters) {
+            String[] nameArr = figure.getBaseName().toLowerCase().split("\\s+");
+            if (Objects.isNull(figure.getTags())) {
+                figure.setTags(new HashSet<>());
+            }
+            Set<String> existingTags = figure.getTags();
+            existingTags.addAll(Arrays.asList(nameArr));
+            figure.setTags(existingTags);
+        }
+
+        // Now, the standard tags
+        addStandardTagToFigure(effectiveCharacters, $ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX, TAG_EX);
+        addStandardTagToFigure(effectiveCharacters, $ -> $.getSeries() == Series.SOG, TAG_SOG);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isRevival, TAG_REVIVAL);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isSet, TAG_SET);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBrokenCloth, TAG_BROKEN);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isMetalBody, TAG_METAL);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isOce, TAG_OCE);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isHongKongVersion, TAG_HK);
+        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBronzeToGold, TAG_BRONZE_TO_GOLD);
+    }
+
+    /**
+     * Add some standard tags to the figure.
+     * 
+     * @param characters The list of characters.
+     * @param predicate  The actual predicate.
+     * @param tagNames   The tag names.
+     */
+    private void addStandardTagToFigure(List<CharacterFigure> characters, Predicate<CharacterFigure> predicate,
+            String tagNames) {
+        long total = characters.stream().filter(predicate).peek($ -> {
+            if (Objects.isNull($.getTags())) {
+                $.setTags(new HashSet<>());
+            }
+            for (String tag : tagNames.split(",")) {
+                $.getTags().add(tag);
+            }
+        }).count();
+        log.debug("{} figures have been updated with new tag: [{}]", total, tagNames);
     }
 
     /**
@@ -147,12 +229,25 @@ public class CharacterFigureService {
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
         List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
-                .map($ -> modelMapper.toModel($))
-                .peek(this::calculatePriceAndDisplayableName)
+                .map(this::fromEntityToDisplayableFigure)
                 .toList();
         // @formatter:on
         log.debug("Total of characters found: {}", figureList.size());
         return figureList;
+    }
+
+    /**
+     * This method converts an entity object to the corresponding model, after that,
+     * the price and final name are calculated to be displayed. This is a convenient
+     * method to be called from other services.
+     * 
+     * @param entity The raw entity.
+     * @return The figure model with the name and price calculated.
+     */
+    public CharacterFigure fromEntityToDisplayableFigure(CharacterFigureEntity entity) {
+        CharacterFigure cf = modelMapper.toModel(entity);
+        calculatePriceAndDisplayableName(cf);
+        return cf;
     }
 
     /**
@@ -182,11 +277,14 @@ public class CharacterFigureService {
      * @param figure The character figure to be shown.
      */
     private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
+        calculateReleasePricing(figure);
+        calculateDisplayableName(figure);
+    }
+
+    private void calculateReleasePricing(final Figure figure) {
         Issuance jpy = figure.getIssuanceJPY();
         Issuance mxn = figure.getIssuanceMXN();
 
-        // the displayable name is calculated here
-        figure.setDisplayableName(calculateFigureDisplayableName(figure));
         // the price is set here.
         if (Objects.nonNull(jpy)) {
             jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
@@ -194,7 +292,11 @@ public class CharacterFigureService {
         if (Objects.nonNull(mxn)) {
             mxn.setReleasePrice(mxn.getBasePrice());
         }
+    }
 
+    private void calculateDisplayableName(final CharacterFigure figure) {
+        // the displayable name is calculated here
+        figure.setDisplayableName(calculateFigureDisplayableName(figure));
         figure.setOriginalName(null);
         figure.setBaseName(null);
     }
@@ -556,6 +658,7 @@ public class CharacterFigureService {
         newRestockFigure.setUrl(newRestock.getUrl());
         newRestockFigure.setDistribution(newRestock.getDistribution());
         newRestockFigure.setRemarks(newRestock.getRemarks());
+        calculateReleasePricing(newRestockFigure); // the release price is set here.
 
         restocks.add(newRestockFigure);
         return restocks;

@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.file.Files;
 
+import com.mesofi.collection.charactercatalog.service.CharacterFinderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,6 +37,8 @@ public class CharacterFigureControllerLoaderTest {
 
     @MockBean
     private CharacterFigureService characterFigureService;
+    @MockBean
+    private CharacterFinderService characterFinderService;
 
     private final String BASE_URL = "/characters/loader";
 

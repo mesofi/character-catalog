@@ -43,8 +43,8 @@ public class CharacterFigureFileMapper {
         if (!StringUtils.hasText(line)) {
             return null;
         }
-
         String[] columns = line.split("\t");
+
         CharacterFigure characterFigure = new CharacterFigure();
         characterFigure.setOriginalName(columns[0]);
         characterFigure.setBaseName(columns[1]);

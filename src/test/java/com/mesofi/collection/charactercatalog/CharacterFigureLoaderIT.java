@@ -5,6 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ public class CharacterFigureLoaderIT {
     }
 
     /**
-     * {@link CharacterFigureController#getAllCharacters()}
+     * {@link CharacterFigureController#getAllCharactersByName(String)}
      */
     @Test
     @Order(2)
@@ -91,7 +92,7 @@ public class CharacterFigureLoaderIT {
                 .jsonPath("$.length()").isEqualTo(6)
                 .jsonPath("$[0].futureRelease").isEqualTo(true)
                 .jsonPath("$[0].remarks").isEqualTo("20th anniversary")
-                .jsonPath("$[0].tags").doesNotExist()
+                .jsonPath("$[0].tags").value(Matchers.hasItems("shun","andromeda"))
                 .jsonPath("$[0].displayableName").isEqualTo("Andromeda Shun (Initial Bronze Cloth) ~20th Anniversary Ver.~")
                 .jsonPath("$[0].lineUp").isEqualTo("MYTH_CLOTH")
                 .jsonPath("$[0].series").isEqualTo("SAINT_SEIYA")

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
+import com.mesofi.collection.charactercatalog.service.CharacterFinderService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -43,7 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/characters")
 public class CharacterFigureController {
 
-    private final CharacterFigureService service;
+    private final CharacterFigureService characterFigureService;
+    private final CharacterFinderService characterFinderService;
 
     /**
      * Handle all the incoming records.
@@ -54,7 +57,7 @@ public class CharacterFigureController {
     public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
         log.debug("Loading all the character records from the original source ...");
         // calls the actual service ...
-        service.loadAllCharacters(file);
+        characterFigureService.loadAllCharacters(file);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
@@ -67,18 +70,23 @@ public class CharacterFigureController {
     @PostMapping
     public CharacterFigure createNewCharacter(@Valid @RequestBody CharacterFigure characterFigure) {
         log.debug("Creating a new character ...");
-        return service.createNewCharacter(characterFigure);
+        return characterFigureService.createNewCharacter(characterFigure);
     }
 
     /**
-     * Get all existing characters.
+     * Get all existing characters by name, when the name is not provided, then all
+     * the characters are retrieved.
      * 
-     * @return The list of characters.
+     * @param name The optional name of the character, if this is NOT provided, then
+     *             returns all the existing characters.
+     * @return The list of characters found based on the name or return all if no
+     *         name is provided.
      */
     @GetMapping
-    public List<CharacterFigure> getAllCharacters() {
-        log.debug("Getting all existing characters ...");
-        return service.retrieveAllCharacters();
+    public List<CharacterFigure> getAllCharactersByName(final @RequestParam(required = false) String name) {
+        log.debug("Getting all existing characters by name {} ...", name);
+        return StringUtils.hasText(name) ? characterFinderService.findCharacterByName(name)
+                : characterFigureService.retrieveAllCharacters();
     }
 
     /**
@@ -89,7 +97,7 @@ public class CharacterFigureController {
     @GetMapping("/{id}")
     public CharacterFigure retrieveCharactersById(@PathVariable String id) {
         log.debug("Getting the character based on id: {}", id);
-        return service.retrieveCharactersById(id);
+        return characterFigureService.retrieveCharactersById(id);
     }
 
     /**
@@ -103,7 +111,7 @@ public class CharacterFigureController {
     public CharacterFigure updateExistingCharacter(@PathVariable String id,
             @Valid @RequestBody CharacterFigure characterFigure) {
         log.debug("Updating existing character with: {}", id);
-        return service.updateExistingCharacter(id, characterFigure);
+        return characterFigureService.updateExistingCharacter(id, characterFigure);
     }
 
     /**
@@ -117,7 +125,7 @@ public class CharacterFigureController {
     public CharacterFigure updateTagsInCharacter(@PathVariable String id,
             @RequestParam(required = false) Set<String> tags) {
         log.debug("Updating existing character with: {}, and tags: {}", id, tags);
-        return service.updateTagsInCharacter(id, tags);
+        return characterFigureService.updateTagsInCharacter(id, tags);
     }
 
     /**
@@ -129,6 +137,6 @@ public class CharacterFigureController {
     @DeleteMapping("/{id}/tags")
     public CharacterFigure deleteAllTagsInCharacter(@PathVariable String id) {
         log.debug("Deleting all the existing tags for character: {}", id);
-        return service.deleteAllTagsInCharacter(id);
+        return characterFigureService.deleteAllTagsInCharacter(id);
     }
 }

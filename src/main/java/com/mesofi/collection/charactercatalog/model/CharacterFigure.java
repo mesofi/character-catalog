@@ -33,10 +33,10 @@ public class CharacterFigure extends Figure {
     @EqualsAndHashCode.Exclude
     private String id; // identifier of the record.
 
+    @EqualsAndHashCode.Exclude
     private String originalName; // Name of the character.
 
     @NotBlank(message = INVALID_BASE_NAME)
-    @EqualsAndHashCode.Exclude
     private String baseName; // Base name of the character.
 
     @EqualsAndHashCode.Exclude
@@ -60,10 +60,8 @@ public class CharacterFigure extends Figure {
     @EqualsAndHashCode.Exclude
     private boolean brokenCloth; // Contains broken armor parts?.
 
-    @EqualsAndHashCode.Exclude
     private boolean bronzeToGold; // Does the bronze cloth become gold?.
 
-    @EqualsAndHashCode.Exclude
     private boolean gold; // Contains true gold?.
 
     private boolean hongKongVersion; // Is it HK version?.
@@ -75,7 +73,6 @@ public class CharacterFigure extends Figure {
     @EqualsAndHashCode.Exclude
     private boolean set; // Is it part of a set?.
 
-    @EqualsAndHashCode.Exclude
     private Integer anniversary; // Is it part of an anniversary?.
 
     @EqualsAndHashCode.Exclude

@@ -93,7 +93,9 @@ public class CharacterFigureServiceTest {
     public void should_load_all_records() throws IOException {
 
         doNothing().when(repository).deleteAll();
-        when(fileMapper.fromLineToCharacterFigure(anyString())).thenReturn(new CharacterFigure());
+        CharacterFigure cf = new CharacterFigure();
+        cf.setBaseName("MyName");
+        when(fileMapper.fromLineToCharacterFigure(anyString())).thenReturn(cf);
         when(repository.saveAll(anyIterable())).thenReturn(new ArrayList<>());
 
         final String folder = "characters/";

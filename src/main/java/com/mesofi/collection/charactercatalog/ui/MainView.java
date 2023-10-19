@@ -1,6 +1,7 @@
 package com.mesofi.collection.charactercatalog.ui;
 
 import java.io.Serial;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -25,7 +26,7 @@ public class MainView extends VerticalLayout {
     private static final long serialVersionUID = -4228406830903202529L;
     private final Grid<CharacterFigureView> grid;
 
-    private final String TBD = "TBD";
+    private final String TBD = "Not published yet";
     private final DateTimeFormatter sStyle = DateTimeFormatter.ofPattern("MMMM, yyyy");
     private final DateTimeFormatter lStyle = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
 
@@ -36,7 +37,8 @@ public class MainView extends VerticalLayout {
                 .map(mapper::toModelView).toList();
 
         this.grid = new Grid<>(CharacterFigureView.class, false);
-        this.grid.addColumn(CharacterFigureView::getDisplayableName).setHeader("Name")
+        this.grid.addColumn(CharacterFigureView::getDisplayableName).setHeader("Name").setAutoWidth(true).setFlexGrow(0)
+                .setSortable(true)
                 .setFooter(String.format("%d total, %d MC EX, %d MC, %d DD, %d App, %d Crown, %d LOS, %d Figuarts",
                         items.size(), items.stream().filter($ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX).count(),
                         items.stream().filter($ -> $.getLineUp() == LineUp.MYTH_CLOTH).count(),
@@ -47,22 +49,26 @@ public class MainView extends VerticalLayout {
                         items.stream().filter($ -> $.getLineUp() == LineUp.FIGUARTS).count()));
 
         Locale locale = new Locale("jp", "JP");
-        //this.grid.addColumn(new NumberRenderer<>(CharacterFigureView::getReleasePrice, "¥ %(,.3f", locale, "¥ " + TBD))
-        //        .setHeader("Price");
-        //this.grid.addColumn(new NumberRenderer<>(CharacterFigureView::getReleasePrice, "%.3f", locale, "¥ " + TBD))
-        //        .setHeader("Price");
-        this.grid.addColumn(new NumberRenderer<>(CharacterFigureView::getReleasePrice, "%,.6f", locale, "¥ " + TBD))
-                .setHeader("Price");
+        this.grid.addColumn(new NumberRenderer<>(CharacterFigureView::getReleasePrice, "¥ %,.0f", locale, "¥ " + TBD))
+                .setHeader("Price").setSortable(true).setComparator(CharacterFigureView::getReleasePrice);
 
         grid.addColumn($ -> Objects.nonNull($.getPreorderDate())
                 ? $.getPreorderDate().format($.isPreorderConfirmationDay() ? lStyle : sStyle)
-                : TBD).setHeader("Preorder Date");
+                : unknownDate($.getReleaseDate())).setHeader("Preorder Date").setSortable(true)
+                .setComparator(CharacterFigureView::getPreorderDate);
 
         grid.addColumn($ -> Objects.nonNull($.getReleaseDate())
                 ? $.getReleaseDate().format($.isReleaseConfirmationDay() ? lStyle : sStyle)
-                : TBD).setHeader("Release Date");
+                : TBD).setHeader("Release Date").setSortable(true).setComparator(CharacterFigureView::getReleaseDate);
 
         this.grid.setItems(items);
         add(grid);
+    }
+
+    private String unknownDate(LocalDate releaseDate) {
+        if (Objects.isNull(releaseDate)) {
+            return TBD;
+        }
+        return releaseDate.isBefore(LocalDate.now()) ? "Unknown" : TBD;
     }
 }

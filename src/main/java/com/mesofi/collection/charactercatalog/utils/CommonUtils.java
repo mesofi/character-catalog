@@ -41,9 +41,9 @@ public class CommonUtils {
     public static BigDecimal toPrice(final String value) {
         if (StringUtils.hasText(value)) {
             if (value.contains("$") || value.contains("¥")) {
-                return new BigDecimal(value.substring(1).replace(',', '.'));
+                return new BigDecimal(value.substring(1).replace(",", ""));
             } else {
-                return new BigDecimal(value.replace(',', '.'));
+                return new BigDecimal(value.replace(",", ""));
             }
         }
         return null;

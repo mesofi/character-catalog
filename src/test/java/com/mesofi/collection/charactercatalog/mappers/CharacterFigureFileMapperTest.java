@@ -103,7 +103,7 @@ public class CharacterFigureFileMapperTest {
         String line = "Dragon Shiryu ~New Bronze Cloth~\tDragon Shiryu\t¥6,000\t¥6,600\t\t\t8/24/2013\t\t\t\thttps://tamashiiweb.com/item/10372\tStores\tMyth Cloth EX\tSaint Seiya\tBronze Saint V2\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
         assertNotNull(figure.getIssuanceJPY());
-        assertEquals(new BigDecimal("6.000"), figure.getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("6000"), figure.getIssuanceJPY().getBasePrice());
         assertNull(figure.getIssuanceJPY().getReleasePrice());
         assertNull(figure.getIssuanceJPY().getFirstAnnouncementDate());
         assertNull(figure.getIssuanceJPY().getPreorderDate());

@@ -145,8 +145,8 @@ public class CharacterFigureLoaderIT {
                 .jsonPath("$[2].surplice").isEqualTo(false)
                 .jsonPath("$[2].set").isEqualTo(false)
 
-                .jsonPath("$[3].issuanceJPY.basePrice").isEqualTo(22.000)
-                .jsonPath("$[3].issuanceJPY.releasePrice").isEqualTo(24.20000)
+                .jsonPath("$[3].issuanceJPY.basePrice").isEqualTo(22000)
+                .jsonPath("$[3].issuanceJPY.releasePrice").isEqualTo(24200)
                 .jsonPath("$[3].issuanceJPY.firstAnnouncementDate").isEqualTo("2023-08-30")
                 .jsonPath("$[3].issuanceJPY.preorderDate").isEqualTo("2023-09-01")
                 .jsonPath("$[3].issuanceJPY.preorderConfirmationDay").isEqualTo(true)
@@ -171,8 +171,8 @@ public class CharacterFigureLoaderIT {
                 .jsonPath("$[3].surplice").isEqualTo(false)
                 .jsonPath("$[3].set").isEqualTo(false)
 
-                .jsonPath("$[4].issuanceJPY.basePrice").isEqualTo(9.200)
-                .jsonPath("$[4].issuanceJPY.releasePrice").isEqualTo(9.93600)
+                .jsonPath("$[4].issuanceJPY.basePrice").isEqualTo(9200)
+                .jsonPath("$[4].issuanceJPY.releasePrice").isEqualTo(9936)
                 .jsonPath("$[4].issuanceJPY.preorderDate").isEqualTo("2017-06-06")
                 .jsonPath("$[4].issuanceJPY.preorderConfirmationDay").isEqualTo(true)
                 .jsonPath("$[4].issuanceJPY.releaseDate").isEqualTo("2017-09-23")
@@ -206,8 +206,8 @@ public class CharacterFigureLoaderIT {
                 .jsonPath("$[4].restocks[0].futureRelease").isEqualTo(false)
                 .jsonPath("$[4].restocks[0].distribution").isEqualTo("TAMASHII_WEB_SHOP")
 
-                .jsonPath("$[5].issuanceJPY.basePrice").isEqualTo(6.300)
-                .jsonPath("$[5].issuanceJPY.releasePrice").isEqualTo(6.80400)
+                .jsonPath("$[5].issuanceJPY.basePrice").isEqualTo(6300)
+                .jsonPath("$[5].issuanceJPY.releasePrice").isEqualTo(6804)
                 .jsonPath("$[5].issuanceJPY.preorderDate").isEqualTo("2017-04-03")
                 .jsonPath("$[5].issuanceJPY.preorderConfirmationDay").isEqualTo(true)
                 .jsonPath("$[5].issuanceJPY.releaseDate").isEqualTo("2017-08-10")

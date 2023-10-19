@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.ui.CharacterFigureView;
 
 /**
  * The actual Character Figure model mapper.
@@ -28,4 +29,11 @@ public interface CharacterFigureModelMapper {
     @Mapping(source = "golden", target = "bronzeToGold")
     @Mapping(source = "hk", target = "hongKongVersion")
     CharacterFigure toModel(CharacterFigureEntity characterFigureEntity);
+
+    @Mapping(source = "issuanceJPY.releasePrice", target = "releasePrice")
+    @Mapping(source = "issuanceJPY.preorderDate", target = "preorderDate")
+    @Mapping(source = "issuanceJPY.preorderConfirmationDay", target = "preorderConfirmationDay")
+    @Mapping(source = "issuanceJPY.releaseDate", target = "releaseDate")
+    @Mapping(source = "issuanceJPY.releaseConfirmationDay", target = "releaseConfirmationDay")
+    CharacterFigureView toModelView(CharacterFigure characterFigure);
 }

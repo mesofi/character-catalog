@@ -13,10 +13,11 @@ import java.util.stream.Stream;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
+import com.mesofi.collection.charactercatalog.views.CharacterFigureView;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Label;
+
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -26,7 +27,7 @@ import com.vaadin.flow.router.Route;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Route("ui")
+//@Route("ui")
 public class MainView extends VerticalLayout {
 
     @Serial

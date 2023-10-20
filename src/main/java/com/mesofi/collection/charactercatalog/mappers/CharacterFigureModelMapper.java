@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.ui.CharacterFigureView;
+import com.mesofi.collection.charactercatalog.views.CharacterFigureView;
 
 /**
  * The actual Character Figure model mapper.

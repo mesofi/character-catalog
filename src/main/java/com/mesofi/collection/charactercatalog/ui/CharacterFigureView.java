@@ -20,5 +20,7 @@ public class CharacterFigureView {
     private LocalDate releaseDate;
     private boolean releaseConfirmationDay;
 
+    private boolean hongKongVersion;
+
     private LineUp lineUp;
 }

@@ -35,5 +35,7 @@ public interface CharacterFigureModelMapper {
     @Mapping(source = "issuanceJPY.preorderConfirmationDay", target = "preorderConfirmationDay")
     @Mapping(source = "issuanceJPY.releaseDate", target = "releaseDate")
     @Mapping(source = "issuanceJPY.releaseConfirmationDay", target = "releaseConfirmationDay")
-    CharacterFigureView toModelView(CharacterFigure characterFigure);
+    CharacterFigureView toView(CharacterFigure characterFigure);
+
+    CharacterFigure toModel(CharacterFigureView characterFigureView);
 }

@@ -40,8 +40,8 @@ public class ListView extends VerticalLayout {
         this.characterFigureService = characterFigureService;
         this.mapper = mapper;
 
-        List<CharacterFigureView> items = characterFigureService.retrieveAllCharacters().stream()
-                .map(mapper::toModelView).toList();
+        List<CharacterFigureView> items = characterFigureService.retrieveAllCharacters().stream().map(mapper::toView)
+                .toList();
 
         // addClassName("list-view-class");
         setSizeFull();
@@ -51,7 +51,13 @@ public class ListView extends VerticalLayout {
 
         add(getToolBar(), getContent());
         populateGrid(items);
+        closeEditor();
+    }
 
+    private void closeEditor() {
+        form.setCharacterFigureView(null);
+        form.setVisible(false);
+        removeClassName("editing");
     }
 
     private void populateGrid(List<CharacterFigureView> items) {
@@ -71,6 +77,20 @@ public class ListView extends VerticalLayout {
     private void configureForm() {
         form = new FigureForm();
         form.setWidth("25em");
+        form.addSaveListener(this::saveFigure);
+        form.addDeleteListener(this::deleteFigure);
+        form.addCloseListener(e -> closeEditor());
+    }
+
+    private void saveFigure(FigureForm.SaveEvent event) {
+        CharacterFigureView newCharacterFigureView = event.getCharacterFigureView();
+        characterFigureService.createNewCharacter(mapper.toModel(newCharacterFigureView));
+        // updateList ?? TODO How to update the list?
+        closeEditor();
+    }
+
+    private void deleteFigure(FigureForm.DeleteEvent deleteEvent) {
+        System.out.println("DELETED");
     }
 
     private Component getToolBar() {
@@ -79,9 +99,15 @@ public class ListView extends VerticalLayout {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
 
         Button button = new Button("Add figure");
+        button.addClickListener(e -> addNewFigure());
         HorizontalLayout toolBar = new HorizontalLayout(filterText, button);
-        // toolBar.addClassName("figure-toolbar-class");
+        toolBar.addClassName("figure-toolbar-class");
         return toolBar;
+    }
+
+    private void addNewFigure() {
+        grid.asSingleSelect().clear();
+        editCharacter(new CharacterFigureView());
     }
 
     private void configureGrid(List<CharacterFigureView> items) {
@@ -125,9 +151,21 @@ public class ListView extends VerticalLayout {
                 ? $.getReleaseDate().format($.isReleaseConfirmationDay() ? lStyle : sStyle)
                 : TBD).setHeader("Release Date").setSortable(true).setComparator(CharacterFigureView::getReleaseDate);
 
-        this.grid.addColumn(CharacterFigureView::getLineUp).setHeader("Line Up").setFlexGrow(0).setSortable(true);
-        
+        grid.addColumn(CharacterFigureView::getLineUp).setHeader("Line Up").setFlexGrow(0).setSortable(true);
+
         grid.getColumns().forEach($ -> $.setAutoWidth(true));
+
+        grid.asSingleSelect().addValueChangeListener(e -> editCharacter(e.getValue()));
+    }
+
+    private void editCharacter(CharacterFigureView value) {
+        if (Objects.isNull(value)) {
+            closeEditor();
+        } else {
+            form.setCharacterFigureView(value);
+            form.setVisible(true);
+            addClassName("editing");
+        }
     }
 
     private String unknownDate(LocalDate releaseDate) {

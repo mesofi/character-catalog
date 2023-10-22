@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -17,17 +16,14 @@ import com.mesofi.collection.charactercatalog.views.CharacterFigureView;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.Route;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-//@Route("ui")
+// @Route("ui")
 public class MainView extends VerticalLayout {
 
     @Serial
@@ -41,8 +37,8 @@ public class MainView extends VerticalLayout {
     public MainView(CharacterFigureService characterFigureService, CharacterFigureModelMapper mapper) {
         log.debug("Displaying all characters ...");
 
-        List<CharacterFigureView> items = characterFigureService.retrieveAllCharacters().stream()
-                .map(mapper::toModelView).toList();
+        List<CharacterFigureView> items = characterFigureService.retrieveAllCharacters().stream().map(mapper::toView)
+                .toList();
 
         this.grid = new Grid<>(CharacterFigureView.class, false);
         this.grid.setAllRowsVisible(true);
@@ -105,33 +101,34 @@ public class MainView extends VerticalLayout {
     private static class CharacterDetailsFormLayout extends FormLayout {
         private final NativeLabel label = new NativeLabel();
         private final NativeLabel label1 = new NativeLabel();
-        //private final TextField emailField = new TextField("Email address");
-        //private final TextField phoneField = new TextField("Phone number");
-        //private final TextField streetField = new TextField("Street address");
-        //private final TextField zipField = new TextField("ZIP code");
-        //private final TextField cityField = new TextField("City");
-        //private final TextField stateField = new TextField("State");
+        // private final TextField emailField = new TextField("Email address");
+        // private final TextField phoneField = new TextField("Phone number");
+        // private final TextField streetField = new TextField("Street address");
+        // private final TextField zipField = new TextField("ZIP code");
+        // private final TextField cityField = new TextField("City");
+        // private final TextField stateField = new TextField("State");
 
         public CharacterDetailsFormLayout() {
             add(label);
             add(label1);
-            //Stream.of(emailField, phoneField, streetField, zipField, cityField, stateField).forEach(field -> {
-            //    field.setReadOnly(true);
-            ///    add(field);
-            //});
+            // Stream.of(emailField, phoneField, streetField, zipField, cityField,
+            // stateField).forEach(field -> {
+            // field.setReadOnly(true);
+            /// add(field);
+            // });
 
-            //setResponsiveSteps(new ResponsiveStep("0", 3));
-            //setColspan(emailField, 3);
-            //setColspan(phoneField, 3);
-            //setColspan(streetField, 3);
+            // setResponsiveSteps(new ResponsiveStep("0", 3));
+            // setColspan(emailField, 3);
+            // setColspan(phoneField, 3);
+            // setColspan(streetField, 3);
         }
 
         public void setPerson(CharacterFigureView characterFigureView) {
             label.setText(characterFigureView.getDisplayableName());
             label.setTitle("dd");
-            
+
             label1.setText("dddd");
-            //emailField.setValue(characterFigureView.getDisplayableName());
+            // emailField.setValue(characterFigureView.getDisplayableName());
         }
     }
 }

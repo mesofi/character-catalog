@@ -297,8 +297,8 @@ public class CharacterFigureService {
     private void calculateDisplayableName(final CharacterFigure figure) {
         // the displayable name is calculated here
         figure.setDisplayableName(calculateFigureDisplayableName(figure));
-        figure.setOriginalName(null);
-        figure.setBaseName(null);
+        //figure.setOriginalName(null);
+        //figure.setBaseName(null);
     }
 
     private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {

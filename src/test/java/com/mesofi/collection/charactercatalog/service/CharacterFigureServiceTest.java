@@ -310,8 +310,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigureExpected = service.retrieveCharactersById(id);
         assertNotNull(characterFigureExpected);
         assertEquals("1", characterFigureExpected.getId());
-        assertNull(characterFigureExpected.getOriginalName());
-        assertNull(characterFigureExpected.getBaseName());
+        assertEquals("Alraune Queen", characterFigureExpected.getOriginalName());
+        assertEquals("Alraune Queen", characterFigureExpected.getBaseName());
         assertEquals("Alraune Queen", characterFigureExpected.getDisplayableName());
         assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
         assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
@@ -580,8 +580,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigureExpected = service.createNewCharacter(newCharacterFigure);
         assertNotNull(characterFigureExpected);
         assertEquals("2", characterFigureExpected.getId());
-        assertNull(characterFigureExpected.getOriginalName());
-        assertNull(characterFigureExpected.getBaseName());
+        assertEquals("Virgo Shaka", characterFigureExpected.getOriginalName());
+        assertEquals("Virgo Shaka", characterFigureExpected.getBaseName());
         assertEquals("Virgo Shaka", characterFigureExpected.getDisplayableName());
         assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
         assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
@@ -654,7 +654,7 @@ public class CharacterFigureServiceTest {
         assertNotNull(characterFigureExpected);
         assertEquals("1", characterFigureExpected.getId());
         assertNull(characterFigureExpected.getOriginalName());
-        assertNull(characterFigureExpected.getBaseName());
+        assertEquals("Virgo Shaka", characterFigureExpected.getBaseName());
         assertEquals("Virgo Shaka", characterFigureExpected.getDisplayableName());
         assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureExpected.getLineUp());
         assertEquals(Series.SAINT_SEIYA, characterFigureExpected.getSeries());
@@ -701,8 +701,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure characterFigureWithRestock = service.createNewCharacter(newCharacter);
         assertNotNull(characterFigureWithRestock);
         assertEquals("1", characterFigureWithRestock.getId());
-        assertNull(characterFigureWithRestock.getOriginalName());
-        assertNull(characterFigureWithRestock.getBaseName());
+        assertEquals("Virgo Shaka", characterFigureWithRestock.getOriginalName());
+        assertEquals("Virgo Shaka", characterFigureWithRestock.getBaseName());
         assertEquals("Virgo Shaka", characterFigureWithRestock.getDisplayableName());
         assertEquals(LineUp.MYTH_CLOTH_EX, characterFigureWithRestock.getLineUp());
         assertEquals(Series.SAINT_SEIYA, characterFigureWithRestock.getSeries());
@@ -809,8 +809,8 @@ public class CharacterFigureServiceTest {
         assertNotNull(actual);
         assertNotNull(actual);
         assertEquals("122kk3j4h5hdn", actual.getId());
-        assertNull(actual.getOriginalName());
-        assertNull(actual.getBaseName());
+        assertEquals("Scorpio Ecarlet", actual.getOriginalName());
+        assertEquals("Scorpio Ecarlet", actual.getBaseName());
         assertEquals("Scorpio Ecarlet", actual.getDisplayableName());
         assertEquals(LineUp.MYTH_CLOTH_EX, actual.getLineUp());
         assertEquals(Series.SAINT_SEIYA, actual.getSeries());
@@ -952,8 +952,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertNull(actual.getOriginalName());
-        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getOriginalName());
+        assertEquals("Virgo Shaka", actual.getBaseName());
         assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());
@@ -1025,8 +1025,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.updateTagsInCharacter(id, Set.of("ex", "virgo"));
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertNull(actual.getOriginalName());
-        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getOriginalName());
+        assertEquals("Virgo Shaka", actual.getBaseName());
         assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());
@@ -1117,8 +1117,8 @@ public class CharacterFigureServiceTest {
         CharacterFigure actual = service.deleteAllTagsInCharacter(id);
         assertNotNull(actual);
         assertEquals("65215079a5d1a04590202d6f", actual.getId());
-        assertNull(actual.getOriginalName());
-        assertNull(actual.getBaseName());
+        assertEquals("Virgo Shaka", actual.getOriginalName());
+        assertEquals("Virgo Shaka", actual.getBaseName());
         assertEquals("Virgo Shaka", actual.getDisplayableName());
         assertNull(actual.getLineUp());
         assertNull(actual.getSeries());

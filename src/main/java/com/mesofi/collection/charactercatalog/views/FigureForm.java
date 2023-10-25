@@ -18,6 +18,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -54,7 +55,7 @@ public class FigureForm extends FormLayout {
     Checkbox preorderConfirmationDayMXN = new Checkbox("Preorder Day confirmed?");
     DatePicker releaseDateMXN = new DatePicker("Release Date");
     Checkbox releaseConfirmationDayMXN = new Checkbox("Release Day confirmed?");
-    Details issuanceMXNDetails = new Details("(MXN) Pricing and Release Date", basePriceMXN, preorderDateMXN,
+    Details issuanceMXNDetails = new Details("(MXN) Pricing  and Release Date", basePriceMXN, preorderDateMXN,
             preorderConfirmationDayMXN, releaseDateMXN, releaseConfirmationDayMXN);
 
     ComboBox<Series> series = new ComboBox<>("Series");
@@ -72,8 +73,9 @@ public class FigureForm extends FormLayout {
     Checkbox manga = new Checkbox("Manga Version");
     Checkbox surplice = new Checkbox("Surplice");
     Checkbox set = new Checkbox("Part of a Set");
-    Details attributesDetails = new Details("Additional Attributes", metalBody, oce, revival, plainCloth, brokenCloth,
-            bronzeToGold, gold, hongKongVersion, manga, surplice, set);
+    VerticalLayout verticalLayout = new VerticalLayout(metalBody, oce, revival, plainCloth, brokenCloth, bronzeToGold,
+            gold, hongKongVersion, manga, surplice, set);
+    Details attributesDetails = new Details("Additional Attributes", verticalLayout);
     TextArea remarks = new TextArea("Additional information");
 
     Button save = new Button("Save");
@@ -95,6 +97,8 @@ public class FigureForm extends FormLayout {
 
         distribution.setItems(Distribution.values());
         distribution.setItemLabelGenerator(Distribution::getStringValue);
+
+        verticalLayout.setSpacing(false);
 
         add(originalName, baseName, lineUp, group, issuanceJPYDetails, issuanceMXNDetails, series, distribution, url,
                 attributesDetails, remarks, createButtonLayout());

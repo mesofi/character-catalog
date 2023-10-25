@@ -16,8 +16,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -30,7 +28,7 @@ public class ListView extends VerticalLayout {
     private final String TBD = "Not published yet";
 
     private final Grid<CharacterFigureView> grid = new Grid<>();
-    private final TextField filterText = new TextField();
+    // private final TextField filterText = new TextField();
     private FigureForm form;
 
     private final CharacterFigureService characterFigureService;
@@ -103,13 +101,13 @@ public class ListView extends VerticalLayout {
     }
 
     private Component getToolBar() {
-        filterText.setPlaceholder("Filter by name ...");
-        filterText.setClearButtonVisible(true);
-        filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        // filterText.setPlaceholder("Filter by name ...");
+        // filterText.setClearButtonVisible(true);
+        // filterText.setValueChangeMode(ValueChangeMode.LAZY);
 
         Button button = new Button("Add figure");
         button.addClickListener(e -> addNewFigure());
-        HorizontalLayout toolBar = new HorizontalLayout(filterText, button);
+        HorizontalLayout toolBar = new HorizontalLayout(button);
         toolBar.addClassName("figure-toolbar-class");
         return toolBar;
     }

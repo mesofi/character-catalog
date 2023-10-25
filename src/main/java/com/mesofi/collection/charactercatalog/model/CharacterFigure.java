@@ -1,60 +1,83 @@
+/*
+ * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
+ * via any medium is strictly prohibited Proprietary and confidential Written by
+ * Armando Rivas, Sep 19, 2023.
+ */
 package com.mesofi.collection.charactercatalog.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_BASE_NAME;
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.INVALID_GROUP;
+
 import java.util.List;
+import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-import com.mesofi.collection.charactercatalog.constraints.Amount;
-import com.mesofi.collection.charactercatalog.constraints.ReleaseDate;
+/**
+ * The actual value object used to hold the info.
+ *
+ * @author armandorivasarzaluz
+ */
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CharacterFigure extends Figure {
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+    @EqualsAndHashCode.Exclude
+    private String id; // identifier of the record.
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Document(collection = "character-figure")
-public class CharacterFigure {
+    @EqualsAndHashCode.Exclude
+    private String originalName; // Name of the character.
 
-    @Id
-    private String id;
+    @NotBlank(message = INVALID_BASE_NAME)
+    private String baseName; // Base name of the character.
 
-    @NotBlank(message = "is required with at least 2 characters")
-    @Size(min = 2, max = 200, message = "must be between 2 and 200")
-    private String name;
+    @EqualsAndHashCode.Exclude
+    private String displayableName; // <== Calculated == name to be displayed.
 
-    @ReleaseDate(message = "is required yyyy-MM-dd and should not be less than 2003-11-01 or greater than 6 months from now")
-    private Date releaseDate;
+    private LineUp lineUp; // MythCloth ... MythCloth EX etc.
 
-    @Amount(message = "is required and must have a positive value")
-    private BigDecimal basePrice;
+    private Series series; // Saint Seiya, Lost Canvas etc.
 
-    @Transient
-    private BigDecimal price;
+    @NotNull(message = INVALID_GROUP)
+    private Group group; // Group of the character.
 
-    @Amount(message = "is required and must have a decimal value")
-    private BigDecimal tax;
+    private boolean metalBody; // Has a metal body.
 
-    @NotNull(message = "is required")
-    private LineUp lineUp;
+    private boolean oce; // Is Original Color Edition?.
 
-    @NotNull(message = "is required")
-    private Distribution distribution;
+    private boolean revival; // Is revival?.
 
-    private String url;
-    @Valid
-    private List<Restock> restocks;
-    private List<Tag> tags;
+    private boolean plainCloth; // Is plain cloth?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean brokenCloth; // Contains broken armor parts?.
+
+    private boolean bronzeToGold; // Does the bronze cloth become gold?.
+
+    private boolean gold; // Contains true gold?.
+
+    private boolean hongKongVersion; // Is it HK version?.
+
+    private boolean manga; // Is it manga version?.
+
+    private boolean surplice; // Is it a surplice?.
+
+    @EqualsAndHashCode.Exclude
+    private boolean set; // Is it part of a set?.
+
+    private Integer anniversary; // Is it part of an anniversary?.
+
+    @EqualsAndHashCode.Exclude
+    private List<RestockFigure> restocks; // used to store the restocks.
+
+    @EqualsAndHashCode.Exclude
+    private Set<String> tags; // the list of tags associated to a character.
 }

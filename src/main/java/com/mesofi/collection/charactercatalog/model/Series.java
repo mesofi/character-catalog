@@ -8,25 +8,25 @@ package com.mesofi.collection.charactercatalog.model;
 import lombok.Getter;
 
 /**
- * The Distribution enum.
+ * The Series enum.
  *
  * @author armandorivasarzaluz
  */
 @Getter
-public enum Distribution {
+public enum Series {
 
     // @formatter:off
-    STORES("Stores"),
-    TAMASHII_WEB_SHOP("Tamashii Web Shop"),
-    TAMASHII_WORLD_TOUR("Tamashii World Tour"),
-    TAMASHII_NATIONS("Tamashii Nations"),
-    TAMASHII_STORE("Tamashii Store"),
-    OTHER("Other Limited Edition");
+    SAINT_SEIYA("Saint Seiya"),
+    SAINTIA_SHO("Saintia Sho"),
+    SOG("Soul of Gold"),
+    LEGEND("Legend Of Sanctuary"),
+    OMEGA("Omega"),
+    LOST_CANVAS("Lost Canvas");
     // @formatter:on
 
     private final String stringValue;
 
-    Distribution(String friendlyName) {
+    Series(String friendlyName) {
         this.stringValue = friendlyName;
     }
 

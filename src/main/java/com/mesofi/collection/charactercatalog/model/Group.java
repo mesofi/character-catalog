@@ -8,25 +8,36 @@ package com.mesofi.collection.charactercatalog.model;
 import lombok.Getter;
 
 /**
- * The Distribution enum.
+ * The Group enum.
  *
  * @author armandorivasarzaluz
  */
 @Getter
-public enum Distribution {
+public enum Group {
 
     // @formatter:off
-    STORES("Stores"),
-    TAMASHII_WEB_SHOP("Tamashii Web Shop"),
-    TAMASHII_WORLD_TOUR("Tamashii World Tour"),
-    TAMASHII_NATIONS("Tamashii Nations"),
-    TAMASHII_STORE("Tamashii Store"),
-    OTHER("Other Limited Edition");
+    V1("Bronze Saint V1"),
+    V2("Bronze Saint V2"),
+    V3("Bronze Saint V3"),
+    V4("Bronze Saint V4"),
+    V5("Bronze Saint V5"),
+    SECONDARY("Bronze Secondary"),
+    BLACK("Black Saint"),
+    STEEL("Steel"),
+    SILVER("Silver Saint"),
+    GOLD("Gold Saint"),
+    ROBE("God Robe"),
+    SCALE("Poseidon Scale"),
+    SURPLICE("Saint Surplice"),
+    SPECTER("Specter"),
+    JUDGE("Judge"),
+    GOD("God"),
+    OTHER("-");
     // @formatter:on
 
     private final String stringValue;
 
-    Distribution(String friendlyName) {
+    Group(String friendlyName) {
         this.stringValue = friendlyName;
     }
 

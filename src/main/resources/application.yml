@@ -1,46 +1,8 @@
-character:
-  symbol-exclude: '[\[\]"-+.^:,-/]'
-  keyword-exclude:
-  - Bandai
-  - Myth
-  - Cloth
-  - Saint
-  - Seiya
-  - Spirits
-  - Masami
-  - Kurumada
-  - Tamashi
-  - Nation
-  - '2021'
-  - Cross
-  - Correction
-  - BOX
-  - EDITION
-  - TAMASHII
-  - LIMITED
-  - Japan
-  - 'No'
-  - Modification
-  - version
-  - With
-  - First
-  - Bonus
-  - Item
-  - BRAND
-  - NEW
-  - USED
-  - Copyright
-  - Sticker
-  - Action
-  - Figure
-  - FROM
-
 logging:
   level:
     org.springframework: INFO
     com.mesofi: DEBUG
 
-spring:
-  data:
-    mongodb:
-      database: saintseiyauniverse
+server:
+  servlet:
+    context-path: /api

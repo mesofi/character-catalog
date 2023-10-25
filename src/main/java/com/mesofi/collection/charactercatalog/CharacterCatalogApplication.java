@@ -1,13 +1,20 @@
+/*
+ * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
+ * via any medium is strictly prohibited Proprietary and confidential Written by
+ * Armando Rivas, Sep 19, 2023.
+ */
 package com.mesofi.collection.charactercatalog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import com.mesofi.collection.charactercatalog.config.CharacterConfig;
-
+/**
+ * Entry point of the application.
+ * 
+ * @author armandorivasarzaluz
+ *
+ */
 @SpringBootApplication
-@EnableConfigurationProperties(CharacterConfig.class)
 public class CharacterCatalogApplication {
 
     public static void main(String[] args) {

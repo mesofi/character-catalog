@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/maven,macos,eclipse,windows,netbeans,intellij+all,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=maven,macos,eclipse,windows,netbeans,intellij+all,visualstudiocode
 
+# Custom
+/frontend/*
+
 ### Eclipse ###
 .metadata
 bin/

@@ -61,8 +61,11 @@ public class ListView extends VerticalLayout {
     }
 
     private void populateGrid(List<CharacterFigureView> items) {
-
         grid.setItems(items);
+    }
+
+    private void populateGrid() {
+        populateGrid(characterFigureService.retrieveAllCharacters().stream().map(mapper::toView).toList());
     }
 
     private Component getContent() {
@@ -83,9 +86,15 @@ public class ListView extends VerticalLayout {
     }
 
     private void saveFigure(FigureForm.SaveEvent event) {
-        CharacterFigureView newCharacterFigureView = event.getCharacterFigureView();
-        characterFigureService.createNewCharacter(mapper.toModel(newCharacterFigureView));
-        // updateList ?? TODO How to update the list?
+        CharacterFigureView characterFigureView = event.getCharacterFigureView();
+        String id = characterFigureView.getId();
+        if (Objects.isNull(id)) {
+            // a new character is created
+            characterFigureService.createNewCharacter(mapper.toModel(characterFigureView));
+        } else {
+            characterFigureService.updateExistingCharacter(id, mapper.toModel(characterFigureView));
+        }
+        populateGrid();
         closeEditor();
     }
 
@@ -128,33 +137,33 @@ public class ListView extends VerticalLayout {
                         items.stream().filter($ -> $.getLineUp() == LineUp.LEGEND).count(),
                         items.stream().filter($ -> $.getLineUp() == LineUp.FIGUARTS).count()));
 
+        grid.addColumn(CharacterFigureView::getLineUp).setHeader("Line Up").setFlexGrow(0).setSortable(true);
+
         Locale jpyLocale = new Locale("jp", "JP");
         Locale cnyLocale = new Locale("cn", "CN");
         this.grid.addColumn($ -> {
             if ($.isHongKongVersion()) {
-                return Objects.isNull($.getReleasePrice()) ? "HK ¥ " + TBD
-                        : String.format(cnyLocale, "HK ¥ %.0f", $.getReleasePrice());
+                return Objects.isNull($.getReleasePriceJPY()) ? "HK ¥ " + TBD
+                        : String.format(cnyLocale, "HK ¥ %.0f", $.getReleasePriceJPY());
             } else {
 
-                return Objects.isNull($.getReleasePrice()) ? "¥ " + TBD
-                        : String.format(jpyLocale, "¥ %,.0f", $.getReleasePrice());
+                return Objects.isNull($.getReleasePriceJPY()) ? "¥ " + TBD
+                        : String.format(jpyLocale, "¥ %,.0f", $.getReleasePriceJPY());
 
             }
-        }).setHeader("Price").setSortable(true).setComparator(CharacterFigureView::getReleasePrice);
+        }).setHeader("Official Price (JPY)").setSortable(true).setComparator(CharacterFigureView::getReleasePriceJPY);
 
-        grid.addColumn($ -> Objects.nonNull($.getPreorderDate())
-                ? $.getPreorderDate().format($.isPreorderConfirmationDay() ? lStyle : sStyle)
-                : unknownDate($.getReleaseDate())).setHeader("Preorder Date").setSortable(true)
-                .setComparator(CharacterFigureView::getPreorderDate);
+        grid.addColumn($ -> Objects.nonNull($.getPreorderDateJPY())
+                ? $.getPreorderDateJPY().format($.isPreorderConfirmationDayJPY() ? lStyle : sStyle)
+                : unknownDate($.getReleaseDateJPY())).setHeader("Preorder Date").setSortable(true)
+                .setComparator(CharacterFigureView::getPreorderDateJPY);
 
-        grid.addColumn($ -> Objects.nonNull($.getReleaseDate())
-                ? $.getReleaseDate().format($.isReleaseConfirmationDay() ? lStyle : sStyle)
-                : TBD).setHeader("Release Date").setSortable(true).setComparator(CharacterFigureView::getReleaseDate);
-
-        grid.addColumn(CharacterFigureView::getLineUp).setHeader("Line Up").setFlexGrow(0).setSortable(true);
+        grid.addColumn($ -> Objects.nonNull($.getReleaseDateJPY())
+                ? $.getReleaseDateJPY().format($.isReleaseConfirmationDayJPY() ? lStyle : sStyle)
+                : TBD).setHeader("Release Date").setSortable(true)
+                .setComparator(CharacterFigureView::getReleaseDateJPY);
 
         grid.getColumns().forEach($ -> $.setAutoWidth(true));
-
         grid.asSingleSelect().addValueChangeListener(e -> editCharacter(e.getValue()));
     }
 

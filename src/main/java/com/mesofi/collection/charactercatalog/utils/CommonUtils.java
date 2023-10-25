@@ -81,7 +81,21 @@ public class CommonUtils {
      * @return A String or null if the input is null.
      */
     public static String toDate(final LocalDate value) {
-        return Objects.nonNull(value) ? value.format(getDateTimeFormatter()) : null;
+        return toDate(value, null);
+    }
+
+    public static String toDate(final LocalDate value, final Boolean monthYearOnly) {
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        if (Objects.isNull(monthYearOnly)) {
+            return value.format(getDateTimeFormatter());
+        }
+        if (monthYearOnly) {
+            return value.format(DateTimeFormatter.ofPattern("M/yyyy"));
+        } else {
+            return value.format(getDateTimeFormatter());
+        }
     }
 
     private static DateTimeFormatter getDateTimeFormatter() {

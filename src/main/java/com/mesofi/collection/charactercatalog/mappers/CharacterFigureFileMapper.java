@@ -83,7 +83,11 @@ public class CharacterFigureFileMapper {
     public Issuance createIssuance(Issuance issuance) {
         return Objects.nonNull(issuance)
                 ? createIssuance(toPrice(issuance.getBasePrice()), toDate(issuance.getFirstAnnouncementDate()),
-                        toDate(issuance.getPreorderDate()), toDate(issuance.getReleaseDate()))
+                        toDate(issuance.getPreorderDate(),
+                                Objects.isNull(issuance.getPreorderConfirmationDay()) ? null
+                                        : !issuance.getPreorderConfirmationDay()),
+                        toDate(issuance.getReleaseDate(), Objects.isNull(issuance.getReleaseConfirmationDay()) ? null
+                                : !issuance.getReleaseConfirmationDay()))
                 : null;
     }
 

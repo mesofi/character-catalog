@@ -3,6 +3,7 @@ package com.mesofi.collection.charactercatalog.views;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.Series;
@@ -14,26 +15,42 @@ import lombok.Setter;
 @Setter
 public class CharacterFigureView {
     private String id;
-    private String displayableName;
     private String originalName;
-    private String baseName; 
-    
+    private String baseName;
+    private String displayableName;
     private LineUp lineUp;
-    private Series series;
     private Group group;
-    
-    
-    
-    
-    
-    private BigDecimal releasePrice;
 
-    private LocalDate preorderDate;
-    private boolean preorderConfirmationDay;
-    private LocalDate releaseDate;
-    private boolean releaseConfirmationDay;
+    private BigDecimal basePriceJPY;
+    private BigDecimal releasePriceJPY;
+    private LocalDate firstAnnouncementDateJPY;
+    private LocalDate preorderDateJPY;
+    private boolean preorderConfirmationDayJPY;
+    private LocalDate releaseDateJPY;
+    private boolean releaseConfirmationDayJPY;
 
+    private BigDecimal basePriceMXN;
+    private BigDecimal releasePriceMXN;
+    private LocalDate firstAnnouncementDateMXN;
+    private LocalDate preorderDateMXN;
+    private boolean preorderConfirmationDayMXN;
+    private LocalDate releaseDateMXN;
+    private boolean releaseConfirmationDayMXN;
+
+    private Series series;
+    private Distribution distribution;
+    private String url;
+
+    private boolean metalBody;
+    private boolean oce;
+    private boolean revival;
+    private boolean plainCloth;
+    private boolean brokenCloth;
+    private boolean bronzeToGold;
+    private boolean gold;
     private boolean hongKongVersion;
-
-    
+    private boolean manga;
+    private boolean surplice;
+    private boolean set;
+    private String remarks;
 }

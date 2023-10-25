@@ -1,5 +1,8 @@
 package com.mesofi.collection.charactercatalog.views;
 
+import java.io.Serial;
+
+import com.mesofi.collection.charactercatalog.model.Distribution;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.Series;
@@ -9,17 +12,20 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import lombok.Getter;
 
-import java.io.Serial;
+import lombok.Getter;
 
 public class FigureForm extends FormLayout {
 
@@ -29,11 +35,46 @@ public class FigureForm extends FormLayout {
     Binder<CharacterFigureView> binder = new BeanValidationBinder<>(CharacterFigureView.class);
     CharacterFigureView characterFigureView;
 
-    TextField originalName = new TextField("Name");
-    TextField baseName = new TextField("Base Name");
+    TextField originalName = new TextField("Tamashii Name");
+    TextField baseName = new TextField("Name");
     ComboBox<LineUp> lineUp = new ComboBox<>("Line Up");
-    ComboBox<Series> series = new ComboBox<>("Series");
     ComboBox<Group> group = new ComboBox<>("Category");
+
+    TextField basePriceJPY = new TextField("Official Price (without taxes)");
+    DatePicker firstAnnouncementDateJPY = new DatePicker("First Announcement Date");
+    DatePicker preorderDateJPY = new DatePicker("Preorder Date");
+    Checkbox preorderConfirmationDayJPY = new Checkbox("Preorder Day confirmed?");
+    DatePicker releaseDateJPY = new DatePicker("Release Date");
+    Checkbox releaseConfirmationDayJPY = new Checkbox("Release Day confirmed?");
+    Details issuanceJPYDetails = new Details("(JPY) Pricing and Release Date", basePriceJPY, firstAnnouncementDateJPY,
+            preorderDateJPY, preorderConfirmationDayJPY, releaseDateJPY, releaseConfirmationDayJPY);
+
+    TextField basePriceMXN = new TextField("Official Price");
+    DatePicker preorderDateMXN = new DatePicker("Preorder Date");
+    Checkbox preorderConfirmationDayMXN = new Checkbox("Preorder Day confirmed?");
+    DatePicker releaseDateMXN = new DatePicker("Release Date");
+    Checkbox releaseConfirmationDayMXN = new Checkbox("Release Day confirmed?");
+    Details issuanceMXNDetails = new Details("(MXN) Pricing and Release Date", basePriceMXN, preorderDateMXN,
+            preorderConfirmationDayMXN, releaseDateMXN, releaseConfirmationDayMXN);
+
+    ComboBox<Series> series = new ComboBox<>("Series");
+    ComboBox<Distribution> distribution = new ComboBox<>("Distribution");
+    TextField url = new TextField("Tamashii URL");
+
+    Checkbox metalBody = new Checkbox("Metal Body");
+    Checkbox oce = new Checkbox("Original Color Edition");
+    Checkbox revival = new Checkbox("Revival");
+    Checkbox plainCloth = new Checkbox("Plain Cloth");
+    Checkbox brokenCloth = new Checkbox("Broke Cloth");
+    Checkbox bronzeToGold = new Checkbox("Bronze to Gold");
+    Checkbox gold = new Checkbox("Gold");
+    Checkbox hongKongVersion = new Checkbox("Hong Kong Version");
+    Checkbox manga = new Checkbox("Manga Version");
+    Checkbox surplice = new Checkbox("Surplice");
+    Checkbox set = new Checkbox("Part of a Set");
+    Details attributesDetails = new Details("Additional Attributes", metalBody, oce, revival, plainCloth, brokenCloth,
+            bronzeToGold, gold, hongKongVersion, manga, surplice, set);
+    TextArea remarks = new TextArea("Additional information");
 
     Button save = new Button("Save");
     Button delete = new Button("Delete");
@@ -52,7 +93,11 @@ public class FigureForm extends FormLayout {
         group.setItems(Group.values());
         group.setItemLabelGenerator(Group::getStringValue);
 
-        add(originalName, baseName, lineUp, series, group, createButtonLayout());
+        distribution.setItems(Distribution.values());
+        distribution.setItemLabelGenerator(Distribution::getStringValue);
+
+        add(originalName, baseName, lineUp, group, issuanceJPYDetails, issuanceMXNDetails, series, distribution, url,
+                attributesDetails, remarks, createButtonLayout());
     }
 
     public void setCharacterFigureView(CharacterFigureView characterFigureView) {

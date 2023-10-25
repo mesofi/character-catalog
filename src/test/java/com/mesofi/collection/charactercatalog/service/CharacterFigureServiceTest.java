@@ -803,7 +803,7 @@ public class CharacterFigureServiceTest {
         figure.setRevival(true);
         figure.setLineUp(LineUp.MYTH_CLOTH_EX);
         figure.setSeries(Series.SAINT_SEIYA);
-        when(modelMapper.toModel(any())).thenReturn(figure);
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(figure);
 
         CharacterFigure actual = service.updateExistingCharacter(id, updatedCharacter);
         assertNotNull(actual);
@@ -875,7 +875,7 @@ public class CharacterFigureServiceTest {
         characterFigure.setSeries(Series.SAINT_SEIYA);
         characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
 
-        when(modelMapper.toModel(any())).thenReturn(characterFigure);
+        when(modelMapper.toModel(any(CharacterFigureEntity.class))).thenReturn(characterFigure);
 
         // the tags do not exist
         CharacterFigure actual = service.updateTagsInCharacter(id, null);

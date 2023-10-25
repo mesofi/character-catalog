@@ -76,7 +76,7 @@ public class CharacterFigure extends Figure {
     private Integer anniversary; // Is it part of an anniversary?.
 
     @EqualsAndHashCode.Exclude
-    private List<RestockFigure> restocks; // used to stored the restocks.
+    private List<RestockFigure> restocks; // used to store the restocks.
 
     @EqualsAndHashCode.Exclude
     private Set<String> tags; // the list of tags associated to a character.

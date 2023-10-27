@@ -13,6 +13,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.mesofi.collection.charactercatalog.model.Figure;
+import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.RestockFigure;
@@ -52,12 +53,16 @@ public class CharacterFigureEntity extends Figure {
     private Integer anniversary;
     private List<RestockFigure> restocks;
     private Set<String> tags;
+    private List<GalleryImage> images;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         CharacterFigureEntity that = (CharacterFigureEntity) o;
         return Objects.equals(id, that.id);
     }

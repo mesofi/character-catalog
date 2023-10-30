@@ -69,6 +69,10 @@ public class CharacterFigureService {
     public static final String INVALID_IMAGE_URL = "Provide a non empty url for the image";
     public static final String INVALID_ORDER_NUMBER = "Provide positive value fo the order";
 
+    public static final String HOST_IMAGE_PREFIX = "https://imagizer.imageshack.com/v2/280x200q70/";
+    public static final String DEFAULT_JPG_EXT = ".jpg";
+    public static final String NO_IMAGE_URL = HOST_IMAGE_PREFIX + "923/3hbcya.png";
+
     public static final String TAG_EX = "ex";
     public static final String TAG_SOG = "soul,gold,god";
     public static final String TAG_REVIVAL = "revival";

@@ -2,8 +2,10 @@ package com.mesofi.collection.charactercatalog.views;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.mesofi.collection.charactercatalog.model.Distribution;
+import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.model.Series;
@@ -53,4 +55,6 @@ public class CharacterFigureView {
     private boolean surplice;
     private boolean set;
     private String remarks;
+
+    private List<GalleryImage> images;
 }

@@ -182,7 +182,7 @@ public class ListView extends VerticalLayout {
         Image image = new Image();
         image.setSrc(found.getUrl());
         image.setAlt(value.getDisplayableName());
-        image.setHeight(200, Unit.PIXELS);
+        image.setHeight(220, Unit.PIXELS);
         image.setWidth(200, Unit.PIXELS);
 
         return image;

@@ -66,7 +66,7 @@ public class FigureForm extends FormLayout {
     Checkbox oce = new Checkbox("Original Color Edition");
     Checkbox revival = new Checkbox("Revival");
     Checkbox plainCloth = new Checkbox("Plain Cloth");
-    Checkbox brokenCloth = new Checkbox("Broke Cloth");
+    Checkbox brokenCloth = new Checkbox("Broken Cloth");
     Checkbox bronzeToGold = new Checkbox("Bronze to Gold");
     Checkbox gold = new Checkbox("Gold");
     Checkbox hongKongVersion = new Checkbox("Hong Kong Version");

@@ -6,6 +6,7 @@
 package com.mesofi.collection.charactercatalog.mappers;
 
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.DEFAULT_JPG_EXT;
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.DEFAULT_PNG_EXT;
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.HOST_IMAGE_PREFIX;
 import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.NO_IMAGE_URL;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.isDayMonthYear;
@@ -134,8 +135,10 @@ public class CharacterFigureFileMapper {
     private String createImageShackUrl(String shortUrl) {
         if (StringUtils.hasText(shortUrl)) {
             String imageUrl = HOST_IMAGE_PREFIX + shortUrl;
-            if (!shortUrl.contains(DEFAULT_JPG_EXT)) {
-                imageUrl += DEFAULT_JPG_EXT;
+            if (!shortUrl.endsWith(DEFAULT_PNG_EXT)) {
+                if (!shortUrl.contains(DEFAULT_JPG_EXT)) {
+                    imageUrl += DEFAULT_JPG_EXT;
+                }
             }
             return imageUrl;
         } else {

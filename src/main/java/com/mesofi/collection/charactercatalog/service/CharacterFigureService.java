@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Figure;
+import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -63,6 +65,16 @@ public class CharacterFigureService {
     public static final String INVALID_BASE_NAME = "Provide a non empty base name";
     public static final String INVALID_GROUP = "Provide a valid group";
     public static final String INVALID_ID = "Provide a non empty character id";
+    public static final String INVALID_IMAGE_ID = "Provide a non empty image id";
+    public static final String INVALID_IMAGE_URL = "Provide a non empty url for the image";
+    public static final String INVALID_ORDER_NUMBER = "Provide positive value fo the order";
+
+    public static final String DEFAULT_JPG_EXT = ".jpg";
+    public static final String DEFAULT_PNG_EXT = ".png";
+    // public static final String HOST_IMAGE_SIZE = "320x240";
+    public static final String HOST_IMAGE_SIZE = "1024x768";
+    public static final String HOST_IMAGE_PREFIX = "https://imagizer.imageshack.com/v2/" + HOST_IMAGE_SIZE + "q70/";
+    public static final String NO_IMAGE_URL = HOST_IMAGE_PREFIX + "923/3hbcya.png";
 
     public static final String TAG_EX = "ex";
     public static final String TAG_SOG = "soul,gold,god";
@@ -74,7 +86,7 @@ public class CharacterFigureService {
     public static final String TAG_HK = "asia";
     public static final String TAG_BRONZE_TO_GOLD = "golden";
 
-    private CharacterFigureRepository repository;
+    private CharacterFigureRepository repo;
     private CharacterFigureModelMapper modelMapper;
     private CharacterFigureFileMapper fileMapper;
 
@@ -101,10 +113,10 @@ public class CharacterFigureService {
         List<CharacterFigureEntity> listEntities = convertStreamToEntityList(inputStream);
 
         // first, removes all the records.
-        repository.deleteAll();
+        repo.deleteAll();
 
         // performs a mapping and saves the records in the DB ...
-        long total = repository.saveAll(listEntities).size();
+        long total = repo.saveAll(listEntities).size();
 
         log.debug("Total of figures loaded correctly: {}", total);
         return total;
@@ -228,7 +240,7 @@ public class CharacterFigureService {
      */
     public List<CharacterFigure> retrieveAllCharacters() {
         // @formatter:off
-        List<CharacterFigure> figureList = repository.findAll(getSorting()).stream()
+        List<CharacterFigure> figureList = repo.findAll(getSorting()).stream()
                 .map(this::fromEntityToDisplayableFigure)
                 .toList();
         // @formatter:on
@@ -264,7 +276,7 @@ public class CharacterFigureService {
         }
 
         // @formatter:off
-        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         // @formatter:on
         calculatePriceAndDisplayableName(figure);
@@ -297,8 +309,8 @@ public class CharacterFigureService {
     private void calculateDisplayableName(final CharacterFigure figure) {
         // the displayable name is calculated here
         figure.setDisplayableName(calculateFigureDisplayableName(figure));
-        //figure.setOriginalName(null);
-        //figure.setBaseName(null);
+        // figure.setOriginalName(null);
+        // figure.setBaseName(null);
     }
 
     private BigDecimal calculateReleasePrice(final BigDecimal basePrice, final LocalDate releaseDate) {
@@ -403,7 +415,7 @@ public class CharacterFigureService {
         validateCharacterFigure(newCharacter);
 
         // check if the new figure is part of restocking, or it is a new one.
-        List<CharacterFigureEntity> existingFigures = repository.findAll(getSorting());
+        List<CharacterFigureEntity> existingFigures = repo.findAll(getSorting());
         log.debug("We found {} existing stored figures ...", existingFigures.size());
 
         // @formatter:off
@@ -421,15 +433,15 @@ public class CharacterFigureService {
             cf.setTags(addTags(cf.getTags(), newCharacter.getTags()));
 
             // once it's added as re-stocking, then it's updated in our DB.
-            repository.findById(cf.getId()).ifPresentOrElse(entity -> {
+            repo.findById(cf.getId()).ifPresentOrElse(entity -> {
                 entity.setRestocks(addRestock(entity.getRestocks(), newCharacter));
                 entity.setTags(addTags(entity.getTags(), newCharacter.getTags()));
-                repository.save(entity); // updates with the new re-stocking
+                repo.save(entity); // updates with the new re-stocking
                 log.debug("The new character has been added as restock of {}, id: {}", cf.getBaseName(), cf.getId());
             }, () -> log.warn("No restock has been added"));
         } else {
             // the new character is saved for the first time.
-            cf = modelMapper.toModel(repository.save(modelMapper.toEntity(newCharacter)));
+            cf = modelMapper.toModel(repo.save(modelMapper.toEntity(newCharacter)));
             log.debug("A new character has been saved with id: {}", cf.getId());
         }
         // finally the price and name is calculated here ...
@@ -496,7 +508,7 @@ public class CharacterFigureService {
         validateCharacterFigure(updatedCharacter);
         CharacterFigureEntity updatedCharacterEntity = modelMapper.toEntity(updatedCharacter);
 
-        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
 
         // update the entity ...
@@ -534,13 +546,13 @@ public class CharacterFigureService {
         }
 
         // the character is updated here.
-        repository.save(characterFigureEntity);
+        repo.save(characterFigureEntity);
         log.debug("Character has been updated correctly!");
 
         // retrieves the entity directly from the DB so that we can send to the
         // response...
         // @formatter:off
-        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         // @formatter:on
         calculatePriceAndDisplayableName(figure);
@@ -561,7 +573,7 @@ public class CharacterFigureService {
             throw new IllegalArgumentException(INVALID_ID);
         }
 
-        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
 
         if (Objects.nonNull(characterFigureEntity.getTags()) & Objects.nonNull(tags)) {
@@ -581,11 +593,11 @@ public class CharacterFigureService {
         }
 
         // update the tags.
-        repository.save(characterFigureEntity);
+        repo.save(characterFigureEntity);
         log.debug("Tags updated correctly!!!");
 
         // gets the character updated.
-        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         calculatePriceAndDisplayableName(figure);
         return figure;
@@ -604,18 +616,18 @@ public class CharacterFigureService {
             throw new IllegalArgumentException(INVALID_ID);
         }
 
-        CharacterFigureEntity characterFigureEntity = repository.findById(id)
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
 
         // deletes all the tags
         characterFigureEntity.setTags(null);
 
         // deletes the tags.
-        repository.save(characterFigureEntity);
+        repo.save(characterFigureEntity);
         log.debug("Tags deleted correctly!!!");
 
         // gets the character updated.
-        CharacterFigure figure = modelMapper.toModel(repository.findById(id)
+        CharacterFigure figure = modelMapper.toModel(repo.findById(id)
                 .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
         calculatePriceAndDisplayableName(figure);
         return figure;
@@ -680,5 +692,158 @@ public class CharacterFigureService {
         data.addAll(existingTags);
         data.addAll(newTags);
         return data;
+    }
+
+    /**
+     * Adds a new Image, and it is associated to an existing character.
+     * 
+     * @param id       Character identifier.
+     * @param newImage The new image to be associated to the character.
+     * @return The updated character.
+     */
+    public CharacterFigure addImage(@NonNull final String id, @NonNull final GalleryImage newImage) {
+        log.debug("Added a new image to character {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // performs some validations.
+        validateGalleryImage(newImage);
+
+        List<GalleryImage> images = characterFigureEntity.getImages();
+        if (Objects.isNull(images)) {
+            characterFigureEntity.setImages(new ArrayList<>());
+        }
+        newImage.setIdImage(UUID.randomUUID().toString());
+        images = characterFigureEntity.getImages();
+        if (images.isEmpty()) {
+            // a single image is added for the first time.
+            newImage.setCoverPhoto(true);
+            newImage.setOrder(1);
+        } else {
+            // there are existing images already stored.
+            // validates some elements of the images before adding one more image.
+            if (newImage.isCoverPhoto() && images.stream().anyMatch(GalleryImage::isCoverPhoto)) {
+                throw new IllegalArgumentException("Cannot add a new image with an existing cover photo");
+            }
+            // we cannot have the same order number in any of the existing images.
+            if (images.stream().anyMatch($ -> $.getOrder() == newImage.getOrder())) {
+                throw new IllegalArgumentException("Cannot add a new image with order: " + newImage.getOrder());
+            }
+        }
+
+        // add the new image first.
+        images.add(newImage);
+
+        // The character image is added.
+        repo.save(characterFigureEntity);
+        log.debug("A new image has been added to the existing character correctly!!! {}",
+                characterFigureEntity.getId());
+
+        // gets the character updated.
+        CharacterFigureEntity characterFigureEntityUpdated = repo.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+        CharacterFigure figure = modelMapper.toModel(characterFigureEntityUpdated);
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    /**
+     * Deletes an existing image from a character.
+     * 
+     * @param id      Character identifier.
+     * @param idImage Image identifier.
+     * @return The updated character.
+     */
+    public CharacterFigure deleteImage(@NonNull final String id, @NonNull final String idImage) {
+        log.debug("Deleting image: {}, from character: {}", idImage, id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+        if (!StringUtils.hasText(idImage)) {
+            throw new IllegalArgumentException(INVALID_IMAGE_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        GalleryImage galleryImage = Optional.ofNullable(characterFigureEntity.getImages())
+                .orElseThrow(() -> new IllegalArgumentException("No images available for this character")).stream()
+                .filter($ -> $.getIdImage().equals(idImage)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No image found for a given id: " + idImage));
+        // remove the image ...
+        characterFigureEntity.getImages().remove(galleryImage);
+
+        if (characterFigureEntity.getImages().isEmpty()) {
+            characterFigureEntity.setImages(null);
+        }
+
+        return deleteAndUpdateCharacterImages(characterFigureEntity, id);
+    }
+
+    /**
+     * Deletes all existing images from a given character.
+     * 
+     * @param id Identifier of the character.
+     * @return The updated images.
+     */
+    public CharacterFigure deleteImages(@NonNull final String id) {
+        log.debug("Deleting all images from character: {}", id);
+
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException(INVALID_ID);
+        }
+
+        CharacterFigureEntity characterFigureEntity = repo.findById(id)
+                .orElseThrow(() -> new CharacterFigureNotFoundException("Character not found with id: " + id));
+
+        // remove the images...
+        characterFigureEntity.setImages(null);
+
+        return deleteAndUpdateCharacterImages(characterFigureEntity, id);
+    }
+
+    /**
+     * Deletes and update the character image.
+     * 
+     * @param characterFigureEntity The actual entity.
+     * @param id                    Unique identifier.
+     * @return The updated character.
+     */
+    private CharacterFigure deleteAndUpdateCharacterImages(CharacterFigureEntity characterFigureEntity, String id) {
+        // The character image is deleted.
+        repo.save(characterFigureEntity);
+        log.debug("The existing character image was deleted correctly!!! {}", characterFigureEntity.getId());
+
+        final String MSG = "Character not found with id: " + id;
+
+        // gets the character updated.
+        CharacterFigureEntity updated = repo.findById(id).orElseThrow(() -> new CharacterFigureNotFoundException(MSG));
+        CharacterFigure figure = modelMapper.toModel(updated);
+        calculatePriceAndDisplayableName(figure);
+        return figure;
+    }
+
+    /**
+     * This method is used to validate a image object.
+     *
+     * @param image The Image to be validated.
+     */
+    private void validateGalleryImage(final GalleryImage image) {
+        // make sure the required fields are there...
+        if (Objects.isNull(image)) {
+            throw new IllegalArgumentException("Provide a valid image");
+        }
+        if (!StringUtils.hasText(image.getUrl())) {
+            throw new IllegalArgumentException(INVALID_IMAGE_URL);
+        }
+        if (image.getOrder() <= 0) {
+            throw new IllegalArgumentException(INVALID_ORDER_NUMBER);
+        }
     }
 }

@@ -155,6 +155,18 @@ public class CommonUtils {
     }
 
     /**
+     * Gets a list of elements based on a comma separated string.
+     * 
+     * @param value String value to be parsed to list.
+     * @return A null value if the input String is empty.
+     */
+    public static List<String> toListValue(final String value) {
+        return StringUtils.hasText(value)
+                ? Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toList())
+                : null;
+    }
+
+    /**
      * Test if the value passed in represents a date compound of year, month and
      * day.
      * 

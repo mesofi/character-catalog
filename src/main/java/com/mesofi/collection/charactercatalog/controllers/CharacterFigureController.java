@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 import com.mesofi.collection.charactercatalog.service.CharacterFinderService;
 
@@ -138,5 +139,43 @@ public class CharacterFigureController {
     public CharacterFigure deleteAllTagsInCharacter(@PathVariable String id) {
         log.debug("Deleting all the existing tags for character: {}", id);
         return characterFigureService.deleteAllTagsInCharacter(id);
+    }
+
+    /**
+     * Adds a new image to an existing character.
+     * 
+     * @param id           The character unique identifier.
+     * @param galleryImage The image to be added.
+     * @return The updated character with the new image.
+     */
+    @PostMapping("/{id}/images")
+    public CharacterFigure addImage(@PathVariable String id, @Valid @RequestBody GalleryImage galleryImage) {
+        log.debug("Creating a new image associated to this character: {} ...", id);
+        return characterFigureService.addImage(id, galleryImage);
+    }
+
+    /**
+     * Deletes an existing image from a character.
+     * 
+     * @param id      The unique identifier.
+     * @param idImage The identifier of the image.
+     * @return The updated character with the new image.
+     */
+    @DeleteMapping("/{id}/images/{idImage}")
+    public CharacterFigure deleteImage(@PathVariable String id, @PathVariable String idImage) {
+        log.debug("Deleting existing image from character: {}", id);
+        return characterFigureService.deleteImage(id, idImage);
+    }
+
+    /**
+     * Deletes all existing images from a character.
+     * 
+     * @param id The unique identifier.
+     * @return The updated character with the new image.
+     */
+    @DeleteMapping("/{id}/images")
+    public CharacterFigure deleteAllImages(@PathVariable String id) {
+        log.debug("Deleting all existing images from character: {}", id);
+        return characterFigureService.deleteImages(id);
     }
 }

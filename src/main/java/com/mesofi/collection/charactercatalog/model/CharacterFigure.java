@@ -80,4 +80,7 @@ public class CharacterFigure extends Figure {
 
     @EqualsAndHashCode.Exclude
     private Set<String> tags; // the list of tags associated to a character.
+
+    @EqualsAndHashCode.Exclude
+    private List<GalleryImage> images; // list of images associated to this character.
 }

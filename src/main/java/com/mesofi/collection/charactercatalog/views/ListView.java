@@ -1,19 +1,26 @@
 package com.mesofi.collection.charactercatalog.views;
 
+import static com.mesofi.collection.charactercatalog.service.CharacterFigureService.NO_IMAGE_URL;
+
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
+import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.model.LineUp;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -125,7 +132,9 @@ public class ListView extends VerticalLayout {
         // grid.addClassName("figure-grid-class");
         grid.setSizeFull();
 
-        this.grid.addColumn(CharacterFigureView::getDisplayableName).setHeader("Name").setFlexGrow(0).setSortable(true)
+        grid.addComponentColumn(this::getCoverPhoto).setTooltipGenerator(CharacterFigureView::getDisplayableName)
+                .setTextAlign(ColumnTextAlign.CENTER).setHeader("Name").setFlexGrow(0).setSortable(true)
+                .setComparator(CharacterFigureView::getDisplayableName)
                 .setFooter(String.format("%d total, %d MC EX, %d MC, %d DD, %d App, %d Crown, %d LOS, %d Figuarts",
                         items.size(), items.stream().filter($ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX).count(),
                         items.stream().filter($ -> $.getLineUp() == LineUp.MYTH_CLOTH).count(),
@@ -139,13 +148,13 @@ public class ListView extends VerticalLayout {
 
         Locale jpyLocale = new Locale("jp", "JP");
         Locale cnyLocale = new Locale("cn", "CN");
-        this.grid.addColumn($ -> {
+        grid.addColumn($ -> {
             if ($.isHongKongVersion()) {
-                return Objects.isNull($.getReleasePriceJPY()) ? "HK ¥ " + TBD
+                return Objects.isNull($.getReleasePriceJPY()) ? TBD
                         : String.format(cnyLocale, "HK ¥ %.0f", $.getReleasePriceJPY());
             } else {
 
-                return Objects.isNull($.getReleasePriceJPY()) ? "¥ " + TBD
+                return Objects.isNull($.getReleasePriceJPY()) ? TBD
                         : String.format(jpyLocale, "¥ %,.0f", $.getReleasePriceJPY());
 
             }
@@ -163,6 +172,22 @@ public class ListView extends VerticalLayout {
 
         grid.getColumns().forEach($ -> $.setAutoWidth(true));
         grid.asSingleSelect().addValueChangeListener(e -> editCharacter(e.getValue()));
+    }
+
+    private Image getCoverPhoto(CharacterFigureView value) {
+        GalleryImage found = Optional.ofNullable(value.getImages()).orElseGet(ArrayList::new).stream()
+                .filter(GalleryImage::isCoverPhoto).findFirst().orElseGet(() -> {
+                    GalleryImage other = new GalleryImage();
+                    other.setUrl(NO_IMAGE_URL);
+                    return other;
+                });
+        Image image = new Image();
+        image.setSrc(found.getUrl());
+        image.setAlt(value.getDisplayableName());
+        // image.setHeight(220, Unit.PIXELS);
+        // image.setWidth(200, Unit.PIXELS);
+
+        return image;
     }
 
     private void editCharacter(CharacterFigureView value) {

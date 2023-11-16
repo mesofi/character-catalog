@@ -71,8 +71,7 @@ public class CharacterFigureService {
 
     public static final String DEFAULT_JPG_EXT = ".jpg";
     public static final String DEFAULT_PNG_EXT = ".png";
-    // public static final String HOST_IMAGE_SIZE = "320x240";
-    public static final String HOST_IMAGE_SIZE = "1024x768";
+    public static final String HOST_IMAGE_SIZE = "320x240";
     public static final String HOST_IMAGE_PREFIX = "https://imagizer.imageshack.com/v2/" + HOST_IMAGE_SIZE + "q70/";
     public static final String NO_IMAGE_URL = HOST_IMAGE_PREFIX + "923/3hbcya.png";
 

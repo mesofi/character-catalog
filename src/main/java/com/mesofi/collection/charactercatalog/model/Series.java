@@ -21,7 +21,8 @@ public enum Series {
     SOG("Soul of Gold"),
     LEGEND("Legend Of Sanctuary"),
     OMEGA("Omega"),
-    LOST_CANVAS("Lost Canvas");
+    LOST_CANVAS("Lost Canvas"),
+    THE_BEGINNING("Saint Seiya The Beginning");
     // @formatter:on
 
     private final String stringValue;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas, Sep 19, 2023.
+ * Armando Rivas Arzaluz, Nov 24, 2023.
  */
 package com.mesofi.collection.charactercatalog.model;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 /**
  * The Group enum.
- *
+ * 
  * @author armandorivasarzaluz
  */
 @Getter
@@ -28,20 +28,16 @@ public enum Group {
     GOLD("Gold Saint"),
     ROBE("God Robe"),
     SCALE("Poseidon Scale"),
-    SURPLICE("Saint Surplice"),
+    SURPLICE("Surplice Saint"),
     SPECTER("Specter"),
     JUDGE("Judge"),
     GOD("God"),
     OTHER("-");
     // @formatter:on
 
-    private final String stringValue;
+    private final String description;
 
-    Group(String friendlyName) {
-        this.stringValue = friendlyName;
-    }
-
-    public String toString() {
-        return this.stringValue;
+    Group(final String description) {
+        this.description = description;
     }
 }

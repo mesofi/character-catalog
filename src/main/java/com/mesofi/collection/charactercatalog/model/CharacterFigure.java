@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas, Sep 19, 2023.
+ * Armando Rivas Arzaluz, Nov 27, 2023.
  */
 package com.mesofi.collection.charactercatalog.model;
 
@@ -20,8 +20,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * The actual value object used to hold the info.
- *
+ * The actual value object used to hold the character info.
+ * 
  * @author armandorivasarzaluz
  */
 @Getter
@@ -75,12 +75,13 @@ public class CharacterFigure extends Figure {
 
     private Integer anniversary; // Is it part of an anniversary?.
 
-    @EqualsAndHashCode.Exclude
-    private List<RestockFigure> restocks; // used to store the restocks.
+    // @EqualsAndHashCode.Exclude
+    // private List<RestockFigure> restocks; // used to store the restocks.
 
     @EqualsAndHashCode.Exclude
     private Set<String> tags; // the list of tags associated to a character.
 
     @EqualsAndHashCode.Exclude
     private List<GalleryImage> images; // list of images associated to this character.
+
 }

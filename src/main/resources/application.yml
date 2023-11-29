@@ -1,8 +1,0 @@
-logging:
-  level:
-    org.springframework: INFO
-    com.mesofi: DEBUG
-
-server:
-  servlet:
-    context-path: /api

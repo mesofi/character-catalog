@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas, Oct 26, 2023.
+ * Armando Rivas Arzaluz, Nov 27, 2023.
  */
 package com.mesofi.collection.charactercatalog.model;
 
@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Common properties.
- *
+ * The image properties.
+ * 
  * @author armandorivasarzaluz
  */
 @Getter

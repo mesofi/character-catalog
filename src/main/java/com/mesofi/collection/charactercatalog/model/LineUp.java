@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas, Sep 19, 2023.
+ * Armando Rivas Arzaluz, Nov 23, 2023.
  */
 package com.mesofi.collection.charactercatalog.model;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 /**
  * The LineUp enum.
- *
+ * 
  * @author armandorivasarzaluz
  */
 @Getter
@@ -25,13 +25,9 @@ public enum LineUp {
     FIGUARTS("Figuarts");
     // @formatter:on
 
-    private final String stringValue;
+    private final String description;
 
-    LineUp(String friendlyName) {
-        this.stringValue = friendlyName;
-    }
-
-    public String toString() {
-        return this.stringValue;
+    LineUp(final String description) {
+        this.description = description;
     }
 }

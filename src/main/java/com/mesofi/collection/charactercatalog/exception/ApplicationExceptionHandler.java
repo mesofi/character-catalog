@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestControllerAdvice
-public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler{
+public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * {@inheritDoc}
      */
@@ -78,7 +78,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler{
     }
 
     @ExceptionHandler(value = { RuntimeException.class })
-    protected ResponseEntity<Object> handleNotFoundc(RuntimeException ex, final WebRequest request) {
+    protected ResponseEntity<Object> handleGenericError(RuntimeException ex, final WebRequest request) {
         log.debug("Unhandle exception ...");
 
         ApiErrorResponse body = new ApiErrorResponse();

@@ -62,7 +62,6 @@ public class GalleryImageTest {
         assertEquals(galleryImage, otherGalleryImage);
     }
 
-    @SuppressWarnings("unlikely-arg-type")
     @Test
     public void should_verify_equality_2() {
         assertNotEquals("", galleryImage);

@@ -5,7 +5,10 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
@@ -60,7 +63,6 @@ public class FigureTest {
         assertEquals("No comments", mockFigure.getRemarks());
     }
 
-    @SuppressWarnings("unlikely-arg-type")
     @Test
     public void should_verify_equality() {
         MockFigure mockFigure1 = new MockFigure();

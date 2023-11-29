@@ -5,12 +5,14 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
  * @author armandorivasarzaluz
  */
+@Service
 public class CharacterFigureService {
 
     public static final String INVALID_BASE_NAME = "Provide a non empty base name";

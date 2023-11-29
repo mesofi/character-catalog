@@ -117,4 +117,58 @@ public class ApplicationExceptionHandlerTest {
         treeSet.add("field: default, objectName: null");
         assertEquals(treeSet.toString(), expectedErrors.toString());
     }
+
+    /**
+     * {@link ApplicationExceptionHandler#handleNotFound(CharacterFigureNotFoundException, WebRequest)}
+     */
+    @Test
+    public void should_verify_response_for_handle_not_found() {
+        CharacterFigureNotFoundException ex = new CharacterFigureNotFoundException("Character not found");
+        ResponseEntity<Object> response = exceptionHandler.handleNotFound(ex, webRequest);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+
+        ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
+
+        assertNotNull(response);
+        assertNotNull(apiErrorResponse);
+        assertEquals("Character not found", apiErrorResponse.getMessage());
+    }
+
+    /**
+     * {@link ApplicationExceptionHandler#handleBadRequest(RuntimeException, WebRequest)}
+     */
+    @Test
+    public void should_verify_response_for_handle_bad_request() {
+        IllegalArgumentException ex = new IllegalArgumentException("Character missing");
+        ResponseEntity<Object> response = exceptionHandler.handleBadRequest(ex, webRequest);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+
+        ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
+
+        assertNotNull(response);
+        assertNotNull(apiErrorResponse);
+        assertEquals("Character missing", apiErrorResponse.getMessage());
+    }
+
+    /**
+     * {@link ApplicationExceptionHandler#handleGenericError(RuntimeException, WebRequest)}
+     */
+    @Test
+    public void should_verify_response_for_handle_generic_error() {
+        RuntimeException ex = new RuntimeException("Unknown error");
+        ResponseEntity<Object> response = exceptionHandler.handleGenericError(ex, webRequest);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+
+        ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
+
+        assertNotNull(response);
+        assertNotNull(apiErrorResponse);
+        assertEquals("Unknown error", apiErrorResponse.getMessage());
+    }
 }

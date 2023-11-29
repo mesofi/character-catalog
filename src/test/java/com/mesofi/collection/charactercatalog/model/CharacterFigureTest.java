@@ -7,6 +7,7 @@ package com.mesofi.collection.charactercatalog.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -95,19 +96,19 @@ public class CharacterFigureTest {
     @Test
     public void should_verify_equality_1() {
         CharacterFigure otherCharacterFigure = characterFigure;
-        assertTrue(characterFigure.equals(otherCharacterFigure));
+        assertEquals(characterFigure, otherCharacterFigure);
     }
 
     @SuppressWarnings("unlikely-arg-type")
     @Test
     public void should_verify_equality_2() {
-        assertFalse(characterFigure.equals(""));
+        assertNotEquals("", characterFigure);
     }
 
     @Test
     public void should_verify_equality_3() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(false);
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -117,7 +118,7 @@ public class CharacterFigureTest {
         when(characterFigureMock.isMetalBody()).thenReturn(false);
         characterFigure.setMetalBody(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -130,7 +131,7 @@ public class CharacterFigureTest {
         characterFigure.setMetalBody(true);
         characterFigure.setOce(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -145,7 +146,7 @@ public class CharacterFigureTest {
         characterFigure.setOce(true);
         characterFigure.setRevival(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -162,7 +163,7 @@ public class CharacterFigureTest {
         characterFigure.setRevival(true);
         characterFigure.setPlainCloth(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -181,7 +182,7 @@ public class CharacterFigureTest {
         characterFigure.setPlainCloth(true);
         characterFigure.setBronzeToGold(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -202,7 +203,7 @@ public class CharacterFigureTest {
         characterFigure.setBronzeToGold(true);
         characterFigure.setGold(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -225,7 +226,7 @@ public class CharacterFigureTest {
         characterFigure.setGold(true);
         characterFigure.setHongKongVersion(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -250,7 +251,7 @@ public class CharacterFigureTest {
         characterFigure.setHongKongVersion(true);
         characterFigure.setManga(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -277,7 +278,7 @@ public class CharacterFigureTest {
         characterFigure.setManga(true);
         characterFigure.setSurplice(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -304,7 +305,7 @@ public class CharacterFigureTest {
         characterFigure.setManga(true);
         characterFigure.setSurplice(true);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -333,7 +334,7 @@ public class CharacterFigureTest {
         characterFigure.setSurplice(true);
         characterFigure.setAnniversary(20);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -362,7 +363,7 @@ public class CharacterFigureTest {
         characterFigure.setSurplice(true);
         characterFigure.setAnniversary(20);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -393,7 +394,7 @@ public class CharacterFigureTest {
         characterFigure.setAnniversary(null);
         characterFigure.setBaseName("Seiya");
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -424,7 +425,7 @@ public class CharacterFigureTest {
         characterFigure.setAnniversary(null);
         characterFigure.setBaseName("Shiryu");
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -455,7 +456,7 @@ public class CharacterFigureTest {
         characterFigure.setAnniversary(null);
         characterFigure.setBaseName(null);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -488,7 +489,7 @@ public class CharacterFigureTest {
         characterFigure.setBaseName(null);
         characterFigure.setLineUp(LineUp.CROWN);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -521,7 +522,7 @@ public class CharacterFigureTest {
         characterFigure.setBaseName(null);
         characterFigure.setLineUp(null);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -554,7 +555,7 @@ public class CharacterFigureTest {
         characterFigure.setBaseName(null);
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -589,7 +590,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setSeries(Series.SAINT_SEIYA);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -624,7 +625,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setSeries(Series.SAINT_SEIYA);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -659,7 +660,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setSeries(null);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -695,7 +696,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setGroup(Group.BLACK);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -731,7 +732,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setGroup(null);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -767,7 +768,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setGroup(Group.BLACK);
 
-        assertFalse(characterFigure.equals(characterFigureMock));
+        assertNotEquals(characterFigure, characterFigureMock);
     }
 
     @Test
@@ -803,7 +804,7 @@ public class CharacterFigureTest {
         characterFigure.setLineUp(LineUp.MYTH_CLOTH);
         characterFigure.setGroup(Group.GOD);
 
-        assertTrue(characterFigure.equals(characterFigureMock));
+        assertEquals(characterFigure, characterFigureMock);
     }
 
     @Test

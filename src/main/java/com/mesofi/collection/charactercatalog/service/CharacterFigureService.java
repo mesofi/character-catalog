@@ -5,6 +5,8 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 /**
  * 
  * @author armandorivasarzaluz
@@ -33,5 +35,15 @@ public class CharacterFigureService {
     public static final String TAG_OCE = "oce,original,color";
     public static final String TAG_HK = "asia";
     public static final String TAG_BRONZE_TO_GOLD = "golden";
+
+    /**
+     * Loads all the characters.
+     * 
+     * @param file The reference to the file with all the records.
+     * @return The total of records loaded.
+     */
+    public long loadAllCharacters(MultipartFile file) {
+        return 0;
+    }
 
 }

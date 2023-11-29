@@ -5,9 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
@@ -69,14 +67,14 @@ public class FigureTest {
         MockFigure mockFigure2 = new MockFigure();
         MockFigure mockFigure3 = mockFigure2;
 
-        assertTrue(mockFigure2.equals(mockFigure3));
-        assertFalse(mockFigure1.equals(""));
+        assertEquals(mockFigure2, mockFigure3);
+        assertNotEquals("", mockFigure1);
 
         when(figure.canEqual(mockFigure1)).thenReturn(true);
-        assertTrue(mockFigure1.equals(figure));
+        assertEquals(mockFigure1, figure);
 
         when(figure.canEqual(mockFigure1)).thenReturn(false);
-        assertFalse(mockFigure1.equals(figure));
+        assertNotEquals(mockFigure1, figure);
     }
 
     @Test

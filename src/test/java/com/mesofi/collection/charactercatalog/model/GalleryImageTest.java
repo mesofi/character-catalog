@@ -7,6 +7,7 @@ package com.mesofi.collection.charactercatalog.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -58,27 +59,27 @@ public class GalleryImageTest {
     @Test
     public void should_verify_equality_1() {
         GalleryImage otherGalleryImage = galleryImage;
-        assertTrue(galleryImage.equals(otherGalleryImage));
+        assertEquals(galleryImage, otherGalleryImage);
     }
 
     @SuppressWarnings("unlikely-arg-type")
     @Test
     public void should_verify_equality_2() {
-        assertFalse(galleryImage.equals(""));
+        assertNotEquals("", galleryImage);
     }
 
     @Test
     public void should_verify_equality_3() {
         when(galleryImageMock.canEqual(galleryImage)).thenReturn(false);
-        assertFalse(galleryImage.equals(galleryImageMock));
+        assertNotEquals(galleryImage, galleryImageMock);
     }
 
     @Test
     public void should_verify_equality_4() {
         when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
         when(galleryImageMock.getIdImage()).thenReturn("idImage1");
-        
-        assertFalse(galleryImage.equals(galleryImageMock));
+
+        assertNotEquals(galleryImage, galleryImageMock);
     }
 
     @Test
@@ -88,7 +89,7 @@ public class GalleryImageTest {
         galleryImage.setIdImage("idImage2");
         when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-        assertFalse(galleryImage.equals(galleryImageMock));
+        assertNotEquals(galleryImage, galleryImageMock);
     }
 
     @Test
@@ -100,7 +101,7 @@ public class GalleryImageTest {
 
         when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        assertFalse(galleryImage.equals(galleryImageMock));
+        assertNotEquals(galleryImage, galleryImageMock);
     }
 
     @Test
@@ -113,7 +114,7 @@ public class GalleryImageTest {
         galleryImage.setUrl("idUrl2");
         when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        assertFalse(galleryImage.equals(galleryImageMock));
+        assertNotEquals(galleryImage, galleryImageMock);
     }
 
     @Test
@@ -126,7 +127,7 @@ public class GalleryImageTest {
         galleryImage.setUrl("idUrl1");
         when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        assertTrue(galleryImage.equals(galleryImageMock));
+        assertEquals(galleryImage, galleryImageMock);
     }
 
     @Test

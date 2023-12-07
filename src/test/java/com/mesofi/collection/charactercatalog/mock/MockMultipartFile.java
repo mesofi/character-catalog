@@ -5,10 +5,12 @@
  */
 package com.mesofi.collection.charactercatalog.mock;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -18,51 +20,55 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class MockMultipartFile implements MultipartFile {
 
+    private boolean throwError;
+    private byte[] content;
+
+    public MockMultipartFile(boolean throwError, @Nullable byte[] content) {
+        this.throwError = throwError;
+        this.content = content;
+    }
+
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getOriginalFilename() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getContentType() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public long getSize() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public byte[] getBytes() throws IOException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        throw new IOException("Some error");
+        if (throwError) {
+            throw new IOException("Some error");
+        } else {
+            return new ByteArrayInputStream(content);
+        }
     }
 
     @Override
     public void transferTo(File dest) throws IOException, IllegalStateException {
-        // TODO Auto-generated method stub
 
     }
-
 }

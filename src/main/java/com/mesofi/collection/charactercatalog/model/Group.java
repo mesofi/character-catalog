@@ -40,4 +40,12 @@ public enum Group {
     Group(final String description) {
         this.description = description;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return description;
+    }
 }

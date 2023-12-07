@@ -29,4 +29,12 @@ public enum Distribution {
     Distribution(final String description) {
         this.description = description;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return description;
+    }
 }

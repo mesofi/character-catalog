@@ -25,5 +25,12 @@ public class DistributionTest {
         assertEquals("Tamashii Nations", Distribution.TAMASHII_NATIONS.getDescription());
         assertEquals("Tamashii Store", Distribution.TAMASHII_STORE.getDescription());
         assertEquals("Other Limited Edition", Distribution.OTHER.getDescription());
+
+        assertEquals("Stores", Distribution.STORES.toString());
+        assertEquals("Tamashii Web Shop", Distribution.TAMASHII_WEB_SHOP.toString());
+        assertEquals("Tamashii World Tour", Distribution.TAMASHII_WORLD_TOUR.toString());
+        assertEquals("Tamashii Nations", Distribution.TAMASHII_NATIONS.toString());
+        assertEquals("Tamashii Store", Distribution.TAMASHII_STORE.toString());
+        assertEquals("Other Limited Edition", Distribution.OTHER.toString());
     }
 }

@@ -30,4 +30,12 @@ public enum Series {
     Series(final String description) {
         this.description = description;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return description;
+    }
 }

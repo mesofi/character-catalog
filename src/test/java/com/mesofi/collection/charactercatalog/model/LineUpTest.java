@@ -18,5 +18,13 @@ public class LineUpTest {
         assertEquals("Saint Cloth Legend", LineUp.LEGEND.getDescription());
         assertEquals("DD Panoramation", LineUp.DDP.getDescription());
         assertEquals("Figuarts", LineUp.FIGUARTS.getDescription());
+
+        assertEquals("Myth Cloth", LineUp.MYTH_CLOTH.toString());
+        assertEquals("Myth Cloth EX", LineUp.MYTH_CLOTH_EX.toString());
+        assertEquals("Appendix", LineUp.APPENDIX.toString());
+        assertEquals("Saint Cloth Crown", LineUp.CROWN.toString());
+        assertEquals("Saint Cloth Legend", LineUp.LEGEND.toString());
+        assertEquals("DD Panoramation", LineUp.DDP.toString());
+        assertEquals("Figuarts", LineUp.FIGUARTS.toString());
     }
 }

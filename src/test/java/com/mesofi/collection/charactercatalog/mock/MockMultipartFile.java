@@ -23,6 +23,10 @@ public class MockMultipartFile implements MultipartFile {
     private boolean throwError;
     private byte[] content;
 
+    public MockMultipartFile(@Nullable byte[] content) {
+        this(false, content);
+    }
+
     public MockMultipartFile(boolean throwError, @Nullable byte[] content) {
         this.throwError = throwError;
         this.content = content;

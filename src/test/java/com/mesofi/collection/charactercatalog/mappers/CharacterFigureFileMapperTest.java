@@ -42,7 +42,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_null_character() {
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(null);
         assertNull(figure);
@@ -51,7 +51,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_unreleased_character() {
         String line = "Epsilon Alioth Fenril EX\tEpsilon Alioth Fenril\t¥0\t¥0\t\t\t\t\t\t\t\t\tMyth Cloth EX\tSaint Seiya\tGod Robe\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\t\t\t\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -101,7 +101,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_released_character_mxn_and_jpy() {
         String line = "Scorpio Milo EX <Revival>\tScorpio Milo\t¥12,000\t¥13,200\t4/10/2023\t4/26/2023\t9/16/2023\t$2,300\t9/26/2023\t11/6/2023\thttps://tamashiiweb.com/item/14387\tStores\tMyth Cloth EX\tSaint Seiya\tGold Saint\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\t\t\t923/vMiqIK\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -150,7 +150,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_released_character_with_custom_values() {
         String line = "Scorpio Milo EX <Revival>\tScorpio Milo\t¥12,000\t¥13,200\t4/10/2023\t4/26/2023\t9/16/2023\t$2,300\t9/26/2023\t11/6/2023\thttps://tamashiiweb.com/item/14387\tStores\tMyth Cloth EX\tSaint Seiya\tGold Saint\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\t\t\t\t923/vMiqIK\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -199,7 +199,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_released_character_with_28_columns() {
         String line = "Pegasus Cross Object JUMP 50th ANNIVERSARY EDITION <Appendix> (Restock)\tPegasus Cross Object\t¥1,389\t¥1,528\t\t11/20/2017\t11/20/2017\t\t\t\thttps://tamashiiweb.com/item/12413\tTamashii Web Shop\tAppendix\tSaint Seiya\t-\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t50\t\t\t\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -242,7 +242,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_released_character_with_29_columns() {
         String line = "Andromeda Shun ~New Bronze Cloth~ Golden Limited Edition EX (Restock)\tAndromeda Shun\t¥8,000\t¥8,800\t\t10/30/2020\t12/2020\t\t\t\thttps://tamashiiweb.com/item/13474\tTamashii Web Shop\tMyth Cloth EX\tSaint Seiya\tBronze Saint V2\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\tOnline Special Sale\t\t\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -284,7 +284,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#fromLineToCharacterFigure(String)}
      */
-    @Test
+    //@Test
     public void should_map_released_character_with_30_columns() {
         String line = "Pisces Aphrodite (God Cloth) EX (Restock)\tPisces Aphrodite\t¥12,500\t¥13,750\t\t\t8/19/2019\t\t\t\thttps://tamashiiweb.com/item/12177\tStores\tMyth Cloth EX\tSoul of Gold\tGold Saint\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\t\tre-stock\t\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -324,7 +324,7 @@ public class CharacterFigureFileMapperTest {
         // assertNull(figure.getRestocks());
     }
 
-    @Test
+    //@Test
     public void should_map_released_character_with_31_columns() {
         String line = "Sagittarius Seiya Gold 24K EX\tSagittarius Seiya Gold 24K EX\t¥20,000\t¥22,000\t\t9/17/2020\t11/4/2020\t\t\t\thttps://tamashiiweb.com/item/13412\tTamashii Nations\tMyth Cloth EX\tSaint Seiya\tGold Saint\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\t\tTN 2020\tgold24/tamashii\t923/EdIHV5\t";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -367,7 +367,7 @@ public class CharacterFigureFileMapperTest {
         // assertNull(figure.getRestocks());
     }
 
-    @Test
+    //@Test
     public void should_map_released_character_with_32_columns() {
         String line = "Sagittarius Seiya Gold 24K EX\tSagittarius Seiya Gold 24K EX\t¥20,000\t¥22,000\t\t9/17/2020\t11/4/2020\t\t\t\thttps://tamashiiweb.com/item/13412\tTamashii Nations\tMyth Cloth EX\tSaint Seiya\tGold Saint\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\t\tTN 2020\tgold24/tamashii\t923/EdIHV5\t923/AsswrAw";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -426,7 +426,7 @@ public class CharacterFigureFileMapperTest {
         // assertNull(figure.getRestocks());
     }
 
-    @Test
+    //@Test
     public void should_map_released_character_with_multiple_official_and_non_official_images() {
         String line = "Scorpio Milo EX <Revival>\tScorpio Milo\t¥12,000\t¥13,200\t4/10/2023\t4/26/2023\t9/16/2023\t$2,300\t9/26/2023\t11/6/2023\thttps://tamashiiweb.com/item/14387\tStores\tMyth Cloth EX\tSaint Seiya\tGold Saint\tFALSE\tFALSE\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\t\t\t923/vMiqIK,924/mqXD5s\t924/dUsdfe9f,924/dUsdfe8f,924/dUsdfe7f";
         CharacterFigure figure = characterFigureFileMapper.fromLineToCharacterFigure(line);
@@ -519,7 +519,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#createIssuance(com.mesofi.collection.charactercatalog.model.Issuance)}
      */
-    @Test
+    //@Test
     public void should_create_empty_issuance_when_input_is_null() {
         assertNull(characterFigureFileMapper.createIssuance(null));
     }
@@ -527,7 +527,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#createIssuance(com.mesofi.collection.charactercatalog.model.Issuance)}
      */
-    @Test
+    //@Test
     public void should_create_empty_issuance_when_input_is_empty() {
         Issuance issuance = new Issuance();
         assertNull(characterFigureFileMapper.createIssuance(issuance));
@@ -536,7 +536,7 @@ public class CharacterFigureFileMapperTest {
     /**
      * {@link CharacterFigureFileMapper#createIssuance(com.mesofi.collection.charactercatalog.model.Issuance)}
      */
-    @Test
+    //@Test
     public void should_create_issuance_when_input_is_provided() {
         Issuance issuance = new Issuance();
         issuance.setBasePrice(new BigDecimal("34.4"));

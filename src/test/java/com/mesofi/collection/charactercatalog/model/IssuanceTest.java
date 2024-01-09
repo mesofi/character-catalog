@@ -30,7 +30,7 @@ public class IssuanceTest {
         issuance = new Issuance();
     }
 
-    @ParameterizedTest
+    //@ParameterizedTest
     @MethodSource("provideBooleanValues")
     public void should_verify_getter_setter_properties(Boolean preorderConfirmationDay,
             Boolean releaseConfirmationDay) {

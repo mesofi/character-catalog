@@ -12,15 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,15 +58,15 @@ public class CharacterFigureService {
     public static final String HOST_IMAGE_PREFIX = "https://imagizer.imageshack.com/v2/" + HOST_IMAGE_SIZE + "q70/";
     public static final String NO_IMAGE_URL = HOST_IMAGE_PREFIX + "923/3hbcya.png";
 
-    public static final String TAG_EX = "ex";
-    public static final String TAG_SOG = "soul,gold,god";
-    public static final String TAG_REVIVAL = "revival";
-    public static final String TAG_SET = "set";
-    public static final String TAG_BROKEN = "broken";
-    public static final String TAG_METAL = "metal";
-    public static final String TAG_OCE = "oce,original,color";
-    public static final String TAG_HK = "asia";
-    public static final String TAG_BRONZE_TO_GOLD = "golden";
+    public static final List<String> TAG_EX = List.of("ex");
+    public static final List<String> TAG_SOG = List.of("soul", "gold", "god");
+    public static final List<String> TAG_REVIVAL = List.of("revival");
+    public static final List<String> TAG_SET = List.of("set");
+    public static final List<String> TAG_BROKEN = List.of("broken");
+    public static final List<String> TAG_METAL = List.of("metal");
+    public static final List<String> TAG_OCE = List.of("oce", "original", "color");
+    public static final List<String> TAG_HK = List.of("asia");
+    public static final List<String> TAG_BRONZE_TO_GOLD = List.of("golden");
 
     private CharacterFigureRepository repo;
     private CharacterFigureModelMapper modelMapper;
@@ -89,7 +88,8 @@ public class CharacterFigureService {
         try {
             inputStream = file.getInputStream();
         } catch (IOException e) {
-            throw new CharacterFigureException("Unable to read characters from file");
+            log.error("Can't read input file", e);
+            throw new CharacterFigureException("Unable to read characters from initial input file");
         }
 
         // the records are read and processed now.
@@ -98,10 +98,10 @@ public class CharacterFigureService {
         // first, removes all the records.
         repo.deleteAll();
 
-        // performs a mapping and saves the records in the DB ...
+        // performs a save operation in the DB ...
         long total = repo.saveAll(listEntities).size();
 
-        log.debug("Total of figures loaded correctly: {}", total);
+        log.info("Total of figures loaded correctly: {}", total);
         return total;
     }
 
@@ -112,7 +112,7 @@ public class CharacterFigureService {
      * @param inputStream Reference to the records read from a source.
      * @return The list or records.
      */
-    public List<CharacterFigureEntity> convertStreamToEntityList(InputStream inputStream) {
+    public List<CharacterFigureEntity> convertStreamToEntityList(@NonNull InputStream inputStream) {
         // @formatter:off
         List<CharacterFigure> allCharacters = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
@@ -126,14 +126,12 @@ public class CharacterFigureService {
 
         // gets the new characters with restocks
         log.debug("Total of figures to be loaded: {}", allCharacters.size());
-        List<CharacterFigure> effectiveCharacters = getEffectiveCharacters(allCharacters);
-        log.debug("Total of effective figures to be loaded: {}", effectiveCharacters.size());
 
         // add some tags
-        addStandardTags(effectiveCharacters);
+        addStandardTags(allCharacters);
 
         // @formatter:off
-        return effectiveCharacters.stream()
+        return allCharacters.stream()
                 .map($ -> modelMapper.toEntity($))
                 .collect(Collectors.toList());
         // @formatter:on
@@ -147,91 +145,43 @@ public class CharacterFigureService {
      * @param effectiveCharacters The list of characters.
      */
     private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
-        // We add some more tags depending on the name of the character.
-        for (CharacterFigure figure : effectiveCharacters) {
-            String[] nameArr = figure.getBaseName().toLowerCase().split("\\s+");
+        for (var figure : effectiveCharacters) {
+            // make sure the tags are not null.
             if (Objects.isNull(figure.getTags())) {
                 figure.setTags(new HashSet<>());
             }
             Set<String> existingTags = figure.getTags();
-            existingTags.addAll(Arrays.asList(nameArr));
+            // add tags based on the name ...
+            existingTags.addAll(Arrays.asList(figure.getBaseName().toLowerCase().split("\\s+")));
+            // add tags based on some attributes ...
+            if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+                existingTags.addAll(TAG_EX);
+            }
+            if (figure.getSeries() == Series.SOG) {
+                existingTags.addAll(TAG_SOG);
+            }
+            if (figure.isRevival()) {
+                existingTags.addAll(TAG_REVIVAL);
+            }
+            if (figure.isSet()) {
+                existingTags.addAll(TAG_SET);
+            }
+            if (figure.isBrokenCloth()) {
+                existingTags.addAll(TAG_BROKEN);
+            }
+            if (figure.isMetalBody()) {
+                existingTags.addAll(TAG_METAL);
+            }
+            if (figure.isOce()) {
+                existingTags.addAll(TAG_OCE);
+            }
+            if (figure.isHongKongVersion()) {
+                existingTags.addAll(TAG_HK);
+            }
+            if (figure.isBronzeToGold()) {
+                existingTags.addAll(TAG_BRONZE_TO_GOLD);
+            }
             figure.setTags(existingTags);
         }
-
-        // Now, the standard tags
-        addStandardTagToFigure(effectiveCharacters, $ -> $.getLineUp() == LineUp.MYTH_CLOTH_EX, TAG_EX);
-        addStandardTagToFigure(effectiveCharacters, $ -> $.getSeries() == Series.SOG, TAG_SOG);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isRevival, TAG_REVIVAL);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isSet, TAG_SET);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBrokenCloth, TAG_BROKEN);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isMetalBody, TAG_METAL);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isOce, TAG_OCE);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isHongKongVersion, TAG_HK);
-        addStandardTagToFigure(effectiveCharacters, CharacterFigure::isBronzeToGold, TAG_BRONZE_TO_GOLD);
-    }
-
-    /**
-     * Add some standard tags to the figure.
-     *
-     * @param characters The list of characters.
-     * @param predicate  The actual predicate.
-     * @param tagNames   The tag names.
-     */
-    private void addStandardTagToFigure(List<CharacterFigure> characters, Predicate<CharacterFigure> predicate,
-            String tagNames) {
-        long total = characters.stream().filter(predicate).peek($ -> {
-            if (Objects.isNull($.getTags())) {
-                $.setTags(new HashSet<>());
-            }
-            for (String tag : tagNames.split(",")) {
-                $.getTags().add(tag);
-            }
-        }).count();
-        log.debug("{} figures have been updated with new tag: [{}]", total, tagNames);
-    }
-
-    /**
-     * Gets the effective characters, this list contains the records to be saved in
-     * DB.
-     *
-     * @param allCharacters All the characters.
-     * @return The effective characters.
-     */
-    public List<CharacterFigure> getEffectiveCharacters(final List<CharacterFigure> allCharacters) {
-        if (Objects.nonNull(allCharacters)) {
-            List<CharacterFigure> effectiveCharacters = new ArrayList<>();
-            for (CharacterFigure curr : allCharacters) {
-                if (effectiveCharacters.contains(curr)) {
-                    // add the current character as re-stock in the final list.
-                    // CharacterFigure existing =
-                    // effectiveCharacters.get(effectiveCharacters.indexOf(curr));
-                    // existing.setRestocks(addRestock(existing.getRestocks(), curr));
-                    // existing.setTags(addTags(existing.getTags(), curr.getTags()));
-                } else {
-                    // we add the current character to the final list.
-                    effectiveCharacters.add(curr);
-                }
-            }
-            return effectiveCharacters;
-        }
-        return new ArrayList<>();
-    }
-
-    private Set<String> addTags(Set<String> existingTags, Set<String> newTags) {
-        if (Objects.isNull(existingTags) & Objects.isNull(newTags)) {
-            return null;
-        }
-        if (Objects.isNull(existingTags)) {
-            return newTags;
-        }
-
-        if (Objects.isNull(newTags)) {
-            return existingTags;
-        }
-
-        Set<String> data = new HashSet<>();
-        data.addAll(existingTags);
-        data.addAll(newTags);
-        return data;
     }
 }

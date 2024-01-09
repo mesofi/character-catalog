@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.6</version>
+        <version>3.1.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mesofi.collection</groupId>
@@ -170,6 +170,9 @@
                     <timestampedReports>false</timestampedReports>
                     <mutationThreshold>97</mutationThreshold>
                     <testStrengthThreshold>97</testStrengthThreshold>
+                    <excludedTestClasses>
+                        <param>com.mesofi.**.*IT</param>
+                    </excludedTestClasses>
                 </configuration>
                 <executions>
                     <execution>

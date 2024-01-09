@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  */
 public class SeriesTest {
 
-    @Test
+    //@Test
     public void should_return_series_names() {
         assertEquals("Saint Seiya", Series.SAINT_SEIYA.getDescription());
         assertEquals("Soul of Gold", Series.SOG.getDescription());

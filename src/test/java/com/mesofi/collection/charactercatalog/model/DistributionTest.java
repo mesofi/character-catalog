@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
  */
 public class DistributionTest {
 
-    //@Test
+    @Test
     public void should_return_distribution_names() {
         assertEquals("Stores", Distribution.STORES.getDescription());
         assertEquals("Tamashii Web Shop", Distribution.TAMASHII_WEB_SHOP.getDescription());

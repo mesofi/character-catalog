@@ -29,13 +29,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
@@ -62,6 +63,7 @@ import com.mesofi.collection.charactercatalog.repository.CharacterFigureReposito
 @ExtendWith(MockitoExtension.class)
 public class CharacterFigureServiceTest {
 
+    @InjectMocks
     private CharacterFigureService service;
 
     @Mock
@@ -73,11 +75,6 @@ public class CharacterFigureServiceTest {
 
     @Mock
     private MultipartFile multipartFile;
-
-    @BeforeEach
-    public void init() {
-        service = new CharacterFigureService(repo, modelMapper, fileMapper);
-    }
 
     /**
      * Test for {@link CharacterFigureService#loadAllCharacters(MultipartFile)}
@@ -142,32 +139,7 @@ public class CharacterFigureServiceTest {
                 "Eta Benetnasch Mime EX\tEta Benetnasch Mime\t¥0\t¥0\t\t\t\t\t\t\t\t\tMyth Cloth EX\tSaint Seiya\tGod Robe\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE"))
                 .thenReturn(cf1);
 
-        CharacterFigure cf2 = new CharacterFigure();
-        cf2.setOriginalName("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX");
-        cf2.setBaseName("Sagittarius Seiya ~Inheritor of the Gold Cloth~");
-        cf2.setIssuanceJPY(createIssuance("¥20,000", "12/28/2023", "1/10/2024", "7/2024"));
-        cf2.setIssuanceMXN(createIssuance("", null, "", ""));
-        cf2.setFutureRelease(!StringUtils.hasText("7/2024"));
-        cf2.setUrl(toStringValue("https://tamashiiweb.com/item/14738"));
-        cf2.setDistribution(Distribution.STORES);
-        cf2.setLineUp(LineUp.MYTH_CLOTH_EX);
-        cf2.setSeries(Series.SAINT_SEIYA);
-        cf2.setGroup(Group.GOLD);
-        cf2.setMetalBody(true);
-        cf2.setOce(false);
-        cf2.setRevival(false);
-        cf2.setPlainCloth(false);
-        cf2.setBrokenCloth(false);
-        cf2.setBronzeToGold(false);
-        cf2.setGold(false);
-        cf2.setHongKongVersion(false);
-        cf2.setManga(false);
-        cf2.setSurplice(false);
-        cf2.setSet(false);
-        cf2.setAnniversary(null);
-        cf2.setRemarks(null);
-        cf2.setTags(null);
-        cf2.setImages(List.of(new GalleryImage(null, "924/b2TERq", true, false, 0)));
+        CharacterFigure cf2 = createCharacterFigureWithReleaseDate("7/2024");
         when(fileMapper.fromLineToCharacterFigure(
                 "Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX\tSagittarius Seiya ~Inheritor of the Gold Cloth~\t¥20,000\t¥22,000\t12/28/2023\t1/10/2024\t7/2024\t\t\t\thttps://tamashiiweb.com/item/14738\tStores\tMyth Cloth EX\tSaint Seiya\tGold Saint\tTRUE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\tFALSE\t\t\t\t924/b2TERq"))
                 .thenReturn(cf2);
@@ -231,33 +203,7 @@ public class CharacterFigureServiceTest {
         cfe1.setImages(null);
         when(modelMapper.toEntity(cf1)).thenReturn(cfe1);
 
-        CharacterFigureEntity cfe2 = new CharacterFigureEntity();
-        cfe2.setId("1000000002");
-        cfe2.setOriginalName("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX");
-        cfe2.setBaseName("Sagittarius Seiya ~Inheritor of the Gold Cloth~");
-        cfe2.setIssuanceJPY(createIssuance("¥20,000", "12/28/2023", "1/10/2024", "7/2024"));
-        cfe2.setIssuanceMXN(createIssuance("", null, "", ""));
-        cfe2.setFutureRelease(!StringUtils.hasText("7/2024"));
-        cfe2.setUrl(toStringValue("https://tamashiiweb.com/item/14738"));
-        cfe2.setDistribution(Distribution.STORES);
-        cfe2.setLineUp(LineUp.MYTH_CLOTH_EX);
-        cfe2.setSeries(Series.SAINT_SEIYA);
-        cfe2.setGroup(Group.GOLD);
-        cfe2.setMetal(true);
-        cfe2.setOce(false);
-        cfe2.setRevival(false);
-        cfe2.setPlainCloth(false);
-        cfe2.setBrokenCloth(false);
-        cfe2.setGolden(false);
-        cfe2.setGold(false);
-        cfe2.setHk(false);
-        cfe2.setManga(false);
-        cfe2.setSurplice(false);
-        cfe2.setSet(false);
-        cfe2.setAnniversary(null);
-        cfe2.setRemarks(null);
-        cfe2.setTags(null);
-        cfe2.setImages(List.of(new GalleryImage(null, "924/b2TERq", true, false, 0)));
+        CharacterFigureEntity cfe2 = createCharacterFigureEntityWithReleaseDate("1000000002", "7/2024");
         when(modelMapper.toEntity(cf2)).thenReturn(cfe2);
 
         CharacterFigureEntity cfe3 = new CharacterFigureEntity();
@@ -940,7 +886,329 @@ public class CharacterFigureServiceTest {
         assertEquals(Set.of("broken", "oce", "original", "color", "&", "goddess", "~broken~", "athena", "seiya", "pegasus"), cf5.getTags());
         assertEquals(Set.of("ex", "asia", "golden", "seiya", "pegasus"), cf6.getTags());
         // @formatter:on
+    }
 
+    @Test
+    public void should_retrieve_all_characters_correctly() {
+        CharacterFigureEntity cfe1 = createCharacterFigureEntityWithReleaseDate("1000000001", "7/2024");
+        CharacterFigureEntity cfe2 = createCharacterFigureEntityWithReleaseDate("1000000002", "3/2018");
+        when(repo.findAll(getSorting())).thenReturn(List.of(cfe1, cfe2));
+
+        when(modelMapper.toModel(cfe1)).thenReturn(createCharacterFigureWithReleaseDate("7/2024"));
+        when(modelMapper.toModel(cfe2)).thenReturn(createCharacterFigureWithReleaseDate("3/2018"));
+
+        // The service is tested here ...
+        List<CharacterFigure> characters = service.retrieveAllCharacters();
+        assertNotNull(characters);
+        assertEquals(2, characters.size());
+
+        var i = 0;
+        assertNull(characters.get(i).getId());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX", characters.get(i).getOriginalName());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~", characters.get(i).getBaseName());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~", characters.get(i).getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characters.get(i).getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characters.get(i).getSeries());
+        assertEquals(Group.GOLD, characters.get(i).getGroup());
+        assertTrue(characters.get(i).isMetalBody());
+        assertFalse(characters.get(i).isOce());
+        assertFalse(characters.get(i).isRevival());
+        assertFalse(characters.get(i).isPlainCloth());
+        assertFalse(characters.get(i).isBrokenCloth());
+        assertFalse(characters.get(i).isBronzeToGold());
+        assertFalse(characters.get(i).isGold());
+        assertFalse(characters.get(i).isHongKongVersion());
+        assertFalse(characters.get(i).isManga());
+        assertFalse(characters.get(i).isSurplice());
+        assertFalse(characters.get(i).isSet());
+        assertNull(characters.get(i).getAnniversary());
+        assertNull(characters.get(i).getTags());
+        assertNotNull(characters.get(i).getImages());
+        assertEquals(1, characters.get(i).getImages().size());
+        assertNull(characters.get(i).getImages().get(0).getIdImage());
+        assertEquals("924/b2TERq", characters.get(i).getImages().get(0).getUrl());
+        assertTrue(characters.get(i).getImages().get(0).isOfficial());
+        assertFalse(characters.get(i).getImages().get(0).isCoverPhoto());
+        assertEquals(0, characters.get(i).getImages().get(0).getOrder());
+        assertNotNull(characters.get(i).getIssuanceJPY());
+        assertEquals(new BigDecimal("20000"), characters.get(i).getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("22000.00"), characters.get(i).getIssuanceJPY().getReleasePrice());
+        assertEquals(LocalDate.of(2023, 12, 28), characters.get(i).getIssuanceJPY().getFirstAnnouncementDate());
+        assertEquals(LocalDate.of(2024, 1, 10), characters.get(i).getIssuanceJPY().getPreorderDate());
+        assertTrue(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
+        assertEquals(LocalDate.of(2024, 7, 1), characters.get(i).getIssuanceJPY().getReleaseDate());
+        assertFalse(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
+        assertNotNull(characters.get(i).getIssuanceMXN());
+        assertEquals(new BigDecimal("3800"), characters.get(i).getIssuanceMXN().getBasePrice());
+        assertEquals(new BigDecimal("3800"), characters.get(i).getIssuanceMXN().getReleasePrice());
+        assertNull(characters.get(i).getIssuanceMXN().getFirstAnnouncementDate());
+        assertNull(characters.get(i).getIssuanceMXN().getPreorderDate());
+        assertNull(characters.get(i).getIssuanceMXN().getPreorderConfirmationDay());
+        assertNull(characters.get(i).getIssuanceMXN().getReleaseDate());
+        assertNull(characters.get(i).getIssuanceMXN().getReleaseConfirmationDay());
+        assertFalse(characters.get(i).isFutureRelease());
+        assertEquals("https://tamashiiweb.com/item/14738", characters.get(i).getUrl());
+        assertEquals(Distribution.STORES, characters.get(i).getDistribution());
+        assertNull(characters.get(i).getRemarks());
+
+        i++;
+        assertNull(characters.get(i).getId());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX", characters.get(i).getOriginalName());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~", characters.get(i).getBaseName());
+        assertEquals("Sagittarius Seiya ~Inheritor of the Gold Cloth~", characters.get(i).getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characters.get(i).getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characters.get(i).getSeries());
+        assertEquals(Group.GOLD, characters.get(i).getGroup());
+        assertTrue(characters.get(i).isMetalBody());
+        assertFalse(characters.get(i).isOce());
+        assertFalse(characters.get(i).isRevival());
+        assertFalse(characters.get(i).isPlainCloth());
+        assertFalse(characters.get(i).isBrokenCloth());
+        assertFalse(characters.get(i).isBronzeToGold());
+        assertFalse(characters.get(i).isGold());
+        assertFalse(characters.get(i).isHongKongVersion());
+        assertFalse(characters.get(i).isManga());
+        assertFalse(characters.get(i).isSurplice());
+        assertFalse(characters.get(i).isSet());
+        assertNull(characters.get(i).getAnniversary());
+        assertNull(characters.get(i).getTags());
+        assertNotNull(characters.get(i).getImages());
+        assertEquals(1, characters.get(i).getImages().size());
+        assertNull(characters.get(i).getImages().get(0).getIdImage());
+        assertEquals("924/b2TERq", characters.get(i).getImages().get(0).getUrl());
+        assertTrue(characters.get(i).getImages().get(0).isOfficial());
+        assertFalse(characters.get(i).getImages().get(0).isCoverPhoto());
+        assertEquals(0, characters.get(i).getImages().get(0).getOrder());
+        assertNotNull(characters.get(i).getIssuanceJPY());
+        assertEquals(new BigDecimal("20000"), characters.get(i).getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("21600.00"), characters.get(i).getIssuanceJPY().getReleasePrice());
+        assertEquals(LocalDate.of(2023, 12, 28), characters.get(i).getIssuanceJPY().getFirstAnnouncementDate());
+        assertEquals(LocalDate.of(2024, 1, 10), characters.get(i).getIssuanceJPY().getPreorderDate());
+        assertTrue(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
+        assertEquals(LocalDate.of(2018, 3, 1), characters.get(i).getIssuanceJPY().getReleaseDate());
+        assertFalse(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
+        assertNotNull(characters.get(i).getIssuanceMXN());
+        assertEquals(new BigDecimal("3800"), characters.get(i).getIssuanceMXN().getBasePrice());
+        assertEquals(new BigDecimal("3800"), characters.get(i).getIssuanceMXN().getReleasePrice());
+        assertNull(characters.get(i).getIssuanceMXN().getFirstAnnouncementDate());
+        assertNull(characters.get(i).getIssuanceMXN().getPreorderDate());
+        assertNull(characters.get(i).getIssuanceMXN().getPreorderConfirmationDay());
+        assertNull(characters.get(i).getIssuanceMXN().getReleaseDate());
+        assertNull(characters.get(i).getIssuanceMXN().getReleaseConfirmationDay());
+        assertFalse(characters.get(i).isFutureRelease());
+        assertEquals("https://tamashiiweb.com/item/14738", characters.get(i).getUrl());
+        assertEquals(Distribution.STORES, characters.get(i).getDistribution());
+        assertNull(characters.get(i).getRemarks());
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v1() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v2_myth_cloth() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V2);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v2_myth_cloth_ex() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V2);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~New Bronze Cloth~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v3() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V3);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Final Bronze Cloth~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v4() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V4);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (God Cloth)", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_group_v5() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V5);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Heaven Chapter)", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_plain_clothes() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.OTHER);
+        characterFigure.setPlainCloth(true);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Plain Clothes)", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_gold_myth_cloth_v1() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Limited Gold~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_gold_myth_cloth_v2() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V2);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Power of Gold~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_gold_myth_cloth_ex_v2() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V2);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (New Bronze Cloth) ~Golden Limited Edition~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_gold_myth_cloth_ex_v3() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V3);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Final Bronze Cloth) ~Golden Limited Edition~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_gold_myth_cloth_ex_v4() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V4);
+        characterFigure.setBronzeToGold(true);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (God Cloth)", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_with_manga() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setManga(true);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ ~Comic Version~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_oce() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setOce(true);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~Original Color Edition~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_anniversary() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setAnniversary(30);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya (Initial Bronze Cloth) ~30th Anniversary Ver.~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_hk() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setHongKongVersion(true);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ ~HK Version~", displayableName);
+    }
+
+    @Test
+    public void should_calculate_figure_displayable_name_surplice() {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setBaseName("Pegasus Seiya");
+        characterFigure.setGroup(Group.V1);
+        characterFigure.setSurplice(true);
+
+        // The service is tested here ...
+        String displayableName = service.calculateFigureDisplayableName(characterFigure);
+        assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ (Surplice)", displayableName);
+    }
+
+    private Sort getSorting() {
+        return Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "futureRelease"),
+                new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate")));
     }
 
     private Issuance createIssuance(String price, String announcement, String preorder, String release) {
@@ -952,5 +1220,66 @@ public class CharacterFigureServiceTest {
         issuance.setReleaseDate(toDate(release));
         issuance.setReleaseConfirmationDay(isDayMonthYear(release));
         return issuance;
+    }
+
+    private CharacterFigure createCharacterFigureWithReleaseDate(String releaseDateJPY) {
+        CharacterFigure cf = new CharacterFigure();
+        cf.setOriginalName("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX");
+        cf.setBaseName("Sagittarius Seiya ~Inheritor of the Gold Cloth~");
+        cf.setIssuanceJPY(createIssuance("¥20,000", "12/28/2023", "1/10/2024", releaseDateJPY));
+        cf.setIssuanceMXN(createIssuance("$3,800", null, "", ""));
+        cf.setFutureRelease(!StringUtils.hasText("7/2024"));
+        cf.setUrl(toStringValue("https://tamashiiweb.com/item/14738"));
+        cf.setDistribution(Distribution.STORES);
+        cf.setLineUp(LineUp.MYTH_CLOTH_EX);
+        cf.setSeries(Series.SAINT_SEIYA);
+        cf.setGroup(Group.GOLD);
+        cf.setMetalBody(true);
+        cf.setOce(false);
+        cf.setRevival(false);
+        cf.setPlainCloth(false);
+        cf.setBrokenCloth(false);
+        cf.setBronzeToGold(false);
+        cf.setGold(false);
+        cf.setHongKongVersion(false);
+        cf.setManga(false);
+        cf.setSurplice(false);
+        cf.setSet(false);
+        cf.setAnniversary(null);
+        cf.setRemarks(null);
+        cf.setTags(null);
+        cf.setImages(List.of(new GalleryImage(null, "924/b2TERq", true, false, 0)));
+        return cf;
+    }
+
+    private CharacterFigureEntity createCharacterFigureEntityWithReleaseDate(String id, String releaseDateJPY) {
+        CharacterFigureEntity cfe = new CharacterFigureEntity();
+        cfe.setId(id);
+        cfe.setOriginalName("Sagittarius Seiya ~Inheritor of the Gold Cloth~ EX");
+        cfe.setBaseName("Sagittarius Seiya ~Inheritor of the Gold Cloth~");
+        cfe.setIssuanceJPY(createIssuance("¥20,000", "12/28/2023", "1/10/2024", releaseDateJPY));
+        cfe.setIssuanceMXN(createIssuance("$3,800", null, "", ""));
+        cfe.setFutureRelease(!StringUtils.hasText("7/2024"));
+        cfe.setUrl(toStringValue("https://tamashiiweb.com/item/14738"));
+        cfe.setDistribution(Distribution.STORES);
+        cfe.setLineUp(LineUp.MYTH_CLOTH_EX);
+        cfe.setSeries(Series.SAINT_SEIYA);
+        cfe.setGroup(Group.GOLD);
+        cfe.setMetal(true);
+        cfe.setOce(false);
+        cfe.setRevival(false);
+        cfe.setPlainCloth(false);
+        cfe.setBrokenCloth(false);
+        cfe.setGolden(false);
+        cfe.setGold(false);
+        cfe.setHk(false);
+        cfe.setManga(false);
+        cfe.setSurplice(false);
+        cfe.setSet(false);
+        cfe.setAnniversary(null);
+        cfe.setRemarks(null);
+        cfe.setTags(null);
+        cfe.setImages(List.of(new GalleryImage(null, "924/b2TERq", true, false, 0)));
+        return cfe;
     }
 }

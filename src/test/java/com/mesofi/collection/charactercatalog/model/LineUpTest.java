@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
  */
 public class LineUpTest {
 
-    //@Test
+    @Test
     public void should_return_lineup_names() {
         assertEquals("Myth Cloth", LineUp.MYTH_CLOTH.getDescription());
         assertEquals("Myth Cloth EX", LineUp.MYTH_CLOTH_EX.getDescription());

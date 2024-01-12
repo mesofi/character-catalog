@@ -42,7 +42,7 @@ public class CharacterFigureTest {
         characterFigure = new CharacterFigure();
     }
 
-    //@ParameterizedTest
+    @ParameterizedTest
     @MethodSource("provideBooleanValues")
     public void should_verify_getter_setter_properties(boolean metalBody, boolean oce, boolean revival,
             boolean plainCloth, boolean brokenCloth, boolean bronzeToGold, boolean gold, boolean hongKongVersion,
@@ -93,24 +93,24 @@ public class CharacterFigureTest {
 
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_1() {
         CharacterFigure otherCharacterFigure = characterFigure;
         assertEquals(characterFigure, otherCharacterFigure);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_2() {
         assertNotEquals("", characterFigure);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_3() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(false);
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_4() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -120,7 +120,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_5() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -133,7 +133,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_6() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -148,7 +148,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_7() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -165,7 +165,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_8() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -184,7 +184,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_9() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -205,7 +205,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_10() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -228,7 +228,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_11() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -253,7 +253,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_12() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -280,7 +280,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_13() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -307,7 +307,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_14() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -336,7 +336,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_15() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -365,7 +365,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_16() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -396,7 +396,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_17() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -427,7 +427,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_18() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -458,7 +458,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_19() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -491,7 +491,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_20() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -524,7 +524,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_21() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -557,7 +557,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_22() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -592,7 +592,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_23() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -627,7 +627,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_24() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -662,7 +662,7 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_25() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -698,7 +698,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_26() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -734,7 +734,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_27() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -770,7 +770,7 @@ public class CharacterFigureTest {
         assertNotEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_28() {
         when(characterFigureMock.canEqual(characterFigure)).thenReturn(true);
 
@@ -806,14 +806,14 @@ public class CharacterFigureTest {
         assertEquals(characterFigure, characterFigureMock);
     }
 
-    //@Test
+    @Test
     public void should_verify_same_type() {
         CharacterFigure otherCharacterFigure = new CharacterFigure();
         assertTrue(characterFigure.canEqual(otherCharacterFigure));
         assertFalse(characterFigure.canEqual("Other"));
     }
 
-    //@Test
+    @Test
     public void should_get_hash_code() {
         assertEquals(-1369399865, characterFigure.hashCode());
     }

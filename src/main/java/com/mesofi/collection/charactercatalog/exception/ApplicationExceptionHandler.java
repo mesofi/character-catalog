@@ -69,7 +69,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
-    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, final WebRequest request) {
+    protected ResponseEntity<Object> handleBadRequest(IllegalArgumentException ex, final WebRequest request) {
         log.debug("Handle invalid request exception ...");
 
         ApiErrorResponse body = new ApiErrorResponse();

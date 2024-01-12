@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 public class CommonUtilsTest {
 
-    //@Test
+    @Test
     public void should_validate_private_access() throws NoSuchMethodException, SecurityException,
             InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Constructor<CommonUtils> constructor = CommonUtils.class.getDeclaredConstructor();
@@ -41,18 +41,18 @@ public class CommonUtilsTest {
         constructor.newInstance();
     }
 
-    //@Test
+    @Test
     public void should_return_null_price() {
         assertNull(CommonUtils.toPrice((String) null));
     }
 
-    //@ParameterizedTest
+    @ParameterizedTest
     @ValueSource(strings = { "¥12,500", "¥0", "$11.9", "3.4" })
     public void should_return_valid_price(final String input) {
         assertNotNull(CommonUtils.toPrice(input));
     }
 
-    //@Test
+    @Test
     public void should_return_convert_price_to_string() {
         BigDecimal decimal = null;
         assertNull(CommonUtils.toPrice(decimal));
@@ -61,19 +61,19 @@ public class CommonUtilsTest {
         assertEquals("34", CommonUtils.toPrice(decimal));
     }
 
-    //@ParameterizedTest
+    @ParameterizedTest
     @NullAndEmptySource
     public void should_return_null_local_date_when_input_is_null_and_empty(String input) {
         assertNull(CommonUtils.toDate(input));
     }
 
-    //@ParameterizedTest
+    @ParameterizedTest
     @ValueSource(strings = { "9/15/2023", "10/30/2020", "7/3/2020", "11/2022", "5/2021" })
     public void should_return_valid_local_date(String input) {
         assertNotNull(CommonUtils.toDate(input));
     }
 
-   // @Test
+    @Test
     public void should_return_convert_date_to_string() {
         LocalDate localDate = null;
         assertNull(CommonUtils.toDate(localDate));
@@ -82,7 +82,7 @@ public class CommonUtilsTest {
         assertEquals("2/3/2022", CommonUtils.toDate(localDate));
     }
 
-    //@Test
+    @Test
     public void should_return_convert_date_with_month_year_only_to_string() {
         LocalDate localDate = LocalDate.of(2022, 2, 3);
         assertEquals("2/2022", CommonUtils.toDate(localDate, true));
@@ -91,7 +91,7 @@ public class CommonUtilsTest {
         assertEquals("10/10/2023", CommonUtils.toDate(localDate, false));
     }
 
-    //@Test
+    @Test
     public void should_return_valid_boolean_value() {
         assertFalse(CommonUtils.toBoolean(null));
         assertFalse(CommonUtils.toBoolean(""));
@@ -100,21 +100,21 @@ public class CommonUtilsTest {
         assertTrue(CommonUtils.toBoolean("TRUE"));
     }
 
-    //@Test
+    @Test
     public void should_return_valid_integer_value() {
         assertNull(CommonUtils.toInteger(null));
         assertNull(CommonUtils.toInteger(""));
         assertEquals(5, CommonUtils.toInteger("5"));
     }
 
-    //@Test
+    @Test
     public void should_return_valid_string_value() {
         assertNull(CommonUtils.toStringValue(null));
         assertNull(CommonUtils.toStringValue(""));
         assertEquals("5", CommonUtils.toStringValue("5"));
     }
 
-    //@Test
+    @Test
     public void should_return_valid_set_value() {
         assertNull(CommonUtils.toSetValue(null));
         assertNull(CommonUtils.toSetValue(""));
@@ -133,13 +133,13 @@ public class CommonUtilsTest {
         assertTrue(list.contains("seiya"));
     }
 
-    //@Test
+    @Test
     public void should_return_valid_list_value() {
         assertNull(CommonUtils.toListValue(null));
         assertEquals(List.of("test", "test2", "test3"), CommonUtils.toListValue("test,test2,test3"));
     }
 
-    //@Test
+    @Test
     public void should_validate_day_month_date() {
         assertNull(CommonUtils.isDayMonthYear(null));
 
@@ -148,7 +148,7 @@ public class CommonUtilsTest {
         assertTrue(CommonUtils.isDayMonthYear("03/4/2023"));
     }
 
-    //@Test
+    @Test
     public void should_reverse_list() {
         List<String> myList = null;
         CommonUtils.reverseListElements(myList);

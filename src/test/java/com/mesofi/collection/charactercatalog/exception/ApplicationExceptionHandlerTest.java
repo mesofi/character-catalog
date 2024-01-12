@@ -9,26 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 
@@ -43,13 +37,20 @@ public class ApplicationExceptionHandlerTest {
     private ApplicationExceptionHandler exceptionHandler;
 
     @Mock
-    private HttpInputMessage httpInputMessage;
-    @Mock
     private WebRequest webRequest;
+
+    @Mock
+    private HttpMessageNotReadableException httpMessageNotReadableException;
+    @Mock
+    private MethodArgumentNotValidException methodArgumentNotValidException;
+    @Mock
+    private CharacterFigureNotFoundException characterFigureNotFoundException;
+    @Mock
+    private IllegalArgumentException illegalArgumentException;
+    @Mock
+    private RuntimeException runtimeException;
     @Mock
     private BindingResult bindingResult;
-    @Mock
-    private Method method;
 
     @BeforeEach
     public void beforeEach() {
@@ -59,116 +60,75 @@ public class ApplicationExceptionHandlerTest {
     /**
      * {@link ApplicationExceptionHandler#handleHttpMessageNotReadable(HttpMessageNotReadableException, org.springframework.http.HttpHeaders, HttpStatusCode, org.springframework.web.context.request.WebRequest)}
      */
-    //@Test
+    @Test
     public void should_verify_response_for_message_not_readable() {
-        String errorMsg = "This is my error message";
-        HttpStatusCode OK = HttpStatusCode.valueOf(200);
-        HttpHeaders headers = new HttpHeaders();
+        when(httpMessageNotReadableException.getMessage()).thenReturn("The error");
 
-        HttpMessageNotReadableException ex = new HttpMessageNotReadableException(errorMsg, httpInputMessage);
-        ResponseEntity<Object> response = exceptionHandler.handleHttpMessageNotReadable(ex, headers, OK, webRequest);
-
+        ResponseEntity<Object> response = exceptionHandler.handleHttpMessageNotReadable(httpMessageNotReadableException, null, HttpStatusCode.valueOf(404), webRequest);
         assertNotNull(response);
-        assertNotNull(response.getBody());
-
         ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
-
-        assertNotNull(response);
         assertNotNull(apiErrorResponse);
-        assertEquals("This is my error message", apiErrorResponse.getMessage());
+        assertEquals("The error", apiErrorResponse.getMessage());
     }
 
     /**
      * {@link ApplicationExceptionHandler#handleMethodArgumentNotValid(org.springframework.web.bind.MethodArgumentNotValidException, org.springframework.http.HttpHeaders, HttpStatusCode, org.springframework.web.context.request.WebRequest)}
      */
-    //@Test
+    @Test
     public void should_verify_response_for_argument_not_valid() {
-        HttpStatusCode OK = HttpStatusCode.valueOf(200);
-        HttpHeaders headers = new HttpHeaders();
+        when(methodArgumentNotValidException.getMessage()).thenReturn("The error");
+        List<FieldError> errors = new ArrayList<FieldError>();
+        errors.add(new FieldError("ddd", "myField", "Invalid value"));
+        when(bindingResult.getFieldErrors()).thenReturn(errors);
+        when(methodArgumentNotValidException.getBindingResult()).thenReturn(bindingResult);
 
-        List<FieldError> fields = new ArrayList<>();
-        FieldError fieldError1 = new FieldError("objectName", "field", "default");
-        fields.add(fieldError1);
-
-        List<ObjectError> errors = new ArrayList<>();
-        ObjectError objectError1 = new ObjectError("objectName", null);
-        errors.add(objectError1);
-
-        when(method.getParameterCount()).thenReturn(1);
-        when(bindingResult.getFieldErrors()).thenReturn(fields);
-        when(bindingResult.getGlobalErrors()).thenReturn(errors);
-
-        MethodParameter methodParameter = new MethodParameter(method, 0);
-
-        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
-        ResponseEntity<Object> response = exceptionHandler.handleMethodArgumentNotValid(ex, headers, OK, webRequest);
-
+        ResponseEntity<Object> response = exceptionHandler.handleMethodArgumentNotValid(methodArgumentNotValidException, null, HttpStatusCode.valueOf(404), webRequest);
         assertNotNull(response);
-        assertNotNull(response.getBody());
-
         ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
-
-        assertNotNull(response);
         assertNotNull(apiErrorResponse);
-        assertEquals("Validation failed for argument [0] in null: ", apiErrorResponse.getMessage());
-        Set<String> expectedErrors = apiErrorResponse.getErrors();
-        assertNotNull(expectedErrors);
-        Set<String> treeSet = new TreeSet<>();
-        treeSet.add("field: default, objectName: null");
-        assertEquals(treeSet.toString(), expectedErrors.toString());
+        assertEquals("The error", apiErrorResponse.getMessage());
+        assertEquals(Set.of("myField: Invalid value"), apiErrorResponse.getErrors());
     }
 
     /**
      * {@link ApplicationExceptionHandler#handleNotFound(CharacterFigureNotFoundException, WebRequest)}
      */
-    //@Test
+    @Test
     public void should_verify_response_for_handle_not_found() {
-        CharacterFigureNotFoundException ex = new CharacterFigureNotFoundException("Character not found");
-        ResponseEntity<Object> response = exceptionHandler.handleNotFound(ex, webRequest);
+        when(characterFigureNotFoundException.getMessage()).thenReturn("The error");
 
+        ResponseEntity<Object> response = exceptionHandler.handleNotFound(characterFigureNotFoundException, webRequest);
         assertNotNull(response);
-        assertNotNull(response.getBody());
-
         ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
-
-        assertNotNull(response);
         assertNotNull(apiErrorResponse);
-        assertEquals("Character not found", apiErrorResponse.getMessage());
-    }
-
-    /**
-     * {@link ApplicationExceptionHandler#handleBadRequest(RuntimeException, WebRequest)}
-     */
-    //@Test
-    public void should_verify_response_for_handle_bad_request() {
-        IllegalArgumentException ex = new IllegalArgumentException("Character missing");
-        ResponseEntity<Object> response = exceptionHandler.handleBadRequest(ex, webRequest);
-
-        assertNotNull(response);
-        assertNotNull(response.getBody());
-
-        ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
-
-        assertNotNull(response);
-        assertNotNull(apiErrorResponse);
-        assertEquals("Character missing", apiErrorResponse.getMessage());
+        assertEquals("The error", apiErrorResponse.getMessage());
     }
 
     /**
      * {@link ApplicationExceptionHandler#handleGenericError(RuntimeException, WebRequest)}
      */
-    //@Test
-    public void should_verify_response_for_handle_generic_error() {
-        RuntimeException ex = new RuntimeException("Unknown error");
-        ResponseEntity<Object> response = exceptionHandler.handleGenericError(ex, webRequest);
+    @Test
+    public void should_verify_response_for_handle_bad_request() {
+        when(illegalArgumentException.getMessage()).thenReturn("The error");
 
+        ResponseEntity<Object> response = exceptionHandler.handleBadRequest(illegalArgumentException, webRequest);
         assertNotNull(response);
-        assertNotNull(response.getBody());
-
         ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
-
-        assertNotNull(response);
         assertNotNull(apiErrorResponse);
-        assertEquals("Unknown error", apiErrorResponse.getMessage());
+        assertEquals("The error", apiErrorResponse.getMessage());
+    }
+
+    /**
+     * {@link ApplicationExceptionHandler#handleGenericError(RuntimeException, WebRequest)}
+     */
+    @Test
+    public void should_verify_response_for_handle_generic_error() {
+        when(runtimeException.getMessage()).thenReturn("The error");
+
+        ResponseEntity<Object> response = exceptionHandler.handleGenericError(runtimeException, webRequest);
+        assertNotNull(response);
+        ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
+        assertNotNull(apiErrorResponse);
+        assertEquals("The error", apiErrorResponse.getMessage());
     }
 }

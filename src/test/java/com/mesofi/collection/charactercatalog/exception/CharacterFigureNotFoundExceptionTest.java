@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  */
 public class CharacterFigureNotFoundExceptionTest {
 
-    //@Test
+    @Test
     public void should_verify_error_message() {
         CharacterFigureNotFoundException notFoundException = new CharacterFigureNotFoundException("My Error message");
 

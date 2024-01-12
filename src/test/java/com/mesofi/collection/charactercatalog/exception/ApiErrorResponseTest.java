@@ -27,7 +27,7 @@ public class ApiErrorResponseTest {
         apiErrorResponse = new ApiErrorResponse();
     }
 
-    //@Test
+    @Test
     public void should_verify_getter_setter_properties() {
         apiErrorResponse.setErrors(Set.of("Error1"));
         apiErrorResponse.setMessage("My Error message");

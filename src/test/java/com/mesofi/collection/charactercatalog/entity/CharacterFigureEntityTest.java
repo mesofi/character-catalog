@@ -38,7 +38,7 @@ public class CharacterFigureEntityTest {
         characterFigureEntity = new CharacterFigureEntity();
     }
 
-    //@ParameterizedTest
+    @ParameterizedTest
     @MethodSource("provideBooleanValues")
     public void should_verify_getter_setter_properties(boolean metal, boolean oce, boolean revival, boolean plainCloth,
             boolean brokenCloth, boolean golden, boolean gold, boolean hk, boolean manga, boolean surplice,
@@ -86,24 +86,24 @@ public class CharacterFigureEntityTest {
         assertEquals(List.of(new GalleryImage()), characterFigureEntity.getImages());
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_1() {
         CharacterFigureEntity otherCharacterFigureEntity = characterFigureEntity;
         assertEquals(characterFigureEntity, otherCharacterFigureEntity);
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_2() {
         assertFalse(characterFigureEntity.equals(null));
     }
 
     @SuppressWarnings("unlikely-arg-type")
-    //@Test
+    @Test
     public void should_verify_equality_3() {
         assertFalse(characterFigureEntity.equals(""));
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_4() {
         CharacterFigureEntity otherCharacterFigureEntity = new CharacterFigureEntity();
         otherCharacterFigureEntity.setId("1");
@@ -112,7 +112,7 @@ public class CharacterFigureEntityTest {
         assertFalse(characterFigureEntity.equals(otherCharacterFigureEntity));
     }
 
-    //@Test
+    @Test
     public void should_verify_equality_5() {
         CharacterFigureEntity otherCharacterFigureEntity = new CharacterFigureEntity();
         otherCharacterFigureEntity.setId("1");
@@ -121,7 +121,7 @@ public class CharacterFigureEntityTest {
         assertTrue(characterFigureEntity.equals(otherCharacterFigureEntity));
     }
 
-    //@Test
+    @Test
     public void should_get_hash_code() {
         assertEquals(992, characterFigureEntity.hashCode());
     }

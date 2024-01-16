@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -1206,6 +1207,62 @@ public class CharacterFigureServiceTest {
         assertEquals("Pegasus Seiya ~Initial Bronze Cloth~ (Surplice)", displayableName);
     }
 
+    /**
+     * Test for {@link CharacterFigureService#retrieveAllCharacters()}
+     */
+    @Test
+    public void should_get_all_characters() {
+        CharacterFigureEntity entity1 = createBasicSSEXFigureEntity("12345", "Pegasus Seiya", "Pegasus Seiya",
+                Group.GOD, false);
+        List<CharacterFigureEntity> mockList = new ArrayList<>();
+        mockList.add(entity1);
+        when(repo.findAll(getSorting())).thenReturn(mockList);
+
+        CharacterFigure figure1 = createBasicFigure(null, "Pegasus Seiya", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOD, false, false);
+        when(modelMapper.toModel(entity1)).thenReturn(figure1);
+
+        List<CharacterFigure> characters = service.retrieveAllCharacters();
+        assertNotNull(characters);
+        assertFalse(characters.isEmpty());
+
+        var i = 0;
+        assertNull(characters.get(i).getId());
+        assertEquals("Pegasus Seiya", characters.get(i).getOriginalName());
+        assertEquals("Pegasus Seiya", characters.get(i).getBaseName());
+        assertEquals("Pegasus Seiya", characters.get(i).getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characters.get(i).getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characters.get(i).getSeries());
+        assertEquals(Group.GOD, characters.get(i).getGroup());
+        assertFalse(characters.get(i).isMetalBody());
+        assertFalse(characters.get(i).isOce());
+        assertFalse(characters.get(i).isRevival());
+        assertFalse(characters.get(i).isPlainCloth());
+        assertFalse(characters.get(i).isBrokenCloth());
+        assertFalse(characters.get(i).isBronzeToGold());
+        assertFalse(characters.get(i).isGold());
+        assertFalse(characters.get(i).isHongKongVersion());
+        assertFalse(characters.get(i).isManga());
+        assertFalse(characters.get(i).isSurplice());
+        assertFalse(characters.get(i).isSet());
+        assertNull(characters.get(i).getAnniversary());
+        assertNull(characters.get(i).getTags());
+        assertNull(characters.get(i).getImages());
+        assertNotNull(characters.get(i).getIssuanceJPY());
+        assertEquals(new BigDecimal("12000"), characters.get(i).getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("12960.00"), characters.get(i).getIssuanceJPY().getReleasePrice());
+        assertNull(characters.get(i).getIssuanceJPY().getFirstAnnouncementDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
+        assertEquals(LocalDate.of(2018, 1, 27), characters.get(i).getIssuanceJPY().getReleaseDate());
+        assertTrue(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
+        assertNull(characters.get(i).getIssuanceMXN());
+        assertFalse(characters.get(i).isFutureRelease());
+        assertNull(characters.get(i).getUrl());
+        assertNull(characters.get(i).getDistribution());
+        assertNull(characters.get(i).getRemarks());
+    }
+
     private Sort getSorting() {
         return Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "futureRelease"),
                 new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate")));
@@ -1281,5 +1338,68 @@ public class CharacterFigureServiceTest {
         cfe.setTags(null);
         cfe.setImages(List.of(new GalleryImage(null, "924/b2TERq", true, false, 0)));
         return cfe;
+    }
+
+    /**
+     * This method is used to create a very generic {@link CharacterFigureEntity}
+     * 
+     * @param id           The unique identifier.
+     * @param originalName The original name.
+     * @param baseName     The base name.
+     * @param group        The group.
+     * @param revival      Is it revival?
+     * @return The new {@link CharacterFigureEntity}
+     */
+    private CharacterFigureEntity createBasicSSEXFigureEntity(String id, String originalName, String baseName,
+            Group group, boolean revival) {
+        CharacterFigureEntity characterFigure = new CharacterFigureEntity();
+        characterFigure.setId(id);
+        characterFigure.setOriginalName(originalName);
+        characterFigure.setBaseName(baseName);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setSeries(Series.SAINT_SEIYA);
+        characterFigure.setGroup(group);
+        characterFigure.setMetal(false);
+        characterFigure.setOce(false);
+        characterFigure.setRevival(revival);
+        characterFigure.setPlainCloth(false);
+        characterFigure.setHk(false);
+        characterFigure.setManga(false);
+        characterFigure.setSurplice(false);
+
+        return characterFigure;
+    }
+
+    /**
+     * Creates a basic figure.
+     * 
+     * @param id           The optional identifier.
+     * @param originalName The original name.
+     * @param releaseDate  The release date.
+     * @param lineUp       The line up.
+     * @param series       The series.
+     * @param group        The actual group.
+     * @param oce          Is it OCE?
+     * @param revival      is it revival?
+     * @return The figure.
+     */
+    private CharacterFigure createBasicFigure(String id, String originalName, LocalDate releaseDate, LineUp lineUp,
+            Series series, Group group, boolean oce, boolean revival) {
+        CharacterFigure characterFigure = new CharacterFigure();
+        characterFigure.setId(id);
+        characterFigure.setOriginalName(originalName);
+        characterFigure.setBaseName(originalName);
+        Issuance issuanceJPY = new Issuance();
+        issuanceJPY.setReleaseConfirmationDay(true);
+        issuanceJPY.setReleaseDate(releaseDate);
+        issuanceJPY.setBasePrice(new BigDecimal("12000"));
+        characterFigure.setIssuanceJPY(issuanceJPY);
+        characterFigure.setLineUp(lineUp);
+        characterFigure.setSeries(series);
+        characterFigure.setGroup(group);
+        characterFigure.setOce(oce);
+        characterFigure.setRevival(revival);
+
+        return characterFigure;
     }
 }

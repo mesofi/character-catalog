@@ -22,8 +22,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.mesofi.collection.charactercatalog.mock.MockFigure;
-
 /**
  * Test for {@link Figure}
  * 
@@ -32,14 +30,14 @@ import com.mesofi.collection.charactercatalog.mock.MockFigure;
 @ExtendWith(MockitoExtension.class)
 public class FigureTest {
 
-    private MockFigure mockFigure;
+    private CharacterFigure characterFigure;
 
     @Mock
     private Figure figure;
 
     @BeforeEach
     public void beforeEach() {
-        mockFigure = new MockFigure();
+        characterFigure = new CharacterFigure();
     }
 
     @ParameterizedTest
@@ -48,25 +46,28 @@ public class FigureTest {
         Issuance issuanceJPY = new Issuance();
         Issuance issuanceMXN = new Issuance();
 
-        mockFigure.setIssuanceJPY(issuanceJPY);
-        mockFigure.setIssuanceMXN(issuanceMXN);
-        mockFigure.setFutureRelease(futureRelease);
-        mockFigure.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/923/8Qfvaa.jpg");
-        mockFigure.setDistribution(Distribution.TAMASHII_STORE);
-        mockFigure.setRemarks("No comments");
+        characterFigure.setIssuanceJPY(issuanceJPY);
+        characterFigure.setIssuanceMXN(issuanceMXN);
+        characterFigure.setFutureRelease(futureRelease);
+        characterFigure.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/923/8Qfvaa.jpg");
+        characterFigure.setDistribution(Distribution.TAMASHII_STORE);
+        characterFigure.setRemarks("No comments");
 
-        assertEquals(issuanceJPY, mockFigure.getIssuanceJPY());
-        assertEquals(issuanceMXN, mockFigure.getIssuanceMXN());
-        assertEquals(futureRelease, mockFigure.isFutureRelease());
-        assertEquals("https://imagizer.imageshack.com/v2/1024x768q70/923/8Qfvaa.jpg", mockFigure.getUrl());
-        assertEquals(Distribution.TAMASHII_STORE, mockFigure.getDistribution());
-        assertEquals("No comments", mockFigure.getRemarks());
+        assertEquals(issuanceJPY, characterFigure.getIssuanceJPY());
+        assertEquals(issuanceMXN, characterFigure.getIssuanceMXN());
+        assertEquals(futureRelease, characterFigure.isFutureRelease());
+        assertEquals("https://imagizer.imageshack.com/v2/1024x768q70/923/8Qfvaa.jpg", characterFigure.getUrl());
+        assertEquals(Distribution.TAMASHII_STORE, characterFigure.getDistribution());
+        assertEquals("No comments", characterFigure.getRemarks());
+
     }
 
     @Test
     public void should_verify_equality() {
-        MockFigure mockFigure1 = new MockFigure();
-        MockFigure mockFigure2 = new MockFigure();
+        Figure mockFigure1 = new Figure() {
+        };
+        Figure mockFigure2 = new Figure() {
+        };
 
         assertEquals(mockFigure2, mockFigure2);
         assertNotEquals("", mockFigure1);
@@ -80,14 +81,16 @@ public class FigureTest {
 
     @Test
     public void should_verify_same_type() {
-        MockFigure mockFigure2 = new MockFigure();
-        assertTrue(mockFigure.canEqual(mockFigure2));
-        assertFalse(mockFigure.canEqual("Other"));
+        CharacterFigure mockFigure2 = new CharacterFigure();
+        assertTrue(characterFigure.canEqual(mockFigure2));
+        assertFalse(characterFigure.canEqual("Other"));
     }
 
     @Test
     public void should_get_hash_code() {
-        assertEquals(1, mockFigure.hashCode());
+        Figure theCharacterFigure = new Figure() {
+        };
+        assertEquals(1, theCharacterFigure.hashCode());
     }
 
     private static Stream<Arguments> provideBooleanValues() {

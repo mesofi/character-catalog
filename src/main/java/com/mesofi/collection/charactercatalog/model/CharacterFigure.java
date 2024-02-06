@@ -18,7 +18,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * The actual value object used to hold the character info.
@@ -29,7 +28,6 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ToString
 public class CharacterFigure extends Figure {
 
     @EqualsAndHashCode.Exclude

@@ -67,9 +67,8 @@ public class FigureTest {
     public void should_verify_equality() {
         MockFigure mockFigure1 = new MockFigure();
         MockFigure mockFigure2 = new MockFigure();
-        MockFigure mockFigure3 = mockFigure2;
 
-        assertEquals(mockFigure2, mockFigure3);
+        assertEquals(mockFigure2, mockFigure2);
         assertNotEquals("", mockFigure1);
 
         when(figure.canEqual(mockFigure1)).thenReturn(true);

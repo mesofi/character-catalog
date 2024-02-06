@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas Arzaluz, Nov 29, 2023.
+ * Armando Rivas Arzaluz, Feb 5, 2024.
  */
 package com.mesofi.collection.charactercatalog.service;
 
@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.LocalDate;
@@ -38,8 +39,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +52,7 @@ import com.mesofi.collection.charactercatalog.model.GalleryImage;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.RestockType;
 import com.mesofi.collection.charactercatalog.model.Series;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
@@ -70,12 +70,13 @@ public class CharacterFigureServiceTest {
     @Mock
     private CharacterFigureRepository repo;
     @Mock
-    private CharacterFigureModelMapper modelMapper;
-    @Mock
-    private CharacterFigureFileMapper fileMapper;
+    private MultipartFile multipartFile;
 
     @Mock
-    private MultipartFile multipartFile;
+    private CharacterFigureModelMapper modelMapper;
+
+    @Mock
+    private CharacterFigureFileMapper fileMapper;
 
     /**
      * Test for {@link CharacterFigureService#loadAllCharacters(MultipartFile)}
@@ -108,7 +109,9 @@ public class CharacterFigureServiceTest {
         final String folder = "characters/";
         final String name = "MythCloth Catalog - CatalogMyth-tiny.tsv";
         final byte[] bytes = Files.readAllBytes(getPathFromClassPath(folder + name));
-        MultipartFile result = new MockMultipartFile(name, name, MediaType.TEXT_PLAIN_VALUE, bytes);
+
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        when(multipartFile.getInputStream()).thenReturn(inputStream);
 
         CharacterFigure cf1 = new CharacterFigure();
         cf1.setOriginalName("Eta Benetnasch Mime EX");
@@ -240,7 +243,7 @@ public class CharacterFigureServiceTest {
         when(repo.saveAll(any())).thenReturn(List.of(cfe1, cfe2, cfe3));
 
         // The service is tested here ...
-        assertEquals(3, service.loadAllCharacters(result));
+        assertEquals(3, service.loadAllCharacters(multipartFile));
     }
 
     /**
@@ -899,7 +902,7 @@ public class CharacterFigureServiceTest {
         when(modelMapper.toModel(cfe2)).thenReturn(createCharacterFigureWithReleaseDate("3/2018"));
 
         // The service is tested here ...
-        List<CharacterFigure> characters = service.retrieveAllCharacters();
+        List<CharacterFigure> characters = service.retrieveAllCharacters(RestockType.ALL);
         assertNotNull(characters);
         assertEquals(2, characters.size());
 
@@ -1208,7 +1211,37 @@ public class CharacterFigureServiceTest {
     }
 
     /**
-     * Test for {@link CharacterFigureService#retrieveAllCharacters()}
+     * This method is used to create a very generic {@link CharacterFigureEntity}
+     * 
+     * @param id           The unique identifier.
+     * @param originalName The original name.
+     * @param baseName     The base name.
+     * @param group        The group.
+     * @param revival      Is it revival?
+     * @return The new {@link CharacterFigureEntity}
+     */
+    private CharacterFigureEntity createBasicSSEXFigureEntity(String id, String originalName, String baseName,
+            Group group, boolean revival) {
+        CharacterFigureEntity characterFigure = new CharacterFigureEntity();
+        characterFigure.setId(id);
+        characterFigure.setOriginalName(originalName);
+        characterFigure.setBaseName(baseName);
+        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
+        characterFigure.setSeries(Series.SAINT_SEIYA);
+        characterFigure.setGroup(group);
+        characterFigure.setMetal(false);
+        characterFigure.setOce(false);
+        characterFigure.setRevival(revival);
+        characterFigure.setPlainCloth(false);
+        characterFigure.setHk(false);
+        characterFigure.setManga(false);
+        characterFigure.setSurplice(false);
+
+        return characterFigure;
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType)}
      */
     @Test
     public void should_get_all_characters() {
@@ -1222,7 +1255,7 @@ public class CharacterFigureServiceTest {
                 LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOD, false, false);
         when(modelMapper.toModel(entity1)).thenReturn(figure1);
 
-        List<CharacterFigure> characters = service.retrieveAllCharacters();
+        List<CharacterFigure> characters = service.retrieveAllCharacters(RestockType.ALL);
         assertNotNull(characters);
         assertFalse(characters.isEmpty());
 
@@ -1255,6 +1288,122 @@ public class CharacterFigureServiceTest {
         assertNull(characters.get(i).getIssuanceJPY().getPreorderDate());
         assertNull(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
         assertEquals(LocalDate.of(2018, 1, 27), characters.get(i).getIssuanceJPY().getReleaseDate());
+        assertTrue(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
+        assertNull(characters.get(i).getIssuanceMXN());
+        assertFalse(characters.get(i).isFutureRelease());
+        assertNull(characters.get(i).getUrl());
+        assertNull(characters.get(i).getDistribution());
+        assertNull(characters.get(i).getRemarks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType)}
+     */
+    @Test
+    public void should_get_all_characters_no_restocks() {
+        CharacterFigureEntity entity = createBasicSSEXFigureEntity("67890", "Libra Dohko (God Cloth) EX", "Libra Dohko",
+                Group.GOLD, false);
+        CharacterFigureEntity entityRestock = createBasicSSEXFigureEntity("67891", "Libra Dohko (God Cloth) EX",
+                "Libra Dohko", Group.GOLD, false);
+        when(repo.findAll(getSorting())).thenReturn(List.of(entity, entityRestock));
+
+        CharacterFigure figure = createBasicFigure(null, "Libra Dohko (God Cloth) EX", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOLD, false, false);
+        CharacterFigure figureRestock = createBasicFigure(null, "Libra Dohko (God Cloth) EX", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOLD, false, false);
+        when(modelMapper.toModel(entity)).thenReturn(figure);
+        when(modelMapper.toModel(entityRestock)).thenReturn(figureRestock);
+
+        List<CharacterFigure> characters = service.retrieveAllCharacters(RestockType.NONE);
+        var i = 0;
+        assertNotNull(characters);
+        assertEquals(1, characters.size());
+        assertNull(characters.get(i).getId());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getOriginalName());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getBaseName());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characters.get(i).getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characters.get(i).getSeries());
+        assertEquals(Group.GOLD, characters.get(i).getGroup());
+        assertFalse(characters.get(i).isMetalBody());
+        assertFalse(characters.get(i).isOce());
+        assertFalse(characters.get(i).isRevival());
+        assertFalse(characters.get(i).isPlainCloth());
+        assertFalse(characters.get(i).isBrokenCloth());
+        assertFalse(characters.get(i).isBronzeToGold());
+        assertFalse(characters.get(i).isGold());
+        assertFalse(characters.get(i).isHongKongVersion());
+        assertFalse(characters.get(i).isManga());
+        assertFalse(characters.get(i).isSurplice());
+        assertFalse(characters.get(i).isSet());
+        assertNull(characters.get(i).getAnniversary());
+        assertNull(characters.get(i).getTags());
+        assertNull(characters.get(i).getImages());
+        assertNotNull(characters.get(i).getIssuanceJPY());
+        assertEquals(new BigDecimal("12000"), characters.get(i).getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("12960.00"), characters.get(i).getIssuanceJPY().getReleasePrice());
+        assertNull(characters.get(i).getIssuanceJPY().getFirstAnnouncementDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
+        assertEquals(LocalDate.of(2018, 1, 27), characters.get(i).getIssuanceJPY().getReleaseDate());
+        assertTrue(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
+        assertNull(characters.get(i).getIssuanceMXN());
+        assertFalse(characters.get(i).isFutureRelease());
+        assertNull(characters.get(i).getUrl());
+        assertNull(characters.get(i).getDistribution());
+        assertNull(characters.get(i).getRemarks());
+    }
+
+    /**
+     * Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType)}
+     */
+    @Test
+    public void should_get_all_characters_only_restocks() {
+        CharacterFigureEntity entity = createBasicSSEXFigureEntity("67890", "Libra Dohko (God Cloth) EX", "Libra Dohko",
+                Group.GOLD, false);
+        CharacterFigureEntity entityRestock = createBasicSSEXFigureEntity("67891", "Libra Dohko (God Cloth) EX",
+                "Libra Dohko", Group.GOLD, false);
+        when(repo.findAll(getSorting())).thenReturn(List.of(entity, entityRestock));
+
+        CharacterFigure figure = createBasicFigure(null, "Libra Dohko (God Cloth) EX", LocalDate.of(2018, 1, 27),
+                LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOLD, false, false);
+        CharacterFigure figureRestock = createBasicFigure(null, "Libra Dohko (God Cloth) EX", LocalDate.of(2021, 9, 18),
+                LineUp.MYTH_CLOTH_EX, Series.SAINT_SEIYA, Group.GOLD, false, false);
+        when(modelMapper.toModel(entity)).thenReturn(figure);
+        when(modelMapper.toModel(entityRestock)).thenReturn(figureRestock);
+
+        List<CharacterFigure> characters = service.retrieveAllCharacters(RestockType.ONLY);
+        var i = 0;
+        assertNotNull(characters);
+        assertEquals(1, characters.size());
+        assertNull(characters.get(i).getId());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getOriginalName());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getBaseName());
+        assertEquals("Libra Dohko (God Cloth) EX", characters.get(i).getDisplayableName());
+        assertEquals(LineUp.MYTH_CLOTH_EX, characters.get(i).getLineUp());
+        assertEquals(Series.SAINT_SEIYA, characters.get(i).getSeries());
+        assertEquals(Group.GOLD, characters.get(i).getGroup());
+        assertFalse(characters.get(i).isMetalBody());
+        assertFalse(characters.get(i).isOce());
+        assertFalse(characters.get(i).isRevival());
+        assertFalse(characters.get(i).isPlainCloth());
+        assertFalse(characters.get(i).isBrokenCloth());
+        assertFalse(characters.get(i).isBronzeToGold());
+        assertFalse(characters.get(i).isGold());
+        assertFalse(characters.get(i).isHongKongVersion());
+        assertFalse(characters.get(i).isManga());
+        assertFalse(characters.get(i).isSurplice());
+        assertFalse(characters.get(i).isSet());
+        assertNull(characters.get(i).getAnniversary());
+        assertNull(characters.get(i).getTags());
+        assertNull(characters.get(i).getImages());
+        assertNotNull(characters.get(i).getIssuanceJPY());
+        assertEquals(new BigDecimal("12000"), characters.get(i).getIssuanceJPY().getBasePrice());
+        assertEquals(new BigDecimal("13200.00"), characters.get(i).getIssuanceJPY().getReleasePrice());
+        assertNull(characters.get(i).getIssuanceJPY().getFirstAnnouncementDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderDate());
+        assertNull(characters.get(i).getIssuanceJPY().getPreorderConfirmationDay());
+        assertEquals(LocalDate.of(2021, 9, 18), characters.get(i).getIssuanceJPY().getReleaseDate());
         assertTrue(characters.get(i).getIssuanceJPY().getReleaseConfirmationDay());
         assertNull(characters.get(i).getIssuanceMXN());
         assertFalse(characters.get(i).isFutureRelease());
@@ -1341,42 +1490,12 @@ public class CharacterFigureServiceTest {
     }
 
     /**
-     * This method is used to create a very generic {@link CharacterFigureEntity}
-     * 
-     * @param id           The unique identifier.
-     * @param originalName The original name.
-     * @param baseName     The base name.
-     * @param group        The group.
-     * @param revival      Is it revival?
-     * @return The new {@link CharacterFigureEntity}
-     */
-    private CharacterFigureEntity createBasicSSEXFigureEntity(String id, String originalName, String baseName,
-            Group group, boolean revival) {
-        CharacterFigureEntity characterFigure = new CharacterFigureEntity();
-        characterFigure.setId(id);
-        characterFigure.setOriginalName(originalName);
-        characterFigure.setBaseName(baseName);
-        characterFigure.setLineUp(LineUp.MYTH_CLOTH_EX);
-        characterFigure.setSeries(Series.SAINT_SEIYA);
-        characterFigure.setGroup(group);
-        characterFigure.setMetal(false);
-        characterFigure.setOce(false);
-        characterFigure.setRevival(revival);
-        characterFigure.setPlainCloth(false);
-        characterFigure.setHk(false);
-        characterFigure.setManga(false);
-        characterFigure.setSurplice(false);
-
-        return characterFigure;
-    }
-
-    /**
      * Creates a basic figure.
      * 
      * @param id           The optional identifier.
      * @param originalName The original name.
      * @param releaseDate  The release date.
-     * @param lineUp       The line up.
+     * @param lineUp       The line-up.
      * @param series       The series.
      * @param group        The actual group.
      * @param oce          Is it OCE?

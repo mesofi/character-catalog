@@ -5,6 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog.exception;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +59,22 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         body.setMessage(ex.getMessage());
         body.setErrors(getErrors(ex));
         return createResponseEntity(body, headers, status, request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex, final WebRequest request) {
+        log.debug("Handle type mismatch exception ...");
+
+        ApiErrorResponse body = new ApiErrorResponse();
+        Optional.ofNullable(ex.getRequiredType()).ifPresentOrElse(requiredType -> {
+            String name = ex.getName();
+            String type = requiredType.getSimpleName();
+            Object value = ex.getValue();
+            String message = String.format("'%s' should be a valid '%s' and '%s' isn't", name, type, value);
+            body.setMessage(message);
+        }, () -> body.setMessage(ex.getMessage()));
+
+        return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = { CharacterFigureNotFoundException.class })

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.RestockType;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 
 import lombok.AllArgsConstructor;
@@ -52,11 +53,16 @@ public class CharacterFigureController {
     }
 
     /**
+     * Gets all the characters based on a restocking type.
      * 
-     * @return
+     * @param restockType The restocking type.
+     * @return The list of characters.
      */
     @GetMapping
-    public List<CharacterFigure> getAllCharactersByName() {
-        return characterFigureService.retrieveAllCharacters();
+    public List<CharacterFigure> getAllCharacters(
+            @RequestParam(name = "restocks", required = false, defaultValue = "ALL") RestockType restockType) {
+        List<CharacterFigure> figureList = characterFigureService.retrieveAllCharacters(restockType);
+        log.debug("Total of figures retrieved: {}, with restock type: {}", figureList.size(), restockType);
+        return figureList;
     }
 }

@@ -17,10 +17,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -36,6 +39,7 @@ import com.mesofi.collection.charactercatalog.model.Figure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.Issuance;
 import com.mesofi.collection.charactercatalog.model.LineUp;
+import com.mesofi.collection.charactercatalog.model.RestockType;
 import com.mesofi.collection.charactercatalog.model.Series;
 import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
@@ -195,16 +199,32 @@ public class CharacterFigureService {
     /**
      * Retrieve all the characters ordered by release date.
      * 
-     * @return The list of characters.
+     * @param restockType The restocking type.
+     * 
+     * @return The list of characters based on the restocking type.
      */
-    public List<CharacterFigure> retrieveAllCharacters() {
-        // @formatter:off
-        List<CharacterFigure> figureList = repo.findAll(getSorting()).stream()
-                .map(this::fromEntityToDisplayableFigure)
-                .toList();
-        // @formatter:on
-        log.debug("Total of characters found: {}", figureList.size());
-        return figureList;
+    public List<CharacterFigure> retrieveAllCharacters(RestockType restockType) {
+        restockType = Optional.ofNullable(restockType).orElse(RestockType.ALL);
+
+        Stream<CharacterFigure> stream = repo.findAll(getSorting()).stream().map(this::fromEntityToDisplayableFigure);
+
+        return switch (restockType) {
+        case ALL -> stream.toList();
+        case NONE -> stream.distinct().toList();
+        case ONLY -> findOnlyRestocks(stream.toList());
+        };
+    }
+
+    /**
+     * Return a list of only re-stocks.
+     * 
+     * @param allCharacters All the existing characters.
+     * @return List of only re-stocks.
+     */
+    private List<CharacterFigure> findOnlyRestocks(List<CharacterFigure> allCharacters) {
+        LinkedHashSet<CharacterFigure> uniqueCharacters = new LinkedHashSet<>();
+        return allCharacters.stream().filter(character -> !uniqueCharacters.add(character))
+                .collect(Collectors.toList());
     }
 
     /**

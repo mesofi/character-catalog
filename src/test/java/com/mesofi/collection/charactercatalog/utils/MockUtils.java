@@ -3,7 +3,7 @@
  * via any medium is strictly prohibited Proprietary and confidential Written by
  * Armando Rivas Arzaluz, Jan 31, 2024.
  */
-package com.mesofi.collection.charactercatalog.mock;
+package com.mesofi.collection.charactercatalog.utils;
 
 import com.mesofi.collection.charactercatalog.model.*;
 

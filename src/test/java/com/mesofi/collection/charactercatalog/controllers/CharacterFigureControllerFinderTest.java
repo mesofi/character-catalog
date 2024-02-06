@@ -5,7 +5,7 @@
  */
 package com.mesofi.collection.charactercatalog.controllers;
 
-import static com.mesofi.collection.charactercatalog.mock.MockUtils.createBasicMcCharacterFigure;
+import static com.mesofi.collection.charactercatalog.utils.MockUtils.createBasicMcCharacterFigure;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

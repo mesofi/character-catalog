@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Mesofi - All Rights Reserved Unauthorized copying of this file,
  * via any medium is strictly prohibited Proprietary and confidential Written by
- * Armando Rivas, Sep 19, 2023.
+ * Armando Rivas Arzaluz, Feb 7, 2024.
  */
 package com.mesofi.collection.charactercatalog;
 
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -20,7 +21,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import com.mesofi.collection.charactercatalog.controllers.CharacterFigureController;
-import com.mesofi.collection.charactercatalog.repository.CharacterFigureRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,15 +32,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @ActiveProfiles("itest")
+@AutoConfigureWebTestClient(timeout = "60000")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CharacterFigureLoaderIT {
 
     @Autowired
     private WebTestClient webTestClient;
-
-    @Autowired
-    private CharacterFigureRepository repository;
 
     final String BASE_URL = "";
     final String CONTEXT = "/characters";
@@ -52,9 +50,6 @@ public class CharacterFigureLoaderIT {
     @Order(1)
     void should_load_all_characters_partial_file() {
         log.debug("Loading all the characters for the first time (partial records) ...");
-
-        // We start by deleting all the existing characters.
-        repository.deleteAll();
 
         final String data = "characters/MythCloth Catalog - CatalogMyth-min.tsv";
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
@@ -242,9 +237,6 @@ public class CharacterFigureLoaderIT {
     @Order(3)
     void should_load_all_characters_complete_file() {
         log.debug("Loading all the characters ...");
-
-        // We start by deleting all the existing characters.
-        repository.deleteAll();
 
         final String data = "characters/MythCloth Catalog - CatalogMyth.tsv";
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();

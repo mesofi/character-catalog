@@ -1,4 +1,4 @@
-# property needed when running the integration tests for embeded mongodb.
+# property needed when running the integration tests for embedded mongodb.
 de:
   flapdoodle:
     mongodb:

@@ -91,7 +91,6 @@ public class CharacterFigureService {
      */
     public long loadAllCharacters(final MultipartFile file) {
         log.debug("Loading all the records ...");
-
         if (Objects.isNull(file)) {
             throw new IllegalArgumentException("The uploaded file is missing...");
         }

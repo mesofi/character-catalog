@@ -11,15 +11,16 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link CharacterFigureException}
- * 
+ *
  * @author armandorivasarzaluz
  */
 public class CharacterFigureExceptionTest {
 
-    @Test
-    public void should_verify_error_message() {
-        CharacterFigureException characterFigureException = new CharacterFigureException("My Error message");
+  @Test
+  public void should_verify_error_message() {
+    CharacterFigureException characterFigureException =
+        new CharacterFigureException("My Error message");
 
-        assertEquals("My Error message", characterFigureException.getMessage());
-    }
+    assertEquals("My Error message", characterFigureException.getMessage());
+  }
 }

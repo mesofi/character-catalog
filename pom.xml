@@ -21,6 +21,7 @@
         <de.flapdoodle.embed.mongo.spring30x>4.9.3</de.flapdoodle.embed.mongo.spring30x>
         <pitest-maven.version>1.15.3</pitest-maven.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
+        <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -190,6 +191,23 @@
                     want it to run
                     -->
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless-maven-plugin.version}</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include> <!-- Check application code -->
+                            <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
+                        </includes>
+                        <googleJavaFormat>
+                            <version>1.15.0</version>
+                            <style>GOOGLE</style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
             </plugin>
         </plugins>
     </build>

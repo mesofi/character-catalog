@@ -11,15 +11,16 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link CharacterFigureNotFoundException}
- * 
+ *
  * @author armandorivasarzaluz
  */
 public class CharacterFigureNotFoundExceptionTest {
 
-    @Test
-    public void should_verify_error_message() {
-        CharacterFigureNotFoundException notFoundException = new CharacterFigureNotFoundException("My Error message");
+  @Test
+  public void should_verify_error_message() {
+    CharacterFigureNotFoundException notFoundException =
+        new CharacterFigureNotFoundException("My Error message");
 
-        assertEquals("My Error message", notFoundException.getMessage());
-    }
+    assertEquals("My Error message", notFoundException.getMessage());
+  }
 }

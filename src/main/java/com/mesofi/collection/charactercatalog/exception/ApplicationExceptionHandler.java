@@ -8,7 +8,7 @@ package com.mesofi.collection.charactercatalog.exception;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,96 +24,104 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Error handling.
- * 
+ *
  * @author armandorivasarzaluz
  */
 @Slf4j
 @RestControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
-        log.debug("Handle http message not readable exception ...");
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Object> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex,
+      @NonNull HttpHeaders headers,
+      @NonNull HttpStatusCode status,
+      @NonNull WebRequest request) {
+    log.debug("Handle http message not readable exception ...");
 
-        ApiErrorResponse body = new ApiErrorResponse();
-        body.setMessage(ex.getMessage());
-        return createResponseEntity(body, headers, status, request);
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    return createResponseEntity(body, headers, status, request);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      @NonNull HttpHeaders headers,
+      @NonNull HttpStatusCode status,
+      @NonNull WebRequest request) {
+    log.debug("Handle method argument not valid exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    body.setErrors(getErrors(ex));
+    return createResponseEntity(body, headers, status, request);
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<Object> handleTypeMismatch(
+      MethodArgumentTypeMismatchException ex, final WebRequest request) {
+    log.debug("Handle type mismatch exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    Optional.ofNullable(ex.getRequiredType())
+        .ifPresentOrElse(
+            requiredType -> {
+              String name = ex.getName();
+              String type = requiredType.getSimpleName();
+              Object value = ex.getValue();
+              String message =
+                  String.format("'%s' should be a valid '%s' and '%s' isn't", name, type, value);
+              body.setMessage(message);
+            },
+            () -> body.setMessage(ex.getMessage()));
+
+    return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+  }
+
+  @ExceptionHandler(value = {CharacterFigureNotFoundException.class})
+  protected ResponseEntity<Object> handleNotFound(
+      CharacterFigureNotFoundException ex, final WebRequest request) {
+    log.debug("Handle character not found exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    return createResponseEntity(body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+  }
+
+  @ExceptionHandler(value = {IllegalArgumentException.class})
+  protected ResponseEntity<Object> handleBadRequest(
+      IllegalArgumentException ex, final WebRequest request) {
+    log.debug("Handle invalid request exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+  }
+
+  @ExceptionHandler(value = {RuntimeException.class})
+  protected ResponseEntity<Object> handleGenericError(
+      RuntimeException ex, final WebRequest request) {
+    log.debug("Unhandle exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    return createResponseEntity(body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+  }
+
+  private Set<String> getErrors(MethodArgumentNotValidException ex) {
+    Set<String> errors = new TreeSet<>();
+
+    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+      errors.add(error.getField() + ": " + error.getDefaultMessage());
+    }
+    for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+      errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
-        log.debug("Handle method argument not valid exception ...");
-
-        ApiErrorResponse body = new ApiErrorResponse();
-        body.setMessage(ex.getMessage());
-        body.setErrors(getErrors(ex));
-        return createResponseEntity(body, headers, status, request);
-    }
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex, final WebRequest request) {
-        log.debug("Handle type mismatch exception ...");
-
-        ApiErrorResponse body = new ApiErrorResponse();
-        Optional.ofNullable(ex.getRequiredType()).ifPresentOrElse(requiredType -> {
-            String name = ex.getName();
-            String type = requiredType.getSimpleName();
-            Object value = ex.getValue();
-            String message = String.format("'%s' should be a valid '%s' and '%s' isn't", name, type, value);
-            body.setMessage(message);
-        }, () -> body.setMessage(ex.getMessage()));
-
-        return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    @ExceptionHandler(value = { CharacterFigureNotFoundException.class })
-    protected ResponseEntity<Object> handleNotFound(CharacterFigureNotFoundException ex, final WebRequest request) {
-        log.debug("Handle character not found exception ...");
-
-        ApiErrorResponse body = new ApiErrorResponse();
-        body.setMessage(ex.getMessage());
-        return createResponseEntity(body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
-    }
-
-    @ExceptionHandler(value = { IllegalArgumentException.class })
-    protected ResponseEntity<Object> handleBadRequest(IllegalArgumentException ex, final WebRequest request) {
-        log.debug("Handle invalid request exception ...");
-
-        ApiErrorResponse body = new ApiErrorResponse();
-        body.setMessage(ex.getMessage());
-        return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    @ExceptionHandler(value = { RuntimeException.class })
-    protected ResponseEntity<Object> handleGenericError(RuntimeException ex, final WebRequest request) {
-        log.debug("Unhandle exception ...");
-
-        ApiErrorResponse body = new ApiErrorResponse();
-        body.setMessage(ex.getMessage());
-        return createResponseEntity(body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
-
-    private Set<String> getErrors(MethodArgumentNotValidException ex) {
-        Set<String> errors = new TreeSet<>();
-
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getField() + ": " + error.getDefaultMessage());
-        }
-        for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-        }
-
-        return errors;
-    }
+    return errors;
+  }
 }

@@ -5,8 +5,12 @@
  */
 package com.mesofi.collection.charactercatalog.controllers;
 
+import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.RestockType;
+import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
 import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,16 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mesofi.collection.charactercatalog.model.CharacterFigure;
-import com.mesofi.collection.charactercatalog.model.RestockType;
-import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Handles HTTP requests.
- * 
+ *
  * @author armandorivasarzaluz
  */
 @Slf4j
@@ -36,33 +33,36 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/characters")
 public class CharacterFigureController {
 
-    private final CharacterFigureService characterFigureService;
+  private final CharacterFigureService characterFigureService;
 
-    /**
-     * Handle all the incoming records.
-     * 
-     * @param file The records to be uploaded.
-     */
-    @PostMapping("/loader")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
-        log.debug("Loading all the character records from the original source ...");
-        // calls the actual service ...
-        long total = characterFigureService.loadAllCharacters(file);
-        log.debug("Total records loaded: {}", total);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-    }
+  /**
+   * Handle all the incoming records.
+   *
+   * @param file The records to be uploaded.
+   */
+  @PostMapping("/loader")
+  public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    log.debug("Loading all the character records from the original source ...");
+    // calls the actual service ...
+    long total = characterFigureService.loadAllCharacters(file);
+    log.debug("Total records loaded: {}", total);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+  }
 
-    /**
-     * Gets all the characters based on a restocking type.
-     * 
-     * @param restockType The restocking type.
-     * @return The list of characters.
-     */
-    @GetMapping
-    public List<CharacterFigure> getAllCharacters(
-            @RequestParam(name = "restocks", required = false, defaultValue = "ALL") RestockType restockType) {
-        List<CharacterFigure> figureList = characterFigureService.retrieveAllCharacters(restockType);
-        log.debug("Total of figures retrieved: {}, with restock type: {}", figureList.size(), restockType);
-        return figureList;
-    }
+  /**
+   * Gets all the characters based on a restocking type.
+   *
+   * @param restockType The restocking type.
+   * @return The list of characters.
+   */
+  @GetMapping
+  public List<CharacterFigure> getAllCharacters(
+      @RequestParam(name = "restocks", required = false, defaultValue = "ALL")
+          RestockType restockType) {
+    List<CharacterFigure> figureList =
+        characterFigureService.retrieveAllCharacters(restockType, null);
+    log.debug(
+        "Total of figures retrieved: {}, with restock type: {}", figureList.size(), restockType);
+    return figureList;
+  }
 }

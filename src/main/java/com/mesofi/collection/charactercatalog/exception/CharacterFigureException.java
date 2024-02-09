@@ -9,15 +9,14 @@ import java.io.Serial;
 
 /**
  * General exception for the service.
- * 
+ *
  * @author armandorivasarzaluz
  */
 public class CharacterFigureException extends RuntimeException {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
-    public CharacterFigureException(String message) {
-        super(message);
-    }
+  public CharacterFigureException(String message) {
+    super(message);
+  }
 }

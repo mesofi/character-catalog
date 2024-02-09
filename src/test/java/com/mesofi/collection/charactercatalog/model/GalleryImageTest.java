@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,135 +23,132 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Test for {@link GalleryImage}
- * 
+ *
  * @author armandorivasarzaluz
  */
 @ExtendWith(MockitoExtension.class)
 public class GalleryImageTest {
 
-    private GalleryImage galleryImage;
+  private GalleryImage galleryImage;
 
-    @Mock
-    private GalleryImage galleryImageMock;
+  @Mock private GalleryImage galleryImageMock;
 
-    @BeforeEach
-    public void beforeEach() {
-        galleryImage = new GalleryImage();
-    }
+  @BeforeEach
+  public void beforeEach() {
+    galleryImage = new GalleryImage();
+  }
 
-    @ParameterizedTest
-    @MethodSource("provideBooleanValues")
-    public void should_verify_getter_setter_properties(boolean official, boolean cover) {
-        galleryImage.setIdImage("3209320mj0uyg387");
-        galleryImage.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg");
-        galleryImage.setOfficial(official);
-        galleryImage.setCoverPhoto(cover);
-        galleryImage.setOrder(2);
+  @ParameterizedTest
+  @MethodSource("provideBooleanValues")
+  public void should_verify_getter_setter_properties(boolean official, boolean cover) {
+    galleryImage.setIdImage("3209320mj0uyg387");
+    galleryImage.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg");
+    galleryImage.setOfficial(official);
+    galleryImage.setCoverPhoto(cover);
+    galleryImage.setOrder(2);
 
-        assertEquals("3209320mj0uyg387", galleryImage.getIdImage());
-        assertEquals("https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg", galleryImage.getUrl());
-        assertEquals(official, galleryImage.isOfficial());
-        assertEquals(cover, galleryImage.isCoverPhoto());
-        assertEquals(2, galleryImage.getOrder());
-    }
+    assertEquals("3209320mj0uyg387", galleryImage.getIdImage());
+    assertEquals(
+        "https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg", galleryImage.getUrl());
+    assertEquals(official, galleryImage.isOfficial());
+    assertEquals(cover, galleryImage.isCoverPhoto());
+    assertEquals(2, galleryImage.getOrder());
+  }
 
-    @Test
-    public void should_verify_equality_1() {
-        GalleryImage otherGalleryImage = galleryImage;
-        assertEquals(galleryImage, otherGalleryImage);
-    }
+  @Test
+  public void should_verify_equality_1() {
+    GalleryImage otherGalleryImage = galleryImage;
+    assertEquals(galleryImage, otherGalleryImage);
+  }
 
-    @Test
-    public void should_verify_equality_2() {
-        assertNotEquals("", galleryImage);
-    }
+  @Test
+  public void should_verify_equality_2() {
+    assertNotEquals("", galleryImage);
+  }
 
-    @Test
-    public void should_verify_equality_3() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(false);
-        assertNotEquals(galleryImage, galleryImageMock);
-    }
+  @Test
+  public void should_verify_equality_3() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(false);
+    assertNotEquals(galleryImage, galleryImageMock);
+  }
 
-    @Test
-    public void should_verify_equality_4() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
-        when(galleryImageMock.getIdImage()).thenReturn("idImage1");
+  @Test
+  public void should_verify_equality_4() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
+    when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-        assertNotEquals(galleryImage, galleryImageMock);
-    }
+    assertNotEquals(galleryImage, galleryImageMock);
+  }
 
-    @Test
-    public void should_verify_equality_5() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
-        
-        galleryImage.setIdImage("idImage2");
-        when(galleryImageMock.getIdImage()).thenReturn("idImage1");
+  @Test
+  public void should_verify_equality_5() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
 
-        assertNotEquals(galleryImage, galleryImageMock);
-    }
+    galleryImage.setIdImage("idImage2");
+    when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-    @Test
-    public void should_verify_equality_6() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
-        
-        galleryImage.setIdImage("idImage1");
-        when(galleryImageMock.getIdImage()).thenReturn("idImage1");
+    assertNotEquals(galleryImage, galleryImageMock);
+  }
 
-        when(galleryImageMock.getUrl()).thenReturn("idUrl1");
+  @Test
+  public void should_verify_equality_6() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
 
-        assertNotEquals(galleryImage, galleryImageMock);
-    }
+    galleryImage.setIdImage("idImage1");
+    when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-    @Test
-    public void should_verify_equality_7() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
-        
-        galleryImage.setIdImage("idImage1");
-        when(galleryImageMock.getIdImage()).thenReturn("idImage1");
+    when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        galleryImage.setUrl("idUrl2");
-        when(galleryImageMock.getUrl()).thenReturn("idUrl1");
+    assertNotEquals(galleryImage, galleryImageMock);
+  }
 
-        assertNotEquals(galleryImage, galleryImageMock);
-    }
+  @Test
+  public void should_verify_equality_7() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
 
-    @Test
-    public void should_verify_equality_8() {
-        when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
-        
-        galleryImage.setIdImage("idImage1");
-        when(galleryImageMock.getIdImage()).thenReturn("idImage1");
+    galleryImage.setIdImage("idImage1");
+    when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-        galleryImage.setUrl("idUrl1");
-        when(galleryImageMock.getUrl()).thenReturn("idUrl1");
+    galleryImage.setUrl("idUrl2");
+    when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        assertEquals(galleryImage, galleryImageMock);
-    }
+    assertNotEquals(galleryImage, galleryImageMock);
+  }
 
-    @Test
-    public void should_verify_same_type() {
-        GalleryImage other = new GalleryImage(null, null, false, false, 0);
-        assertTrue(galleryImage.canEqual(other));
-        assertFalse(galleryImage.canEqual("Other"));
-    }
+  @Test
+  public void should_verify_equality_8() {
+    when(galleryImageMock.canEqual(galleryImage)).thenReturn(true);
 
-    @Test
-    public void should_get_hash_code() {
-        assertEquals(6061, galleryImage.hashCode());
+    galleryImage.setIdImage("idImage1");
+    when(galleryImageMock.getIdImage()).thenReturn("idImage1");
 
-        galleryImage.setIdImage("1234");
-        assertEquals(89060602, galleryImage.hashCode());
+    galleryImage.setUrl("idUrl1");
+    when(galleryImageMock.getUrl()).thenReturn("idUrl1");
 
-        galleryImage.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg");
-        assertEquals(2016231658, galleryImage.hashCode());
-    }
+    assertEquals(galleryImage, galleryImageMock);
+  }
 
-    private static Stream<Arguments> provideBooleanValues() {
-        // @formatter:off
-        return Stream.of(
-                Arguments.of(true, true),
-                Arguments.of(false, false)
-        );
-        // @formatter:on
-    }
+  @Test
+  public void should_verify_same_type() {
+    GalleryImage other = new GalleryImage(null, null, false, false, 0);
+    assertTrue(galleryImage.canEqual(other));
+    assertFalse(galleryImage.canEqual("Other"));
+  }
+
+  @Test
+  public void should_get_hash_code() {
+    assertEquals(6061, galleryImage.hashCode());
+
+    galleryImage.setIdImage("1234");
+    assertEquals(89060602, galleryImage.hashCode());
+
+    galleryImage.setUrl("https://imagizer.imageshack.com/v2/1024x768q70/924/hbuF2m.jpg");
+    assertEquals(2016231658, galleryImage.hashCode());
+  }
+
+  private static Stream<Arguments> provideBooleanValues() {
+    // @formatter:off
+    return Stream.of(Arguments.of(true, true), Arguments.of(false, false));
+    // @formatter:on
+  }
 }

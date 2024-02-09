@@ -10,14 +10,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Entry point of the application.
- * 
- * @author armandorivasarzaluz
  *
+ * @author armandorivasarzaluz
  */
 @SpringBootApplication
 public class CharacterCatalogApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(CharacterCatalogApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(CharacterCatalogApplication.class, args);
+  }
 }

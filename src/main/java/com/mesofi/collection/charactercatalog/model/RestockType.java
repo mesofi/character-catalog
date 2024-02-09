@@ -6,9 +6,10 @@
 package com.mesofi.collection.charactercatalog.model;
 
 /**
- * 
  * @author armandorivasarzaluz
  */
 public enum RestockType {
-    NONE, ONLY, ALL
+  NONE,
+  ONLY,
+  ALL
 }

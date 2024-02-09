@@ -9,32 +9,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link ApiErrorResponse}
- * 
+ *
  * @author armandorivasarzaluz
  */
 public class ApiErrorResponseTest {
 
-    private ApiErrorResponse apiErrorResponse;
+  private ApiErrorResponse apiErrorResponse;
 
-    @BeforeEach
-    public void beforeEach() {
-        apiErrorResponse = new ApiErrorResponse();
-    }
+  @BeforeEach
+  public void beforeEach() {
+    apiErrorResponse = new ApiErrorResponse();
+  }
 
-    @Test
-    public void should_verify_getter_setter_properties() {
-        apiErrorResponse.setErrors(Set.of("Error1"));
-        apiErrorResponse.setMessage("My Error message");
-        apiErrorResponse.setTimestamp(LocalDateTime.of(2023, 10, 2, 4, 5));
+  @Test
+  public void should_verify_getter_setter_properties() {
+    apiErrorResponse.setErrors(Set.of("Error1"));
+    apiErrorResponse.setMessage("My Error message");
+    apiErrorResponse.setTimestamp(LocalDateTime.of(2023, 10, 2, 4, 5));
 
-        assertEquals(Set.of("Error1"), apiErrorResponse.getErrors());
-        assertEquals("My Error message", apiErrorResponse.getMessage());
-        assertEquals(LocalDateTime.of(2023, 10, 2, 4, 5), apiErrorResponse.getTimestamp());
-    }
+    assertEquals(Set.of("Error1"), apiErrorResponse.getErrors());
+    assertEquals("My Error message", apiErrorResponse.getMessage());
+    assertEquals(LocalDateTime.of(2023, 10, 2, 4, 5), apiErrorResponse.getTimestamp());
+  }
 }

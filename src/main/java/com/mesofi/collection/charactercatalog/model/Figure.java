@@ -6,14 +6,13 @@
 package com.mesofi.collection.charactercatalog.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Common figure properties.
- * 
+ *
  * @author armandorivasarzaluz
  */
 @Getter
@@ -22,21 +21,17 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class Figure {
 
-    @EqualsAndHashCode.Exclude
-    private Issuance issuanceJPY;
+  @EqualsAndHashCode.Exclude private Issuance issuanceJPY;
 
-    @EqualsAndHashCode.Exclude
-    private Issuance issuanceMXN;
+  @EqualsAndHashCode.Exclude private Issuance issuanceMXN;
 
-    @EqualsAndHashCode.Exclude
-    private boolean futureRelease; // <== Calculated == Used to determine if the figure is in the future or not.
+  @EqualsAndHashCode.Exclude
+  private boolean
+      futureRelease; // <== Calculated == Used to determine if the figure is in the future or not.
 
-    @EqualsAndHashCode.Exclude
-    private String url; // URL for the Tamashii website.
+  @EqualsAndHashCode.Exclude private String url; // URL for the Tamashii website.
 
-    @EqualsAndHashCode.Exclude
-    private Distribution distribution; // how this figure was distributed.
+  @EqualsAndHashCode.Exclude private Distribution distribution; // how this figure was distributed.
 
-    @EqualsAndHashCode.Exclude
-    private String remarks; // remarks or comments.
+  @EqualsAndHashCode.Exclude private String remarks; // remarks or comments.
 }

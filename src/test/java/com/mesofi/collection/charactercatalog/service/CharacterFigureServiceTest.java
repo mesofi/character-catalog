@@ -11,6 +11,7 @@ import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toInteger
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toPrice;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.toStringValue;
 import static com.mesofi.collection.charactercatalog.utils.FileUtils.getPathFromClassPath;
+import static com.mesofi.collection.charactercatalog.utils.MockUtils.getNamingExclusions;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.mesofi.collection.charactercatalog.CharacterCatalogConfig;
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
@@ -64,12 +66,12 @@ public class CharacterFigureServiceTest {
 
   @InjectMocks private CharacterFigureService service;
 
-  @Mock private CharacterFigureRepository repo;
   @Mock private MultipartFile multipartFile;
 
+  @Mock private CharacterFigureRepository repo;
   @Mock private CharacterFigureModelMapper modelMapper;
-
   @Mock private CharacterFigureFileMapper fileMapper;
+  @Mock private CharacterCatalogConfig.Props props;
 
   /** Test for {@link CharacterFigureService#loadAllCharacters(MultipartFile)} */
   @Test
@@ -1346,7 +1348,10 @@ public class CharacterFigureServiceTest {
     assertNull(characters.get(i).getRemarks());
   }
 
-  /** Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType, String) */
+  /**
+   * Test for
+   * {@link CharacterFigureService#retrieveAllCharacters(RestockType, String)
+   */
   @Test
   public void retrieveAllCharacters_whenAllCharactersAvailable_thenReturnNoRestocks() {
     CharacterFigureEntity entity =
@@ -1420,7 +1425,10 @@ public class CharacterFigureServiceTest {
     assertNull(characters.get(i).getRemarks());
   }
 
-  /** Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType)} */
+  /**
+   * Test for
+   * {@link CharacterFigureService#retrieveAllCharacters(RestockType, String)
+   */
   @Test
   public void retrieveAllCharacters_whenAllCharactersAvailable_thenReturnOnlyRestocks() {
     CharacterFigureEntity entity =
@@ -1492,6 +1500,77 @@ public class CharacterFigureServiceTest {
     assertNull(characters.get(i).getUrl());
     assertNull(characters.get(i).getDistribution());
     assertNull(characters.get(i).getRemarks());
+  }
+
+  /** Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType, String) */
+  @Test
+  public void retrieveAllCharacters_whenAllCharactersAvailable_thenReturnOnlyRestocks_() {
+    CharacterFigureEntity entity1 =
+        createBasicSSEXFigureEntity(
+            "67890", "Libra Dohko (God Cloth) EX", "Libra Dohko", Group.GOLD, false);
+    CharacterFigureEntity entity2 =
+        createBasicSSEXFigureEntity(
+            "67891", "Gemini Saga (Surplice) EX", "Gemini Saga", Group.SURPLICE, false);
+    CharacterFigureEntity entity3 =
+        createBasicSSEXFigureEntity(
+            "67892", "Gemini Saga Gold 24K EX", "Gemini Saga", Group.GOLD, false);
+    CharacterFigureEntity entity4 =
+        createBasicSSEXFigureEntity(
+            "67893", "Gemini Saga EX <Revival>", "Gemini Saga", Group.GOLD, true);
+
+    when(repo.findAll(getSorting())).thenReturn(List.of(entity1, entity2, entity3, entity4));
+
+    CharacterFigure figure1 =
+        createBasicFigure(
+            null,
+            "Libra Dohko (God Cloth) EX",
+            LocalDate.of(2018, 1, 27),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            false);
+    CharacterFigure figure2 =
+        createBasicFigure(
+            null,
+            "Gemini Saga (Surplice) EX",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.SURPLICE,
+            false,
+            false);
+    CharacterFigure figure3 =
+        createBasicFigure(
+            null,
+            "Gemini Saga Gold 24K EX",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            false);
+    CharacterFigure figure4 =
+        createBasicFigure(
+            null,
+            "Gemini Saga EX <Revival>",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            true);
+    when(modelMapper.toModel(entity1)).thenReturn(figure1);
+    when(modelMapper.toModel(entity2)).thenReturn(figure2);
+    when(modelMapper.toModel(entity3)).thenReturn(figure3);
+    when(modelMapper.toModel(entity4)).thenReturn(figure4);
+
+    when(props.namingExclusions()).thenReturn(getNamingExclusions());
+
+    List<CharacterFigure> characters =
+        service.retrieveAllCharacters(
+            RestockType.ALL,
+            "Bandai Saint Seiya Myth Cloth EX Gemini Saga (God Cloth) / no correction BOX - Saga Saga premium set - no correction");
   }
 
   private CharacterFigure createCharacterFigureWithReleaseDate(String releaseDateJPY) {

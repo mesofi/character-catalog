@@ -5,8 +5,10 @@
  */
 package com.mesofi.collection.charactercatalog.service;
 
+import static com.mesofi.collection.charactercatalog.model.RestockType.ALL;
 import static com.mesofi.collection.charactercatalog.utils.CommonUtils.reverseListElements;
 
+import com.mesofi.collection.charactercatalog.CharacterCatalogConfig;
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
@@ -81,6 +83,7 @@ public class CharacterFigureService {
   private CharacterFigureRepository repo;
   private CharacterFigureModelMapper modelMapper;
   private CharacterFigureFileMapper fileMapper;
+  private CharacterCatalogConfig.Props props;
 
   /**
    * Loads all the characters.
@@ -146,169 +149,53 @@ public class CharacterFigureService {
   }
 
   /**
-   * Add some standard tags to the figures. Normally this method should be called if we want to
-   * apply certain tags to a specific set of characters, as opposite to set them directly in the
-   * catalog (tags very specific).
-   *
-   * @param effectiveCharacters The list of characters.
-   */
-  private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
-    for (var figure : effectiveCharacters) {
-      // make sure the tags are not null.
-      if (Objects.isNull(figure.getTags())) {
-        figure.setTags(new HashSet<>());
-      }
-      Set<String> existingTags = figure.getTags();
-      // add tags based on the name ...
-      existingTags.addAll(Arrays.asList(figure.getBaseName().toLowerCase().split("\\s+")));
-      // add tags based on some attributes ...
-      if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
-        existingTags.addAll(TAG_EX);
-      }
-      if (figure.getSeries() == Series.SOG) {
-        existingTags.addAll(TAG_SOG);
-      }
-      if (figure.isRevival()) {
-        existingTags.addAll(TAG_REVIVAL);
-      }
-      if (figure.isSet()) {
-        existingTags.addAll(TAG_SET);
-      }
-      if (figure.isBrokenCloth()) {
-        existingTags.addAll(TAG_BROKEN);
-      }
-      if (figure.isMetalBody()) {
-        existingTags.addAll(TAG_METAL);
-      }
-      if (figure.isOce()) {
-        existingTags.addAll(TAG_OCE);
-      }
-      if (figure.isHongKongVersion()) {
-        existingTags.addAll(TAG_HK);
-      }
-      if (figure.isBronzeToGold()) {
-        existingTags.addAll(TAG_BRONZE_TO_GOLD);
-      }
-      figure.setTags(existingTags);
-    }
-  }
-
-  /**
    * Retrieve all the characters ordered by release date.
    *
-   * @param restockType The restocking type.
+   * @param type The restocking type.
    * @param name The name of the character.
    * @return The list of characters based on the restocking type.
    */
-  public List<CharacterFigure> retrieveAllCharacters(
-      final RestockType restockType, final String name) {
+  public List<CharacterFigure> retrieveAllCharacters(final RestockType type, final String name) {
     Stream<CharacterFigure> stream =
         repo.findAll(getSorting()).stream().map(this::fromEntityToDisplayableFigure);
-    List<CharacterFigure> restockTypeList =
-        switch (Optional.ofNullable(restockType).orElse(RestockType.ALL)) {
+    List<CharacterFigure> list =
+        switch (Optional.ofNullable(type).orElse(ALL)) {
           case ALL -> stream.toList();
           case NONE -> stream.distinct().toList();
           case ONLY -> findOnlyRestocks(stream.toList());
         };
     if (StringUtils.hasText(name)) {
-      // @formatter:off
-      List<String> exclusions =
-          Stream.of(
-                  "Bandai",
-                  "Saint",
-                  "Seiya",
-                  "Myth",
-                  "Cloth",
-                  "Masami",
-                  "Kurumada",
-                  "Cross",
-                  "Correction",
-                  "BOX",
-                  "Modification",
-                  "No",
-                  "Japan",
-                  "version",
-                  "ver.",
-                  "ver",
-                  "OF",
-                  "-",
-                  "/",
-                  "gold",
-                  "Tamashi",
-                  "Tamashii",
-                  "Spirits",
-                  "Nation",
-                  "used",
-                  "web",
-                  "Zodiac",
-                  "copyright",
-                  "sticker",
-                  "from",
-                  "figure",
-                  "action",
-                  "with",
-                  "item",
-                  "first",
-                  "bonus",
-                  "product")
-              .map(String::toLowerCase)
-              .toList();
-      // @formatter:on
-
-      // @formatter:off
       Set<String> simpleNameKeywords =
           Arrays.stream(name.split("\\s+"))
               .map(String::toLowerCase)
-              .filter($ -> !exclusions.contains($))
-              .map(
-                  $ ->
-                      $.replaceAll(
-                          "[\\[\\]\"()-]", "")) // removes characters for example: [], (), - etc ...
-              .filter($ -> !exclusions.contains($))
+              .filter($ -> !props.namingExclusions().contains($))
+              // removes characters for example: [], (), - etc ...
+              .map($ -> $.replaceAll("[\\[\\]\"()-]", ""))
+              .filter($ -> !props.namingExclusions().contains($))
               .collect(Collectors.toSet());
-      // @formatter:on
+
       log.info("Simplified figure name: {}", simpleNameKeywords);
 
       List<CharacterFigure> tmpList;
       for (String nameKeyword : simpleNameKeywords) {
-        // @formatter:off
         tmpList =
-            restockTypeList.stream()
+            list.stream()
                 .filter($ -> Objects.nonNull($.getTags()))
                 .filter($ -> $.getTags().stream().anyMatch(nameKeyword::equalsIgnoreCase))
                 .toList();
-        // @formatter:on
         if (tmpList.isEmpty()) {
-          // no matches yet, we continue with the next tag
-          continue;
+          continue; // no matches yet, we continue with the next tag
         }
-        restockTypeList = tmpList;
-        if (restockTypeList.size() == 1) {
-          // we found at least one match
-          break;
+        list = tmpList;
+        if (list.size() == 1) {
+          break; // we found at least one match
         }
       }
       log.info(
           "Character matches: {}",
-          restockTypeList.stream().map(CharacterFigure::getBaseName).collect(Collectors.toList()));
-
-      return restockTypeList;
-    } else {
-      return restockTypeList;
+          list.stream().map(CharacterFigure::getBaseName).collect(Collectors.toList()));
     }
-  }
-
-  /**
-   * Return a list of only re-stocks.
-   *
-   * @param allCharacters All the existing characters.
-   * @return List of only re-stocks.
-   */
-  private List<CharacterFigure> findOnlyRestocks(List<CharacterFigure> allCharacters) {
-    LinkedHashSet<CharacterFigure> uniqueCharacters = new LinkedHashSet<>();
-    return allCharacters.stream()
-        .filter(character -> !uniqueCharacters.add(character))
-        .collect(Collectors.toList());
+    return list;
   }
 
   /**
@@ -323,51 +210,6 @@ public class CharacterFigureService {
     CharacterFigure cf = modelMapper.toModel(entity);
     calculatePriceAndDisplayableName(cf);
     return cf;
-  }
-
-  /**
-   * This method is used to prepare the figure to be displayed in the response.
-   *
-   * @param figure The character figure to be shown.
-   */
-  private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
-    calculateReleasePricing(figure);
-    calculateDisplayableName(figure);
-  }
-
-  private void calculateReleasePricing(final Figure figure) {
-    Issuance jpy = figure.getIssuanceJPY();
-    Issuance mxn = figure.getIssuanceMXN();
-
-    // the price is set here.
-    if (Objects.nonNull(jpy)) {
-      jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
-    }
-    if (Objects.nonNull(mxn)) {
-      mxn.setReleasePrice(mxn.getBasePrice());
-    }
-  }
-
-  private void calculateDisplayableName(final CharacterFigure figure) {
-    // the displayable name is calculated here
-    figure.setDisplayableName(calculateFigureDisplayableName(figure));
-    // figure.setOriginalName(null);
-    // figure.setBaseName(null);
-  }
-
-  private BigDecimal calculateReleasePrice(
-      final BigDecimal basePrice, final LocalDate releaseDate) {
-    BigDecimal releasePrice;
-    if (Objects.nonNull(basePrice) && Objects.nonNull(releaseDate)) {
-      LocalDate october12019 = LocalDate.of(2019, 10, 1);
-      if (releaseDate.isBefore(october12019)) {
-        releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".08")));
-      } else {
-        releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".10")));
-      }
-      return releasePrice;
-    }
-    return null;
   }
 
   /**
@@ -445,11 +287,110 @@ public class CharacterFigureService {
     return sb.toString();
   }
 
-  private Sort getSorting() {
-    List<Sort.Order> orders = new ArrayList<>();
-    orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
-    orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
-    return Sort.by(orders);
+  /**
+   * Add some standard tags to the figures. Normally this method should be called if we want to
+   * apply certain tags to a specific set of characters, as opposite to set them directly in the
+   * catalog (tags very specific).
+   *
+   * @param effectiveCharacters The list of characters.
+   */
+  private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
+    for (var figure : effectiveCharacters) {
+      // make sure the tags are not null.
+      if (Objects.isNull(figure.getTags())) {
+        figure.setTags(new HashSet<>());
+      }
+      Set<String> existingTags = figure.getTags();
+      // add tags based on the name ...
+      existingTags.addAll(Arrays.asList(figure.getBaseName().toLowerCase().split("\\s+")));
+      // add tags based on some attributes ...
+      if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+        existingTags.addAll(TAG_EX);
+      }
+      if (figure.getSeries() == Series.SOG) {
+        existingTags.addAll(TAG_SOG);
+      }
+      if (figure.isRevival()) {
+        existingTags.addAll(TAG_REVIVAL);
+      }
+      if (figure.isSet()) {
+        existingTags.addAll(TAG_SET);
+      }
+      if (figure.isBrokenCloth()) {
+        existingTags.addAll(TAG_BROKEN);
+      }
+      if (figure.isMetalBody()) {
+        existingTags.addAll(TAG_METAL);
+      }
+      if (figure.isOce()) {
+        existingTags.addAll(TAG_OCE);
+      }
+      if (figure.isHongKongVersion()) {
+        existingTags.addAll(TAG_HK);
+      }
+      if (figure.isBronzeToGold()) {
+        existingTags.addAll(TAG_BRONZE_TO_GOLD);
+      }
+      figure.setTags(existingTags);
+    }
+  }
+
+  /**
+   * Return a list of only re-stocks.
+   *
+   * @param allCharacters All the existing characters.
+   * @return List of only re-stocks.
+   */
+  private List<CharacterFigure> findOnlyRestocks(List<CharacterFigure> allCharacters) {
+    LinkedHashSet<CharacterFigure> uniqueCharacters = new LinkedHashSet<>();
+    return allCharacters.stream()
+        .filter(character -> !uniqueCharacters.add(character))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * This method is used to prepare the figure to be displayed in the response.
+   *
+   * @param figure The character figure to be shown.
+   */
+  private void calculatePriceAndDisplayableName(final CharacterFigure figure) {
+    calculateReleasePricing(figure);
+    calculateDisplayableName(figure);
+  }
+
+  private void calculateReleasePricing(final Figure figure) {
+    Issuance jpy = figure.getIssuanceJPY();
+    Issuance mxn = figure.getIssuanceMXN();
+
+    // the price is set here.
+    if (Objects.nonNull(jpy)) {
+      jpy.setReleasePrice(calculateReleasePrice(jpy.getBasePrice(), jpy.getReleaseDate()));
+    }
+    if (Objects.nonNull(mxn)) {
+      mxn.setReleasePrice(mxn.getBasePrice());
+    }
+  }
+
+  private void calculateDisplayableName(final CharacterFigure figure) {
+    // the displayable name is calculated here
+    figure.setDisplayableName(calculateFigureDisplayableName(figure));
+    // figure.setOriginalName(null);
+    // figure.setBaseName(null);
+  }
+
+  private BigDecimal calculateReleasePrice(
+      final BigDecimal basePrice, final LocalDate releaseDate) {
+    BigDecimal releasePrice;
+    if (Objects.nonNull(basePrice) && Objects.nonNull(releaseDate)) {
+      LocalDate october12019 = LocalDate.of(2019, 10, 1);
+      if (releaseDate.isBefore(october12019)) {
+        releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".08")));
+      } else {
+        releasePrice = basePrice.add(basePrice.multiply(new BigDecimal(".10")));
+      }
+      return releasePrice;
+    }
+    return null;
   }
 
   private StringBuilder replacePattern(String name) {
@@ -459,5 +400,12 @@ public class CharacterFigureService {
   private void appendAttr(StringBuilder sb, String attribute) {
     sb.append(" ");
     sb.append(attribute);
+  }
+
+  private Sort getSorting() {
+    List<Sort.Order> orders = new ArrayList<>();
+    orders.add(new Sort.Order(Sort.Direction.DESC, "futureRelease"));
+    orders.add(new Sort.Order(Sort.Direction.DESC, "issuanceJPY.releaseDate"));
+    return Sort.by(orders);
   }
 }

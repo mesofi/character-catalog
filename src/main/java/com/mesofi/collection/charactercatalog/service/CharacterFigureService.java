@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -141,11 +142,9 @@ public class CharacterFigureService {
     log.debug("Total of figures to be loaded: {}", allCharacters.size());
 
     // add some tags
-    addStandardTags(allCharacters);
+    allCharacters.forEach(this::addStandardTags);
 
-    // @formatter:off
     return allCharacters.stream().map($ -> modelMapper.toEntity($)).collect(Collectors.toList());
-    // @formatter:on
   }
 
   /**
@@ -165,13 +164,16 @@ public class CharacterFigureService {
           case ONLY -> findOnlyRestocks(stream.toList());
         };
     if (StringUtils.hasText(name)) {
+
+      Predicate<String> wordNamePredicate =
+          wordName -> props.namingExclusions().stream().noneMatch(wordName::equalsIgnoreCase);
       Set<String> simpleNameKeywords =
           Arrays.stream(name.split("\\s+"))
               .map(String::toLowerCase)
-              .filter($ -> !props.namingExclusions().contains($))
+              .filter(wordNamePredicate)
               // removes characters for example: [], (), - etc ...
-              .map($ -> $.replaceAll("[\\[\\]\"()-]", ""))
-              .filter($ -> !props.namingExclusions().contains($))
+              .map(wordName -> wordName.replaceAll("[\\[\\]\"()-]", ""))
+              .filter(wordNamePredicate)
               .collect(Collectors.toSet());
 
       log.info("Simplified figure name: {}", simpleNameKeywords);
@@ -180,7 +182,6 @@ public class CharacterFigureService {
       for (String nameKeyword : simpleNameKeywords) {
         tmpList =
             list.stream()
-                .filter($ -> Objects.nonNull($.getTags()))
                 .filter($ -> $.getTags().stream().anyMatch(nameKeyword::equalsIgnoreCase))
                 .toList();
         if (tmpList.isEmpty()) {
@@ -292,46 +293,43 @@ public class CharacterFigureService {
    * apply certain tags to a specific set of characters, as opposite to set them directly in the
    * catalog (tags very specific).
    *
-   * @param effectiveCharacters The list of characters.
+   * @param figure The list of characters.
    */
-  private void addStandardTags(List<CharacterFigure> effectiveCharacters) {
-    for (var figure : effectiveCharacters) {
-      // make sure the tags are not null.
-      if (Objects.isNull(figure.getTags())) {
-        figure.setTags(new HashSet<>());
-      }
-      Set<String> existingTags = figure.getTags();
-      // add tags based on the name ...
-      existingTags.addAll(Arrays.asList(figure.getBaseName().toLowerCase().split("\\s+")));
-      // add tags based on some attributes ...
-      if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
-        existingTags.addAll(TAG_EX);
-      }
-      if (figure.getSeries() == Series.SOG) {
-        existingTags.addAll(TAG_SOG);
-      }
-      if (figure.isRevival()) {
-        existingTags.addAll(TAG_REVIVAL);
-      }
-      if (figure.isSet()) {
-        existingTags.addAll(TAG_SET);
-      }
-      if (figure.isBrokenCloth()) {
-        existingTags.addAll(TAG_BROKEN);
-      }
-      if (figure.isMetalBody()) {
-        existingTags.addAll(TAG_METAL);
-      }
-      if (figure.isOce()) {
-        existingTags.addAll(TAG_OCE);
-      }
-      if (figure.isHongKongVersion()) {
-        existingTags.addAll(TAG_HK);
-      }
-      if (figure.isBronzeToGold()) {
-        existingTags.addAll(TAG_BRONZE_TO_GOLD);
-      }
-      figure.setTags(existingTags);
+  void addStandardTags(final CharacterFigure figure) {
+    // make sure the tags are not null.
+    if (Objects.isNull(figure.getTags())) {
+      figure.setTags(new HashSet<>());
+    }
+    Set<String> existingTags = figure.getTags();
+    // add tags based on the name ...
+    existingTags.addAll(Arrays.asList(figure.getBaseName().toLowerCase().split("\\s+")));
+    // add tags based on some attributes ...
+    if (figure.getLineUp() == LineUp.MYTH_CLOTH_EX) {
+      existingTags.addAll(TAG_EX);
+    }
+    if (figure.getSeries() == Series.SOG) {
+      existingTags.addAll(TAG_SOG);
+    }
+    if (figure.isRevival()) {
+      existingTags.addAll(TAG_REVIVAL);
+    }
+    if (figure.isSet()) {
+      existingTags.addAll(TAG_SET);
+    }
+    if (figure.isBrokenCloth()) {
+      existingTags.addAll(TAG_BROKEN);
+    }
+    if (figure.isMetalBody()) {
+      existingTags.addAll(TAG_METAL);
+    }
+    if (figure.isOce()) {
+      existingTags.addAll(TAG_OCE);
+    }
+    if (figure.isHongKongVersion()) {
+      existingTags.addAll(TAG_HK);
+    }
+    if (figure.isBronzeToGold()) {
+      existingTags.addAll(TAG_BRONZE_TO_GOLD);
     }
   }
 

@@ -1502,9 +1502,12 @@ public class CharacterFigureServiceTest {
     assertNull(characters.get(i).getRemarks());
   }
 
-  /** Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType, String) */
+  /**
+   * Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType,
+   * String)
+   */
   @Test
-  public void retrieveAllCharacters_whenAllCharactersAvailable_thenReturnOnlyRestocks_() {
+  public void retrieveAllCharacters_whenAllCharacters_thenReturnMultipleMatchingCharacters() {
     CharacterFigureEntity entity1 =
         createBasicSSEXFigureEntity(
             "67890", "Libra Dohko (God Cloth) EX", "Libra Dohko", Group.GOLD, false);
@@ -1560,6 +1563,12 @@ public class CharacterFigureServiceTest {
             Group.GOLD,
             false,
             true);
+
+    service.addStandardTags(figure1);
+    service.addStandardTags(figure2);
+    service.addStandardTags(figure3);
+    service.addStandardTags(figure4);
+
     when(modelMapper.toModel(entity1)).thenReturn(figure1);
     when(modelMapper.toModel(entity2)).thenReturn(figure2);
     when(modelMapper.toModel(entity3)).thenReturn(figure3);
@@ -1571,6 +1580,115 @@ public class CharacterFigureServiceTest {
         service.retrieveAllCharacters(
             RestockType.ALL,
             "Bandai Saint Seiya Myth Cloth EX Gemini Saga (God Cloth) / no correction BOX - Saga Saga premium set - no correction");
+    assertNotNull(characters);
+    assertEquals(3, characters.size());
+    assertEquals("Gemini Saga (Surplice) EX", characters.get(0).getBaseName());
+    assertEquals("Gemini Saga Gold 24K EX", characters.get(1).getBaseName());
+    assertEquals("Gemini Saga EX <Revival>", characters.get(2).getBaseName());
+  }
+
+  /**
+   * Test for {@link CharacterFigureService#retrieveAllCharacters(RestockType,
+   * String)
+   */
+  @Test
+  public void retrieveAllCharacters_whenAllCharacters_thenReturnSingleMatchingCharacters() {
+    CharacterFigureEntity entity1 =
+        createBasicSSEXFigureEntity(
+            "67890", "Libra Dohko (God Cloth) EX", "Libra Dohko", Group.GOLD, false);
+    CharacterFigureEntity entity2 =
+        createBasicSSEXFigureEntity(
+            "67891", "Gemini Saga (Surplice) EX", "Gemini Saga", Group.SURPLICE, false);
+    CharacterFigureEntity entity3 =
+        createBasicSSEXFigureEntity(
+            "67892", "Gemini Saga Gold 24K EX", "Gemini Saga", Group.GOLD, false);
+    CharacterFigureEntity entity4 =
+        createBasicSSEXFigureEntity(
+            "67893", "Gemini Saga EX <Revival>", "Gemini Saga", Group.GOLD, true);
+    CharacterFigureEntity entity5 =
+        createBasicSSEXFigureEntity(
+            "67894",
+            "Gemini Saga (God Cloth) Saga Saga Premium Set EX",
+            "Gemini Saga ~Saga Saga Premium Set~",
+            Group.GOLD,
+            false);
+
+    when(repo.findAll(getSorting()))
+        .thenReturn(List.of(entity1, entity2, entity3, entity4, entity5));
+
+    CharacterFigure figure1 =
+        createBasicFigure(
+            null,
+            "Libra Dohko (God Cloth) EX",
+            LocalDate.of(2018, 1, 27),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            false);
+    CharacterFigure figure2 =
+        createBasicFigure(
+            null,
+            "Gemini Saga (Surplice) EX",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.SURPLICE,
+            false,
+            false);
+    CharacterFigure figure3 =
+        createBasicFigure(
+            null,
+            "Gemini Saga Gold 24K EX",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            false);
+    CharacterFigure figure4 =
+        createBasicFigure(
+            null,
+            "Gemini Saga EX <Revival>",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            true);
+    CharacterFigure figure5 =
+        createBasicFigure(
+            null,
+            "Gemini Saga (God Cloth) Saga Saga Premium Set EX",
+            LocalDate.of(2021, 9, 18),
+            LineUp.MYTH_CLOTH_EX,
+            Series.SAINT_SEIYA,
+            Group.GOLD,
+            false,
+            false);
+
+    service.addStandardTags(figure1);
+    service.addStandardTags(figure2);
+    service.addStandardTags(figure3);
+    service.addStandardTags(figure4);
+    service.addStandardTags(figure5);
+
+    when(modelMapper.toModel(entity1)).thenReturn(figure1);
+    when(modelMapper.toModel(entity2)).thenReturn(figure2);
+    when(modelMapper.toModel(entity3)).thenReturn(figure3);
+    when(modelMapper.toModel(entity4)).thenReturn(figure4);
+    when(modelMapper.toModel(entity5)).thenReturn(figure5);
+
+    when(props.namingExclusions()).thenReturn(getNamingExclusions());
+
+    List<CharacterFigure> characters =
+        service.retrieveAllCharacters(
+            RestockType.ALL,
+            "Bandai Saint Seiya Myth Cloth EX Gemini Saga (God Cloth) / no correction BOX - Saga Saga premium set - no correction");
+    assertNotNull(characters);
+    assertEquals(1, characters.size());
+    assertEquals(
+        "Gemini Saga (God Cloth) Saga Saga Premium Set EX", characters.get(0).getBaseName());
   }
 
   private CharacterFigure createCharacterFigureWithReleaseDate(String releaseDateJPY) {

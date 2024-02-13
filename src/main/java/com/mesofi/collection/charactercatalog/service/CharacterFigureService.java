@@ -119,6 +119,14 @@ public class CharacterFigureService {
   }
 
   /**
+   * @param characterFigure
+   * @return
+   */
+  public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
+    return null;
+  }
+
+  /**
    * Converts and process the incoming records and return a list with the characters ready to be
    * saved in a persistence storage.
    *

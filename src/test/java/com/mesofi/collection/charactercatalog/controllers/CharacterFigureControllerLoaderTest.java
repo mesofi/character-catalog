@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Test for {@link
- * CharacterFigureController#handleFileUpload(org.springframework.web.multipart.MultipartFile)}
+ * CharacterFigureController#loadAllCharacters(org.springframework.web.multipart.MultipartFile)}
  *
  * @author armandorivasarzaluz
  */

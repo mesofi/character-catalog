@@ -17,6 +17,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,7 +40,21 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
       @NonNull HttpHeaders headers,
       @NonNull HttpStatusCode status,
       @NonNull WebRequest request) {
-    log.debug("Handle http message not readable exception ...");
+    log.debug("Handle HTTP message not readable exception ...");
+
+    ApiErrorResponse body = new ApiErrorResponse();
+    body.setMessage(ex.getMessage());
+    return createResponseEntity(body, headers, status, request);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+      HttpMediaTypeNotSupportedException ex,
+      @NonNull HttpHeaders headers,
+      @NonNull HttpStatusCode status,
+      @NonNull WebRequest request) {
+    log.debug("Handle HTTP media type not supported exception ...");
 
     ApiErrorResponse body = new ApiErrorResponse();
     body.setMessage(ex.getMessage());

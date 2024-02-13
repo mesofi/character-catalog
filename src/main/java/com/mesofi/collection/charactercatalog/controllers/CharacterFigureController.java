@@ -50,19 +50,19 @@ public class CharacterFigureController {
   }
 
   /**
-   * Gets all the characters based on a restocking type.
+   * Gets all the characters based on a restocking type and character name.
    *
-   * @param restockType The restocking type.
+   * @param type The restocking type.
+   * @param name The name of the character.
    * @return The list of characters.
    */
   @GetMapping
   public List<CharacterFigure> getAllCharacters(
-      @RequestParam(name = "restocks", required = false, defaultValue = "ALL")
-          RestockType restockType) {
-    List<CharacterFigure> figureList =
-        characterFigureService.retrieveAllCharacters(restockType, null);
-    log.debug(
-        "Total of figures retrieved: {}, with restock type: {}", figureList.size(), restockType);
-    return figureList;
+      @RequestParam(name = "restocks", required = false, defaultValue = "ALL") RestockType type,
+      @RequestParam(name = "name", required = false) String name) {
+
+    List<CharacterFigure> list = characterFigureService.retrieveAllCharacters(type, name);
+    log.debug("Figures found: {}, restock: {}, name: '{}'", list.size(), type, name);
+    return list;
   }
 }

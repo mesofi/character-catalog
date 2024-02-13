@@ -7,6 +7,8 @@ package com.mesofi.collection.charactercatalog.controllers;
 
 import static com.mesofi.collection.charactercatalog.utils.MockUtils.createBasicMcCharacterFigure;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 /**
- * Test for {@link CharacterFigureController#getAllCharacters(RestockType)}
+ * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
  *
  * @author armandorivasarzaluz
  */
@@ -49,11 +51,17 @@ public class CharacterFigureControllerFinderTest {
 
   private final String BASE_URL = "/characters";
 
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @param invalidValue Invalid values.
+   * @throws Exception If there's an exception during the call.
+   */
   @ParameterizedTest
   @ValueSource(strings = {"invalid-value", "nones"})
-  public void should_return_bad_request_when_param_value_is_invalid(final String invalidValue)
+  public void retrieveAllCharacters_whenInvalidParamValue_thenBadRequest(final String invalidValue)
       throws Exception {
-    // @formatter:off
+
     mockMvc
         .perform(get(BASE_URL).param("restocks", invalidValue))
         .andDo(print())
@@ -63,11 +71,17 @@ public class CharacterFigureControllerFinderTest {
             jsonPath("message")
                 .value(
                     "'restocks' should be a valid 'RestockType' and '" + invalidValue + "' isn't"));
-    // @formatter:on
+
+    verifyNoInteractions(characterFigureService);
   }
 
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
   @Test
-  public void should_return_success_all_records_when_param_value_is_missing() throws Exception {
+  public void retrieveAllCharacters_whenNoParams_thenGetAllSuccessfully() throws Exception {
     List<CharacterFigure> result = new ArrayList<>();
     String id1 = UUID.randomUUID().toString();
     String id2 = UUID.randomUUID().toString();
@@ -84,14 +98,19 @@ public class CharacterFigureControllerFinderTest {
             id3, "Gemini", new BigDecimal("15000"), LocalDate.of(2024, 4, 4)));
 
     when(characterFigureService.retrieveAllCharacters(RestockType.ALL, null)).thenReturn(result);
-    // @formatter:off
+
     mockMvc.perform(get(BASE_URL)).andDo(print()).andExpectAll(allCharacterMatchers(id1, id2, id3));
-    // @formatter:on
+
+    verify(characterFigureService).retrieveAllCharacters(RestockType.ALL, null);
   }
 
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
   @Test
-  public void should_return_success_all_records_when_param_value_is_all_or_not_param()
-      throws Exception {
+  public void retrieveAllCharacters_whenRestockTypeAll_thenGetAllSuccessfully() throws Exception {
     List<CharacterFigure> result = new ArrayList<>();
     String id1 = UUID.randomUUID().toString();
     String id2 = UUID.randomUUID().toString();
@@ -108,12 +127,202 @@ public class CharacterFigureControllerFinderTest {
             id3, "Gemini", new BigDecimal("15000"), LocalDate.of(2024, 4, 4)));
 
     when(characterFigureService.retrieveAllCharacters(RestockType.ALL, null)).thenReturn(result);
-    // @formatter:off
+
     mockMvc
         .perform(get(BASE_URL).param("restocks", "ALL"))
         .andDo(print())
         .andExpectAll(allCharacterMatchers(id1, id2, id3));
-    // @formatter:on
+
+    verify(characterFigureService).retrieveAllCharacters(RestockType.ALL, null);
+  }
+
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void retrieveAllCharacters_whenRestockTypeOnly_thenGetOnlyRestocksSuccessfully()
+      throws Exception {
+    String id1 = UUID.randomUUID().toString();
+
+    when(characterFigureService.retrieveAllCharacters(RestockType.ONLY, null))
+        .thenReturn(
+            List.of(
+                createBasicMcCharacterFigure(
+                    id1, "Leo", new BigDecimal("10000"), LocalDate.of(2022, 1, 1))));
+
+    mockMvc
+        .perform(get(BASE_URL).param("restocks", "ONLY"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(id1))
+        .andExpect(jsonPath("$[0].originalName").value("Leo"))
+        .andExpect(jsonPath("$[0].baseName").value("Leo"))
+        .andExpect(jsonPath("$[0].displayableName").doesNotExist())
+        .andExpect(jsonPath("$[0].lineUp").value(LineUp.MYTH_CLOTH.name()))
+        .andExpect(jsonPath("$[0].series").value(Series.SAINT_SEIYA.name()))
+        .andExpect(jsonPath("$[0].group").value(Group.GOLD.name()))
+        .andExpect(jsonPath("$[0].metalBody").value(false))
+        .andExpect(jsonPath("$[0].oce").value(false))
+        .andExpect(jsonPath("$[0].revival").value(false))
+        .andExpect(jsonPath("$[0].plainCloth").value(false))
+        .andExpect(jsonPath("$[0].brokenCloth").value(false))
+        .andExpect(jsonPath("$[0].bronzeToGold").value(false))
+        .andExpect(jsonPath("$[0].gold").value(false))
+        .andExpect(jsonPath("$[0].hongKongVersion").value(false))
+        .andExpect(jsonPath("$[0].manga").value(false))
+        .andExpect(jsonPath("$[0].surplice").value(false))
+        .andExpect(jsonPath("$[0].set").value(false))
+        .andExpect(jsonPath("$[0].anniversary").doesNotExist())
+        .andExpect(jsonPath("$[0].tags").doesNotExist())
+        .andExpect(jsonPath("$[0].images").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY").exists())
+        .andExpect(jsonPath("$[0].issuanceJPY.basePrice").value("10000"))
+        .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").value("2022-01-01"))
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.basePrice").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].futureRelease").value(false))
+        .andExpect(jsonPath("$[0].url").doesNotExist())
+        .andExpect(jsonPath("$[0].distribution").doesNotExist())
+        .andExpect(jsonPath("$[0].remarks").doesNotExist());
+
+    verify(characterFigureService).retrieveAllCharacters(RestockType.ONLY, null);
+  }
+
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void retrieveAllCharacters_whenRestockTypeNone_thenGetNoRestocksSuccessfully()
+      throws Exception {
+    String id1 = UUID.randomUUID().toString();
+
+    when(characterFigureService.retrieveAllCharacters(RestockType.NONE, null))
+        .thenReturn(
+            List.of(
+                createBasicMcCharacterFigure(
+                    id1, "Virgo", new BigDecimal("11000"), LocalDate.of(2021, 3, 3))));
+
+    mockMvc
+        .perform(get(BASE_URL).param("restocks", "NONE"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(id1))
+        .andExpect(jsonPath("$[0].originalName").value("Virgo"))
+        .andExpect(jsonPath("$[0].baseName").value("Virgo"))
+        .andExpect(jsonPath("$[0].displayableName").doesNotExist())
+        .andExpect(jsonPath("$[0].lineUp").value(LineUp.MYTH_CLOTH.name()))
+        .andExpect(jsonPath("$[0].series").value(Series.SAINT_SEIYA.name()))
+        .andExpect(jsonPath("$[0].group").value(Group.GOLD.name()))
+        .andExpect(jsonPath("$[0].metalBody").value(false))
+        .andExpect(jsonPath("$[0].oce").value(false))
+        .andExpect(jsonPath("$[0].revival").value(false))
+        .andExpect(jsonPath("$[0].plainCloth").value(false))
+        .andExpect(jsonPath("$[0].brokenCloth").value(false))
+        .andExpect(jsonPath("$[0].bronzeToGold").value(false))
+        .andExpect(jsonPath("$[0].gold").value(false))
+        .andExpect(jsonPath("$[0].hongKongVersion").value(false))
+        .andExpect(jsonPath("$[0].manga").value(false))
+        .andExpect(jsonPath("$[0].surplice").value(false))
+        .andExpect(jsonPath("$[0].set").value(false))
+        .andExpect(jsonPath("$[0].anniversary").doesNotExist())
+        .andExpect(jsonPath("$[0].tags").doesNotExist())
+        .andExpect(jsonPath("$[0].images").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY").exists())
+        .andExpect(jsonPath("$[0].issuanceJPY.basePrice").value("11000"))
+        .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").value("2021-03-03"))
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.basePrice").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].futureRelease").value(false))
+        .andExpect(jsonPath("$[0].url").doesNotExist())
+        .andExpect(jsonPath("$[0].distribution").doesNotExist())
+        .andExpect(jsonPath("$[0].remarks").doesNotExist());
+
+    verify(characterFigureService).retrieveAllCharacters(RestockType.NONE, null);
+  }
+
+  /**
+   * Test for {@link CharacterFigureController#getAllCharacters(RestockType, String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void retrieveAllCharacters_whenFindingByName_thenGetOneSingleRecordSuccessfully()
+      throws Exception {
+    String id1 = UUID.randomUUID().toString();
+
+    when(characterFigureService.retrieveAllCharacters(RestockType.ALL, "Gemini"))
+        .thenReturn(
+            List.of(
+                createBasicMcCharacterFigure(
+                    id1, "Gemini", new BigDecimal("11000"), LocalDate.of(2021, 3, 3))));
+
+    mockMvc
+        .perform(get(BASE_URL).param("restocks", "ALL").param("name", "Gemini"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(id1))
+        .andExpect(jsonPath("$[0].originalName").value("Gemini"))
+        .andExpect(jsonPath("$[0].baseName").value("Gemini"))
+        .andExpect(jsonPath("$[0].displayableName").doesNotExist())
+        .andExpect(jsonPath("$[0].lineUp").value(LineUp.MYTH_CLOTH.name()))
+        .andExpect(jsonPath("$[0].series").value(Series.SAINT_SEIYA.name()))
+        .andExpect(jsonPath("$[0].group").value(Group.GOLD.name()))
+        .andExpect(jsonPath("$[0].metalBody").value(false))
+        .andExpect(jsonPath("$[0].oce").value(false))
+        .andExpect(jsonPath("$[0].revival").value(false))
+        .andExpect(jsonPath("$[0].plainCloth").value(false))
+        .andExpect(jsonPath("$[0].brokenCloth").value(false))
+        .andExpect(jsonPath("$[0].bronzeToGold").value(false))
+        .andExpect(jsonPath("$[0].gold").value(false))
+        .andExpect(jsonPath("$[0].hongKongVersion").value(false))
+        .andExpect(jsonPath("$[0].manga").value(false))
+        .andExpect(jsonPath("$[0].surplice").value(false))
+        .andExpect(jsonPath("$[0].set").value(false))
+        .andExpect(jsonPath("$[0].anniversary").doesNotExist())
+        .andExpect(jsonPath("$[0].tags").doesNotExist())
+        .andExpect(jsonPath("$[0].images").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY").exists())
+        .andExpect(jsonPath("$[0].issuanceJPY.basePrice").value("11000"))
+        .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").value("2021-03-03"))
+        .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.basePrice").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$[0].issuanceMXN.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$[0].futureRelease").value(false))
+        .andExpect(jsonPath("$[0].url").doesNotExist())
+        .andExpect(jsonPath("$[0].distribution").doesNotExist())
+        .andExpect(jsonPath("$[0].remarks").doesNotExist());
+
+    verify(characterFigureService).retrieveAllCharacters(RestockType.ALL, "Gemini");
   }
 
   private ResultMatcher[] allCharacterMatchers(String... ids) {
@@ -239,119 +448,5 @@ public class CharacterFigureControllerFinderTest {
             jsonPath("$[2].remarks").doesNotExist());
     // @formatter:on
     return list.toArray(ResultMatcher[]::new);
-  }
-
-  @Test
-  public void should_return_success_only_restocks_when_param_value_is_only() throws Exception {
-    String id1 = UUID.randomUUID().toString();
-
-    when(characterFigureService.retrieveAllCharacters(RestockType.ONLY, null))
-        .thenReturn(
-            List.of(
-                createBasicMcCharacterFigure(
-                    id1, "Leo", new BigDecimal("10000"), LocalDate.of(2022, 1, 1))));
-
-    // @formatter:off
-    mockMvc
-        .perform(get(BASE_URL).param("restocks", "ONLY"))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0].id").value(id1))
-        .andExpect(jsonPath("$[0].originalName").value("Leo"))
-        .andExpect(jsonPath("$[0].baseName").value("Leo"))
-        .andExpect(jsonPath("$[0].displayableName").doesNotExist())
-        .andExpect(jsonPath("$[0].lineUp").value(LineUp.MYTH_CLOTH.name()))
-        .andExpect(jsonPath("$[0].series").value(Series.SAINT_SEIYA.name()))
-        .andExpect(jsonPath("$[0].group").value(Group.GOLD.name()))
-        .andExpect(jsonPath("$[0].metalBody").value(false))
-        .andExpect(jsonPath("$[0].oce").value(false))
-        .andExpect(jsonPath("$[0].revival").value(false))
-        .andExpect(jsonPath("$[0].plainCloth").value(false))
-        .andExpect(jsonPath("$[0].brokenCloth").value(false))
-        .andExpect(jsonPath("$[0].bronzeToGold").value(false))
-        .andExpect(jsonPath("$[0].gold").value(false))
-        .andExpect(jsonPath("$[0].hongKongVersion").value(false))
-        .andExpect(jsonPath("$[0].manga").value(false))
-        .andExpect(jsonPath("$[0].surplice").value(false))
-        .andExpect(jsonPath("$[0].set").value(false))
-        .andExpect(jsonPath("$[0].anniversary").doesNotExist())
-        .andExpect(jsonPath("$[0].tags").doesNotExist())
-        .andExpect(jsonPath("$[0].images").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY").exists())
-        .andExpect(jsonPath("$[0].issuanceJPY.basePrice").value("10000"))
-        .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").value("2022-01-01"))
-        .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.basePrice").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.firstAnnouncementDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.preorderDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.preorderConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.releaseDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.releaseConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].futureRelease").value(false))
-        .andExpect(jsonPath("$[0].url").doesNotExist())
-        .andExpect(jsonPath("$[0].distribution").doesNotExist())
-        .andExpect(jsonPath("$[0].remarks").doesNotExist());
-    // @formatter:on
-  }
-
-  @Test
-  public void should_return_success_no_restocks_when_param_value_is_none() throws Exception {
-    String id1 = UUID.randomUUID().toString();
-
-    when(characterFigureService.retrieveAllCharacters(RestockType.NONE, null))
-        .thenReturn(
-            List.of(
-                createBasicMcCharacterFigure(
-                    id1, "Virgo", new BigDecimal("11000"), LocalDate.of(2021, 3, 3))));
-
-    // @formatter:off
-    mockMvc
-        .perform(get(BASE_URL).param("restocks", "NONE"))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0].id").value(id1))
-        .andExpect(jsonPath("$[0].originalName").value("Virgo"))
-        .andExpect(jsonPath("$[0].baseName").value("Virgo"))
-        .andExpect(jsonPath("$[0].displayableName").doesNotExist())
-        .andExpect(jsonPath("$[0].lineUp").value(LineUp.MYTH_CLOTH.name()))
-        .andExpect(jsonPath("$[0].series").value(Series.SAINT_SEIYA.name()))
-        .andExpect(jsonPath("$[0].group").value(Group.GOLD.name()))
-        .andExpect(jsonPath("$[0].metalBody").value(false))
-        .andExpect(jsonPath("$[0].oce").value(false))
-        .andExpect(jsonPath("$[0].revival").value(false))
-        .andExpect(jsonPath("$[0].plainCloth").value(false))
-        .andExpect(jsonPath("$[0].brokenCloth").value(false))
-        .andExpect(jsonPath("$[0].bronzeToGold").value(false))
-        .andExpect(jsonPath("$[0].gold").value(false))
-        .andExpect(jsonPath("$[0].hongKongVersion").value(false))
-        .andExpect(jsonPath("$[0].manga").value(false))
-        .andExpect(jsonPath("$[0].surplice").value(false))
-        .andExpect(jsonPath("$[0].set").value(false))
-        .andExpect(jsonPath("$[0].anniversary").doesNotExist())
-        .andExpect(jsonPath("$[0].tags").doesNotExist())
-        .andExpect(jsonPath("$[0].images").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY").exists())
-        .andExpect(jsonPath("$[0].issuanceJPY.basePrice").value("11000"))
-        .andExpect(jsonPath("$[0].issuanceJPY.firstAnnouncementDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.preorderDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.preorderConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceJPY.releaseDate").value("2021-03-03"))
-        .andExpect(jsonPath("$[0].issuanceJPY.releaseConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.basePrice").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.firstAnnouncementDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.preorderDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.preorderConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.releaseDate").doesNotExist())
-        .andExpect(jsonPath("$[0].issuanceMXN.releaseConfirmationDay").doesNotExist())
-        .andExpect(jsonPath("$[0].futureRelease").value(false))
-        .andExpect(jsonPath("$[0].url").doesNotExist())
-        .andExpect(jsonPath("$[0].distribution").doesNotExist())
-        .andExpect(jsonPath("$[0].remarks").doesNotExist());
-    // @formatter:on
   }
 }

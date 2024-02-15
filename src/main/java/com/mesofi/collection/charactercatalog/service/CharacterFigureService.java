@@ -158,35 +158,6 @@ public class CharacterFigureService {
   /**
    * Retrieve all the characters ordered by release date.
    *
-   * @return The list of characters.
-   */
-  public List<CharacterFigure> retrieveAllCharacters() {
-    return retrieveAllCharacters(RestockType.ALL, null);
-  }
-
-  /**
-   * Retrieve all the characters ordered by release date.
-   *
-   * @param type The restocking type.
-   * @return The list of characters based on the restocking type.
-   */
-  public List<CharacterFigure> retrieveAllCharacters(final RestockType type) {
-    return retrieveAllCharacters(type, null);
-  }
-
-  /**
-   * Retrieve all the characters ordered by release date.
-   *
-   * @param name The name of the character.
-   * @return The list of characters based on the name.
-   */
-  public List<CharacterFigure> retrieveAllCharacters(final String name) {
-    return retrieveAllCharacters(RestockType.ALL, name);
-  }
-
-  /**
-   * Retrieve all the characters ordered by release date.
-   *
    * @param type The restocking type.
    * @param name The name of the character.
    * @return The list of characters based on the restocking type.

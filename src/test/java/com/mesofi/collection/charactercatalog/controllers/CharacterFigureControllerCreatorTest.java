@@ -7,6 +7,8 @@ package com.mesofi.collection.charactercatalog.controllers;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -14,7 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.mesofi.collection.charactercatalog.model.CharacterFigure;
+import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -88,7 +93,7 @@ public class CharacterFigureControllerCreatorTest {
         .andDo(print())
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(APPLICATION_JSON))
-        .andExpect(jsonPath("message").value(containsString("Validation failed for argument [0]")))
+        .andExpect(jsonPath("message").value(containsString("Validation failed for argument ")))
         .andExpect(jsonPath("errors").isArray())
         .andExpect(jsonPath("errors", hasSize(2)))
         .andExpect(jsonPath("errors[0]").value("baseName: Provide a non empty base name"))
@@ -114,10 +119,10 @@ public class CharacterFigureControllerCreatorTest {
         .andDo(print())
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(APPLICATION_JSON))
-        .andExpect(jsonPath("message").value(containsString("Validation failed for argument [0]")))
+        .andExpect(jsonPath("message").value(containsString("Validation failed for argument ")))
         .andExpect(jsonPath("errors").isArray())
         .andExpect(jsonPath("errors", hasSize(1)))
-        .andExpect(jsonPath("errors[0]").value("group: Provide a valid group"));
+        .andExpect(jsonPath("errors").value("group: Provide a valid group"));
   }
 
   /**
@@ -147,5 +152,75 @@ public class CharacterFigureControllerCreatorTest {
                         "not one of the values accepted for Enum class: [GOLD, SPECTER, SCALE, STEEL, SILVER, OTHER, SECONDARY, JUDGE, V1, V2, V3, V4, SURPLICE, ROBE, GOD, BLACK, V5]")))
         .andExpect(jsonPath("errors").isArray())
         .andExpect(jsonPath("errors", hasSize(0)));
+  }
+  /**
+   * Test for {@link
+   * CharacterFigureController#createNewCharacter(com.mesofi.collection.charactercatalog.model.CharacterFigure)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void createNewCharacter_whenBasicInfo_thenCreateCharacterSuccesfully() throws Exception {
+    String id = UUID.randomUUID().toString();
+    CharacterFigure expectedCharacter = new CharacterFigure();
+    expectedCharacter.setId(id);
+    expectedCharacter.setBaseName("Whale Moses");
+
+    CharacterFigure characterFigure = new CharacterFigure();
+    characterFigure.setBaseName("Whale Moses");
+    characterFigure.setGroup(Group.SILVER);
+    when(characterFigureService.createNewCharacter(characterFigure)).thenReturn(expectedCharacter);
+
+    final String jsonRequest =
+        """
+            {
+                "baseName": "Whale Moses",
+                "group": "SILVER"
+            }""";
+    mockMvc
+        .perform(post(BASE_URL).contentType(APPLICATION_JSON).content(jsonRequest))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.originalName").doesNotExist())
+        .andExpect(jsonPath("$.baseName").value("Whale Moses"))
+        .andExpect(jsonPath("$.displayableName").doesNotExist())
+        .andExpect(jsonPath("$.lineUp").doesNotExist())
+        .andExpect(jsonPath("$.series").doesNotExist())
+        .andExpect(jsonPath("$.group").doesNotExist())
+        .andExpect(jsonPath("$.metalBody").value(false))
+        .andExpect(jsonPath("$.oce").value(false))
+        .andExpect(jsonPath("$.revival").value(false))
+        .andExpect(jsonPath("$.plainCloth").value(false))
+        .andExpect(jsonPath("$.brokenCloth").value(false))
+        .andExpect(jsonPath("$.bronzeToGold").value(false))
+        .andExpect(jsonPath("$.gold").value(false))
+        .andExpect(jsonPath("$.hongKongVersion").value(false))
+        .andExpect(jsonPath("$.manga").value(false))
+        .andExpect(jsonPath("$.surplice").value(false))
+        .andExpect(jsonPath("$.set").value(false))
+        .andExpect(jsonPath("$.anniversary").doesNotExist())
+        .andExpect(jsonPath("$.tags").doesNotExist())
+        .andExpect(jsonPath("$.images").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.basePrice").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.basePrice").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.futureRelease").value(false))
+        .andExpect(jsonPath("$.url").doesNotExist())
+        .andExpect(jsonPath("$.distribution").doesNotExist())
+        .andExpect(jsonPath("$.remarks").doesNotExist());
+
+    verify(characterFigureService).createNewCharacter(characterFigure);
   }
 }

@@ -119,11 +119,13 @@ public class CharacterFigureService {
   }
 
   /**
-   * @param characterFigure
-   * @return
+   * Creates a new character and returned the corresponding saved character.
+   *
+   * @param characterFigure The character figure.
+   * @return The figured saved.
    */
   public CharacterFigure createNewCharacter(final CharacterFigure characterFigure) {
-    return null;
+    return fromEntityToDisplayableFigure(repo.save(prepareCharacterToPersist(characterFigure)));
   }
 
   /**
@@ -149,10 +151,7 @@ public class CharacterFigureService {
     // gets the new characters with restocks
     log.debug("Total of figures to be loaded: {}", allCharacters.size());
 
-    // add some tags
-    allCharacters.forEach(this::addStandardTags);
-
-    return allCharacters.stream().map($ -> modelMapper.toEntity($)).collect(Collectors.toList());
+    return allCharacters.stream().map(this::prepareCharacterToPersist).collect(Collectors.toList());
   }
 
   /**
@@ -205,20 +204,6 @@ public class CharacterFigureService {
           list.stream().map(CharacterFigure::getBaseName).collect(Collectors.toList()));
     }
     return list;
-  }
-
-  /**
-   * This method converts an entity object to the corresponding model, after that, the price and
-   * final name are calculated to be displayed. This is a convenient method to be called from other
-   * services.
-   *
-   * @param entity The raw entity.
-   * @return The figure model with the name and price calculated.
-   */
-  public CharacterFigure fromEntityToDisplayableFigure(CharacterFigureEntity entity) {
-    CharacterFigure cf = modelMapper.toModel(entity);
-    calculatePriceAndDisplayableName(cf);
-    return cf;
   }
 
   /**
@@ -339,6 +324,31 @@ public class CharacterFigureService {
     if (figure.isBronzeToGold()) {
       existingTags.addAll(TAG_BRONZE_TO_GOLD);
     }
+  }
+
+  /**
+   * Prepares the character before it is persisted.
+   *
+   * @param characterFigure The character figure.
+   * @return The entity to be persisted.
+   */
+  private CharacterFigureEntity prepareCharacterToPersist(CharacterFigure characterFigure) {
+    addStandardTags(characterFigure);
+    return modelMapper.toEntity(characterFigure);
+  }
+
+  /**
+   * This method converts an entity object to the corresponding model, after that, the price and
+   * final name are calculated to be displayed. This is a convenient method to be called from other
+   * services.
+   *
+   * @param entity The raw entity.
+   * @return The figure model with the name and price calculated.
+   */
+  private CharacterFigure fromEntityToDisplayableFigure(CharacterFigureEntity entity) {
+    CharacterFigure cf = modelMapper.toModel(entity);
+    calculatePriceAndDisplayableName(cf);
+    return cf;
   }
 
   /**

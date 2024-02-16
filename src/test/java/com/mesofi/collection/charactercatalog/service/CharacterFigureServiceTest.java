@@ -243,6 +243,76 @@ public class CharacterFigureServiceTest {
     assertEquals(3, service.loadAllCharacters(multipartFile));
   }
 
+  /** Test for {@link CharacterFigureService#createNewCharacter(CharacterFigure)} */
+  @Test
+  public void createNewCharacter_whenCharacterInfo_thenCreateSuccessfully() {
+    CharacterFigure newCharacterFigure =
+        createBasicFigure(
+            null,
+            "Goddess Athena OCE",
+            LocalDate.of(2008, 2, 28),
+            LineUp.MYTH_CLOTH,
+            Group.GOD,
+            true,
+            false);
+
+    CharacterFigureEntity cfe1 = new CharacterFigureEntity();
+    CharacterFigureEntity cfeSaved = new CharacterFigureEntity();
+    when(modelMapper.toEntity(newCharacterFigure)).thenReturn(cfe1);
+
+    when(repo.save(cfe1)).thenReturn(cfeSaved);
+
+    CharacterFigure newCharacterFigure1 =
+        createBasicFigure(
+            null,
+            "Goddess Athena OCE",
+            LocalDate.of(2008, 2, 28),
+            LineUp.MYTH_CLOTH,
+            Group.GOD,
+            true,
+            false);
+    when(modelMapper.toModel(cfeSaved)).thenReturn(newCharacterFigure1);
+    CharacterFigure actualCharacterFigure = service.createNewCharacter(newCharacterFigure);
+    assertNotNull(actualCharacterFigure);
+    assertNull(actualCharacterFigure.getId());
+    assertEquals("Goddess Athena OCE", actualCharacterFigure.getOriginalName());
+    assertEquals("Goddess Athena OCE", actualCharacterFigure.getBaseName());
+    assertEquals(
+        "Goddess Athena OCE ~Original Color Edition~", actualCharacterFigure.getDisplayableName());
+    assertEquals(LineUp.MYTH_CLOTH, actualCharacterFigure.getLineUp());
+    assertEquals(Series.SAINT_SEIYA, actualCharacterFigure.getSeries());
+    assertEquals(Group.GOD, actualCharacterFigure.getGroup());
+    assertFalse(actualCharacterFigure.isMetalBody());
+    assertTrue(actualCharacterFigure.isOce());
+    assertFalse(actualCharacterFigure.isRevival());
+    assertFalse(actualCharacterFigure.isPlainCloth());
+    assertFalse(actualCharacterFigure.isBrokenCloth());
+    assertFalse(actualCharacterFigure.isBronzeToGold());
+    assertFalse(actualCharacterFigure.isGold());
+    assertFalse(actualCharacterFigure.isHongKongVersion());
+    assertFalse(actualCharacterFigure.isManga());
+    assertFalse(actualCharacterFigure.isSurplice());
+    assertFalse(actualCharacterFigure.isSet());
+    assertNull(actualCharacterFigure.getAnniversary());
+    assertNull(actualCharacterFigure.getTags());
+    assertNull(actualCharacterFigure.getImages());
+    assertNotNull(actualCharacterFigure.getIssuanceJPY());
+    assertEquals(new BigDecimal("12000"), actualCharacterFigure.getIssuanceJPY().getBasePrice());
+    assertEquals(
+        new BigDecimal("12960.00"), actualCharacterFigure.getIssuanceJPY().getReleasePrice());
+    assertNull(actualCharacterFigure.getIssuanceJPY().getFirstAnnouncementDate());
+    assertNull(actualCharacterFigure.getIssuanceJPY().getPreorderDate());
+    assertNull(actualCharacterFigure.getIssuanceJPY().getPreorderConfirmationDay());
+    assertEquals(
+        LocalDate.of(2008, 2, 28), actualCharacterFigure.getIssuanceJPY().getReleaseDate());
+    assertTrue(actualCharacterFigure.getIssuanceJPY().getReleaseConfirmationDay());
+    assertNull(actualCharacterFigure.getIssuanceMXN());
+    assertFalse(actualCharacterFigure.isFutureRelease());
+    assertNull(actualCharacterFigure.getUrl());
+    assertNull(actualCharacterFigure.getDistribution());
+    assertNull(actualCharacterFigure.getRemarks());
+  }
+
   /**
    * Test for {@link CharacterFigureService#convertStreamToEntityList(java.io.InputStream)}
    *
@@ -1301,7 +1371,6 @@ public class CharacterFigureServiceTest {
             "Pegasus Seiya",
             LocalDate.of(2018, 1, 27),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOD,
             false,
             false);
@@ -1368,7 +1437,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2018, 1, 27),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1378,7 +1446,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1445,7 +1512,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2018, 1, 27),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1455,7 +1521,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1529,7 +1594,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2018, 1, 27),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1539,7 +1603,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga (Surplice) EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.SURPLICE,
             false,
             false);
@@ -1549,7 +1612,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga Gold 24K EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1559,7 +1621,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga EX <Revival>",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             true);
@@ -1622,7 +1683,6 @@ public class CharacterFigureServiceTest {
             "Libra Dohko (God Cloth) EX",
             LocalDate.of(2018, 1, 27),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1632,7 +1692,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga (Surplice) EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.SURPLICE,
             false,
             false);
@@ -1642,7 +1701,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga Gold 24K EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1652,7 +1710,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga EX <Revival>",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             true);
@@ -1662,7 +1719,6 @@ public class CharacterFigureServiceTest {
             "Gemini Saga (God Cloth) Saga Saga Premium Set EX",
             LocalDate.of(2021, 9, 18),
             LineUp.MYTH_CLOTH_EX,
-            Series.SAINT_SEIYA,
             Group.GOLD,
             false,
             false);
@@ -1790,7 +1846,6 @@ public class CharacterFigureServiceTest {
    * @param originalName The original name.
    * @param releaseDate The release date.
    * @param lineUp The line-up.
-   * @param series The series.
    * @param group The actual group.
    * @param oce Is it OCE?
    * @param revival is it revival?
@@ -1801,7 +1856,6 @@ public class CharacterFigureServiceTest {
       String originalName,
       LocalDate releaseDate,
       LineUp lineUp,
-      Series series,
       Group group,
       boolean oce,
       boolean revival) {
@@ -1815,7 +1869,7 @@ public class CharacterFigureServiceTest {
     issuanceJPY.setBasePrice(new BigDecimal("12000"));
     characterFigure.setIssuanceJPY(issuanceJPY);
     characterFigure.setLineUp(lineUp);
-    characterFigure.setSeries(series);
+    characterFigure.setSeries(Series.SAINT_SEIYA);
     characterFigure.setGroup(group);
     characterFigure.setOce(oce);
     characterFigure.setRevival(revival);

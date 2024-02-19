@@ -207,6 +207,15 @@ public class CharacterFigureService {
   }
 
   /**
+   * @param id
+   * @return
+   */
+  public CharacterFigure retrieveCharactersById(String id) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
    * Calculate the figure name.
    *
    * @param figure The figure name object.

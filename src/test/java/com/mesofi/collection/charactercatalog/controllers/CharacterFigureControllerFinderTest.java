@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.model.LineUp;
@@ -323,6 +324,90 @@ public class CharacterFigureControllerFinderTest {
         .andExpect(jsonPath("$[0].remarks").doesNotExist());
 
     verify(characterFigureService).retrieveAllCharacters(RestockType.ALL, "Gemini");
+  }
+
+  /**
+   * Test for {@link CharacterFigureController#retrieveCharacterById(String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void retrieveCharacterById_whenInvalidId_thenNotFound() throws Exception {
+    String id = "invalid";
+
+    when(characterFigureService.retrieveCharactersById(id))
+        .thenThrow(CharacterFigureNotFoundException.class);
+
+    mockMvc
+        .perform(get(BASE_URL + "/{id}", id))
+        .andDo(print())
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.message").value("Error not defined"))
+        .andExpect(jsonPath("$.errors").isArray())
+        .andExpect(jsonPath("$.errors", hasSize(0)));
+
+    verify(characterFigureService).retrieveCharactersById(id);
+  }
+
+  /**
+   * Test for {@link CharacterFigureController#retrieveCharacterById(String)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void retrieveCharacterById_whenIdProvided_thenGetRecordSuccessfully() throws Exception {
+    String id = UUID.randomUUID().toString();
+
+    when(characterFigureService.retrieveCharactersById(id))
+        .thenReturn(
+            createBasicMcCharacterFigure(
+                id, "Gemini", new BigDecimal("11000"), LocalDate.of(2021, 3, 3)));
+
+    mockMvc
+        .perform(get(BASE_URL + "/{id}", id))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.originalName").value("Gemini"))
+        .andExpect(jsonPath("$.baseName").value("Gemini"))
+        .andExpect(jsonPath("$.displayableName").doesNotExist())
+        .andExpect(jsonPath("$.lineUp").value(LineUp.MYTH_CLOTH.name()))
+        .andExpect(jsonPath("$.series").value(Series.SAINT_SEIYA.name()))
+        .andExpect(jsonPath("$.group").value(Group.GOLD.name()))
+        .andExpect(jsonPath("$.metalBody").value(false))
+        .andExpect(jsonPath("$.oce").value(false))
+        .andExpect(jsonPath("$.revival").value(false))
+        .andExpect(jsonPath("$.plainCloth").value(false))
+        .andExpect(jsonPath("$.brokenCloth").value(false))
+        .andExpect(jsonPath("$.bronzeToGold").value(false))
+        .andExpect(jsonPath("$.gold").value(false))
+        .andExpect(jsonPath("$.hongKongVersion").value(false))
+        .andExpect(jsonPath("$.manga").value(false))
+        .andExpect(jsonPath("$.surplice").value(false))
+        .andExpect(jsonPath("$.set").value(false))
+        .andExpect(jsonPath("$.anniversary").doesNotExist())
+        .andExpect(jsonPath("$.tags").doesNotExist())
+        .andExpect(jsonPath("$.images").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY").exists())
+        .andExpect(jsonPath("$.issuanceJPY.basePrice").value("11000"))
+        .andExpect(jsonPath("$.issuanceJPY.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceJPY.releaseDate").value("2021-03-03"))
+        .andExpect(jsonPath("$.issuanceJPY.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.basePrice").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.firstAnnouncementDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.preorderDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.preorderConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.releaseDate").doesNotExist())
+        .andExpect(jsonPath("$.issuanceMXN.releaseConfirmationDay").doesNotExist())
+        .andExpect(jsonPath("$.futureRelease").value(false))
+        .andExpect(jsonPath("$.url").doesNotExist())
+        .andExpect(jsonPath("$.distribution").doesNotExist())
+        .andExpect(jsonPath("$.remarks").doesNotExist());
+
+    verify(characterFigureService).retrieveCharactersById(id);
   }
 
   private ResultMatcher[] allCharacterMatchers(String... ids) {

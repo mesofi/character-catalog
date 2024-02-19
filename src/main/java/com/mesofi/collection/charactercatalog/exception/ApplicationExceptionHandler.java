@@ -5,12 +5,15 @@
  */
 package com.mesofi.collection.charactercatalog.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -33,6 +37,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Object> handleMissingServletRequestPart(
+      MissingServletRequestPartException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request) {
+    log.debug("Handle missing servlet request part exception ...");
+
+    return createCustomRequestEntity(ex, headers, status, request);
+  }
+
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<Object> handleHttpMessageNotReadable(
@@ -42,38 +59,34 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
       @NonNull WebRequest request) {
     log.debug("Handle HTTP message not readable exception ...");
 
-    ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    return createResponseEntity(body, headers, status, request);
+    return createCustomRequestEntity(ex, headers, status, request);
   }
 
   /** {@inheritDoc} */
   @Override
-  protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+  public ResponseEntity<Object> handleHttpMediaTypeNotSupported(
       HttpMediaTypeNotSupportedException ex,
       @NonNull HttpHeaders headers,
       @NonNull HttpStatusCode status,
       @NonNull WebRequest request) {
     log.debug("Handle HTTP media type not supported exception ...");
 
-    ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    return createResponseEntity(body, headers, status, request);
+    return createCustomRequestEntity(ex, headers, status, request);
   }
 
   /** {@inheritDoc} */
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+  public ResponseEntity<Object> handleMethodArgumentNotValid(
       MethodArgumentNotValidException ex,
       @NonNull HttpHeaders headers,
       @NonNull HttpStatusCode status,
       @NonNull WebRequest request) {
     log.debug("Handle method argument not valid exception ...");
 
-    ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    body.setErrors(getErrors(ex));
-    return createResponseEntity(body, headers, status, request);
+    ResponseEntity<Object> response = createCustomRequestEntity(ex, headers, status, request);
+    ApiErrorResponse apiErrorResponse = (ApiErrorResponse) response.getBody();
+    apiErrorResponse.setErrors(getErrors(ex));
+    return response;
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -94,37 +107,46 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
             },
             () -> body.setMessage(ex.getMessage()));
 
-    return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    return createResponseEntity(body, new HttpHeaders(), BAD_REQUEST, request);
   }
 
   @ExceptionHandler(value = {CharacterFigureNotFoundException.class})
-  protected ResponseEntity<Object> handleNotFound(
+  public ResponseEntity<Object> handleNotFound(
       CharacterFigureNotFoundException ex, final WebRequest request) {
     log.debug("Handle character not found exception ...");
 
-    ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    return createResponseEntity(body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    return createCustomRequestEntity(ex, new HttpHeaders(), NOT_FOUND, request);
   }
 
   @ExceptionHandler(value = {IllegalArgumentException.class})
-  protected ResponseEntity<Object> handleBadRequest(
+  public ResponseEntity<Object> handleBadRequest(
       IllegalArgumentException ex, final WebRequest request) {
     log.debug("Handle invalid request exception ...");
 
-    ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    return createResponseEntity(body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    return createCustomRequestEntity(ex, new HttpHeaders(), BAD_REQUEST, request);
   }
 
   @ExceptionHandler(value = {RuntimeException.class})
-  protected ResponseEntity<Object> handleGenericError(
-      RuntimeException ex, final WebRequest request) {
-    log.debug("Unhandle exception ...");
+  public ResponseEntity<Object> handleGenericError(RuntimeException ex, final WebRequest request) {
+    log.debug("Unhandled exception ...");
 
+    return createCustomRequestEntity(ex, new HttpHeaders(), INTERNAL_SERVER_ERROR, request);
+  }
+
+  /**
+   * Creates a custom request entity.
+   *
+   * @param ex The source exception.
+   * @param headers The headers.
+   * @param status The status.
+   * @param request The request.
+   * @return The custom response.
+   */
+  private ResponseEntity<Object> createCustomRequestEntity(
+      Exception ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
     ApiErrorResponse body = new ApiErrorResponse();
-    body.setMessage(ex.getMessage());
-    return createResponseEntity(body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    body.setMessage(Optional.ofNullable(ex.getMessage()).orElseGet(() -> "Error not defined"));
+    return createResponseEntity(body, headers, status, request);
   }
 
   private Set<String> getErrors(MethodArgumentNotValidException ex) {

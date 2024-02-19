@@ -41,11 +41,11 @@ public class CharacterFigureLoaderIT {
 
   /**
    * {@link
-   * CharacterFigureController#handleFileUpload(org.springframework.web.multipart.MultipartFile)}
+   * CharacterFigureController#loadAllCharacters(org.springframework.web.multipart.MultipartFile)}
    */
   @Test
   @Order(1)
-  void should_load_all_characters_partial_file() {
+  void loadAllCharacters_WhenPartialFile_ThenLoadRecords() {
     log.debug("Loading all the characters for the first time (partial records) ...");
 
     final String data = "characters/MythCloth Catalog - CatalogMyth-min.tsv";
@@ -70,11 +70,12 @@ public class CharacterFigureLoaderIT {
 
   /**
    * {@link
-   * CharacterFigureController#getAllCharacters(com.mesofi.collection.charactercatalog.model.RestockType)}
+   * CharacterFigureController#getAllCharacters(com.mesofi.collection.charactercatalog.model.RestockType,
+   * String)}
    */
   @Test
   @Order(2)
-  void should_verify_characters_loaded() {
+  void getAllCharacters_WhenPartialFileLoaded_ThenVerifyRecordsLoaded() {
     log.debug("Retrieving all existing characters ...");
 
     // @formatter:off
@@ -368,11 +369,79 @@ public class CharacterFigureLoaderIT {
 
   /**
    * {@link
-   * CharacterFigureController#handleFileUpload(org.springframework.web.multipart.MultipartFile)}
+   * CharacterFigureController#createNewCharacter(com.mesofi.collection.charactercatalog.model.CharacterFigure)}
    */
   @Test
   @Order(3)
-  void should_load_all_characters_complete_file() {
+  void createNewCharacter_WhenExistingRecords_ThenCreateNew() {
+    log.debug("Creating a new character ...");
+
+    String newCharacter =
+        """
+            {
+                "baseName": "Whale Moses",
+                "group": "SILVER"
+            }""";
+    webTestClient
+        .post()
+        .uri(BASE_URL + CONTEXT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .bodyValue(newCharacter)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("$.futureRelease")
+        .isEqualTo(false)
+        .jsonPath("$.baseName")
+        .isEqualTo("Whale Moses")
+        .jsonPath("$.remarks")
+        .doesNotExist()
+        .jsonPath("$.tags")
+        .value(Matchers.hasItems("whale", "moses"))
+        .jsonPath("$.displayableName")
+        .isEqualTo("Whale Moses")
+        .jsonPath("$.lineUp")
+        .doesNotExist()
+        .jsonPath("$.series")
+        .doesNotExist()
+        .jsonPath("$.group")
+        .isEqualTo("SILVER")
+        .jsonPath("$.metalBody")
+        .isEqualTo(false)
+        .jsonPath("$.oce")
+        .isEqualTo(false)
+        .jsonPath("$.revival")
+        .isEqualTo(false)
+        .jsonPath("$.plainCloth")
+        .isEqualTo(false)
+        .jsonPath("$.brokenCloth")
+        .isEqualTo(false)
+        .jsonPath("$.bronzeToGold")
+        .isEqualTo(false)
+        .jsonPath("$.gold")
+        .isEqualTo(false)
+        .jsonPath("$.hongKongVersion")
+        .isEqualTo(false)
+        .jsonPath("$.manga")
+        .isEqualTo(false)
+        .jsonPath("$.surplice")
+        .isEqualTo(false)
+        .jsonPath("$.set")
+        .isEqualTo(false)
+        .jsonPath("$.anniversary")
+        .doesNotExist();
+    log.debug("A new character has been created.");
+  }
+
+  /**
+   * {@link
+   * CharacterFigureController#loadAllCharacters(org.springframework.web.multipart.MultipartFile)}
+   */
+  @Test
+  @Order(4)
+  void loadAllCharacters_WhenCompleteFile_ThenLoadRecords() {
     log.debug("Loading all the characters ...");
 
     final String data = "characters/MythCloth Catalog - CatalogMyth.tsv";

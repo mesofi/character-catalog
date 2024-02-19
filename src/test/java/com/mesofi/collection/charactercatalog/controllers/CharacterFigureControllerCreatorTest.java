@@ -5,11 +5,14 @@
  */
 package com.mesofi.collection.charactercatalog.controllers;
 
+import static com.mesofi.collection.charactercatalog.utils.FileUtils.getPathFromClassPath;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -19,12 +22,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
 import com.mesofi.collection.charactercatalog.model.Group;
 import com.mesofi.collection.charactercatalog.service.CharacterFigureService;
+import java.nio.file.Files;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Test used to create characters.
@@ -39,6 +44,45 @@ public class CharacterFigureControllerCreatorTest {
   @MockBean private CharacterFigureService characterFigureService;
 
   private final String BASE_URL = "/characters";
+
+  /**
+   * Test for {@link
+   * CharacterFigureController#loadAllCharacters(org.springframework.web.multipart.MultipartFile)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void loadAllCharacters_whenFileMissing_thenBadRequest() throws Exception {
+    mockMvc
+        .perform(multipart(BASE_URL + "/loader"))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(APPLICATION_JSON))
+        .andExpect(
+            jsonPath("message").value(containsString("Required part 'file' is not present.")))
+        .andExpect(jsonPath("errors").isArray())
+        .andExpect(jsonPath("errors", hasSize(0)));
+  }
+
+  /**
+   * Test for {@link
+   * CharacterFigureController#loadAllCharacters(org.springframework.web.multipart.MultipartFile)}
+   *
+   * @throws Exception If there's an exception during the call.
+   */
+  @Test
+  public void loadAllCharacters_whenFileProvided_thenSuccess() throws Exception {
+    when(characterFigureService.loadAllCharacters(any(MultipartFile.class))).thenReturn(4l);
+
+    final String CATALOG = "characters/MythCloth Catalog - CatalogMyth-min.tsv";
+    final byte[] bytes = Files.readAllBytes(getPathFromClassPath(CATALOG));
+
+    mockMvc
+        .perform(multipart(BASE_URL + "/loader").file("file", bytes))
+        .andDo(print())
+        .andExpect(status().isAccepted())
+        .andExpect(content().string("")); // size of the test input file
+  }
 
   /**
    * Test for {@link

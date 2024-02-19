@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.mesofi.collection.charactercatalog.CharacterCatalogConfig;
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -44,6 +45,7 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1745,6 +1747,78 @@ public class CharacterFigureServiceTest {
     assertEquals(1, characters.size());
     assertEquals(
         "Gemini Saga (God Cloth) Saga Saga Premium Set EX", characters.get(0).getBaseName());
+  }
+
+  /** Test for {@link CharacterFigureService#retrieveCharactersById(String)} */
+  @Test
+  public void retrieveCharactersById_whenInvalidId_thenCharacterNotFound() {
+    String id = "invalid";
+    when(repo.findById(id)).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(CharacterFigureNotFoundException.class)
+        .isThrownBy(() -> service.retrieveCharactersById(id))
+        .withMessage("Character not found with id: invalid");
+  }
+
+  /** Test for {@link CharacterFigureService#retrieveCharactersById(String)} */
+  @Test
+  public void retrieveCharactersById_whenIdProvided_thenGetCharacterSuccessfully() {
+    String id = "67890";
+
+    CharacterFigure figure =
+        createBasicFigure(
+            null,
+            "Libra Dohko (God Cloth) EX",
+            LocalDate.of(2018, 1, 27),
+            LineUp.MYTH_CLOTH_EX,
+            Group.GOLD,
+            false,
+            false);
+
+    CharacterFigureEntity entity =
+        createBasicSSEXFigureEntity(
+            id, "Libra Dohko (God Cloth) EX", "Libra Dohko", Group.GOLD, false);
+
+    when(repo.findById(id)).thenReturn(Optional.of(entity));
+
+    when(modelMapper.toModel(entity)).thenReturn(figure);
+
+    CharacterFigure character = service.retrieveCharactersById(id);
+    assertNotNull(character);
+    assertNull(character.getId());
+    assertEquals("Libra Dohko (God Cloth) EX", character.getOriginalName());
+    assertEquals("Libra Dohko (God Cloth) EX", character.getBaseName());
+    assertEquals("Libra Dohko (God Cloth) EX", character.getDisplayableName());
+    assertEquals(LineUp.MYTH_CLOTH_EX, character.getLineUp());
+    assertEquals(Series.SAINT_SEIYA, character.getSeries());
+    assertEquals(Group.GOLD, character.getGroup());
+    assertFalse(character.isMetalBody());
+    assertFalse(character.isOce());
+    assertFalse(character.isRevival());
+    assertFalse(character.isPlainCloth());
+    assertFalse(character.isBrokenCloth());
+    assertFalse(character.isBronzeToGold());
+    assertFalse(character.isGold());
+    assertFalse(character.isHongKongVersion());
+    assertFalse(character.isManga());
+    assertFalse(character.isSurplice());
+    assertFalse(character.isSet());
+    assertNull(character.getAnniversary());
+    assertNull(character.getTags());
+    assertNull(character.getImages());
+    assertNotNull(character.getIssuanceJPY());
+    assertEquals(new BigDecimal("12000"), character.getIssuanceJPY().getBasePrice());
+    assertEquals(new BigDecimal("12960.00"), character.getIssuanceJPY().getReleasePrice());
+    assertNull(character.getIssuanceJPY().getFirstAnnouncementDate());
+    assertNull(character.getIssuanceJPY().getPreorderDate());
+    assertNull(character.getIssuanceJPY().getPreorderConfirmationDay());
+    assertEquals(LocalDate.of(2018, 1, 27), character.getIssuanceJPY().getReleaseDate());
+    assertTrue(character.getIssuanceJPY().getReleaseConfirmationDay());
+    assertNull(character.getIssuanceMXN());
+    assertFalse(character.isFutureRelease());
+    assertNull(character.getUrl());
+    assertNull(character.getDistribution());
+    assertNull(character.getRemarks());
   }
 
   private CharacterFigure createCharacterFigureWithReleaseDate(String releaseDateJPY) {

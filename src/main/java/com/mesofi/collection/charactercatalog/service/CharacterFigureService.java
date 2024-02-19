@@ -11,6 +11,7 @@ import static com.mesofi.collection.charactercatalog.utils.CommonUtils.reverseLi
 import com.mesofi.collection.charactercatalog.CharacterCatalogConfig;
 import com.mesofi.collection.charactercatalog.entity.CharacterFigureEntity;
 import com.mesofi.collection.charactercatalog.exception.CharacterFigureException;
+import com.mesofi.collection.charactercatalog.exception.CharacterFigureNotFoundException;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureFileMapper;
 import com.mesofi.collection.charactercatalog.mappers.CharacterFigureModelMapper;
 import com.mesofi.collection.charactercatalog.model.CharacterFigure;
@@ -207,12 +208,17 @@ public class CharacterFigureService {
   }
 
   /**
-   * @param id
-   * @return
+   * Finds the character based on the unique identifier.
+   *
+   * @param id Character unique identifier.
+   * @return The character found or exception if it was not found.
    */
-  public CharacterFigure retrieveCharactersById(String id) {
-    // TODO Auto-generated method stub
-    return null;
+  public CharacterFigure retrieveCharactersById(final String id) {
+    log.debug("Finding a character by id: {}", id);
+    return fromEntityToDisplayableFigure(
+        repo.findById(id)
+            .orElseThrow(
+                () -> new CharacterFigureNotFoundException("Character not found with id: " + id)));
   }
 
   /**

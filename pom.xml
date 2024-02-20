@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.1.8</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mesofi.collection</groupId>
     <artifactId>character-catalog</artifactId>
@@ -148,10 +149,7 @@
                     </outputFormats>
                     <!-- Omitting mutator, testPlugin and verbose for brevity -->
                     <exportLineCoverage>true</exportLineCoverage>
-                    <!--
-                    It's currently not possible to aggregate timestamped reports,
-                    so it must be disabled
-                    -->
+                    <!-- It's currently not possible to aggregate timestamped reports, so it must be disabled -->
                     <timestampedReports>false</timestampedReports>
                     <mutationThreshold>97</mutationThreshold>
                     <testStrengthThreshold>97</testStrengthThreshold>
@@ -161,19 +159,14 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <!--
-                        Use an id to disable it in some modules
-                        -->
+                        <!-- Use an id to disable it in some modules -->
                         <id>pitest-mutation-coverage</id>
                         <phase>test</phase>
                         <goals>
                             <goal>mutationCoverage</goal>
                         </goals>
                     </execution>
-                    <!--
-                    No report-aggregate here. Most of the time you don't
-                    want it to run
-                    -->
+                    <!-- No report-aggregate here. Most of the time you don't want it to run -->
                 </executions>
             </plugin>
             <plugin>
